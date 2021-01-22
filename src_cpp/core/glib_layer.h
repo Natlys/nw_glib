@@ -19,6 +19,7 @@ namespace GLIB
 		using OnDrawData = HashMap<GMaterial*, DArray<DrawObjectData>>;
 	public:
 		String strName = "gel_default";
+		bool bIsEnabled = true;
 		UInt32 unDrawOrder = 0;
 		
 		DrawConfig DConfig;
@@ -43,9 +44,6 @@ namespace GLIB
 		UByte* pShdData = nullptr;
 		UByte* pShdIter = nullptr;
 		Size szShdData = 0;
-		// --texture_data
-		ATexture* pTextures[GLIB_MAX_TEXTURES];
-		UInt8 unTexCount = 0;
 		// --objects
 		AShader* pShader = nullptr;
 		AFrameBuf* pFrameBuf = nullptr;
@@ -62,7 +60,7 @@ namespace GLIB
 		void SetViewport(const V4f& xywhViewport);
 		void AddDrawData(const DrawObjectData& rDOData);
 		// --core_methods
-		void OnDraw(AGApi* pGApi);
+		UInt8 OnDraw(AGApi* pGApi);
 		bool UploadVtxData(const DrawObjectData& rDOData);
 		bool UploadShdData(const DrawSceneData& rDSData);
 		inline void ResetData();
@@ -77,8 +75,6 @@ namespace GLIB
 		szIdxData = unIdxData = 0;
 		pShdIter = &pShdData[0];
 		szShdData = 0;
-		for (UInt8 txi = 0; txi < unTexCount; txi++) { pTextures[txi] = nullptr; }
-		unTexCount = 0;
 		unDrawCalls = 0;
 	}
 }

@@ -15,13 +15,15 @@
 
 #include <stb_image.h>
 
+#include <../src_glsl/shd_screen.hpp>
+
 namespace GLIB
 {
 	GEngine::GEngine() :
 		m_bIsRunning(false),
-		m_pGApi(nullptr), m_pWindow(nullptr),
+		m_pGApi(nullptr), m_pWindow(nullptr), m_pGMtlScreen(nullptr),
 		m_DInfo(GEngineInfo()) { }
-	GEngine::~GEngine() {}
+	GEngine::~GEngine() { }
 
 	// --setters
 	GLayer* GEngine::AddLayer(const char* strName) {
@@ -47,12 +49,14 @@ namespace GLIB
 			if (rEvt.EvtType == ET_MOUSE_PRESS) {
 				MouseEvent* pmEvt = static_cast<MouseEvent*>(&rEvt);
 				switch (pmEvt->nButton) {
+				case GLIB_MS_BTN_0:	break;
 				default: break;
 				}
 			}
 			else if (rEvt.EvtType == ET_MOUSE_RELEASE) {
 				MouseEvent* pmEvt = static_cast<MouseEvent*>(&rEvt);
 				switch (pmEvt->nButton) {
+				case GLIB_MS_BTN_0:	break;
 				default: break;
 				}
 			}
@@ -66,6 +70,7 @@ namespace GLIB
 			else if (rEvt.EvtType == ET_KEY_RELEASE) {
 				KeyboardEvent* pkEvt = static_cast<KeyboardEvent*>(&rEvt);
 				switch (pkEvt->unKeyCode) {
+				case GLIB_KEY_ESCAPE_27: Quit(); break;
 				default: break;
 				}
 			}
@@ -84,7 +89,10 @@ namespace GLIB
 		m_pGApi->SetClearColor(0.1f, 0.2f, 0.3f);
 
 		if (true) {
-			AShader::Create("shd_3d_batch")->LoadF("D:/dev/native_world/nw_glib/src_glsl/shd_3d_batch.glsl");
+			if (!AShader::Create("shd_3d_batch")->LoadF("D:/dev/native_world/nw_glib/src_glsl/shd_3d_batch.glsl")) { Quit(); return false; }
+			AShader* pShader = AShader::Create("shd_screen");
+			pShader->SetCode(strScreenShaderCode);
+			if (!pShader->Compile()) { Quit(); return false; }
 		}
 		if (true) {
 			ATexture2d::Create("tex_white")->LoadF("");
@@ -105,15 +113,17 @@ namespace GLIB
 			}
 		}
 		if (true) {
-			new GMaterial("gmt_3d_batch");
-			GetGResource<GMaterial>("gmt_3d_batch")->SetShader(GetGResource<AShader>("shd_3d_batch"));
-			GetGResource<GMaterial>("gmt_3d_batch")->SetTexture(GetGResource<ATexture>("tex_2d_bat"));
+			GMaterial* pGMtl = nullptr;
+			m_pGMtlScreen = pGMtl = new GMaterial("gmt_screen");
+			pGMtl->SetShader(GetGResource<AShader>("shd_screen"));
+			pGMtl = new GMaterial("gmt_3d_batch");
+			pGMtl->SetShader(GetGResource<AShader>("shd_3d_batch"));
+			pGMtl->SetTexture(GetGResource<ATexture>("tex_2d_bat"));
 		}
 		AddLayer("gel_3d_batch");
 		m_GLayer = m_GLayers.begin();
 		m_GLayer->SetShader(GetGResource<AShader>("shd_3d_batch"));
 
-		if (!m_bIsRunning) { Quit(); }
 		return true;
 	}
 	void GEngine::Quit()
@@ -148,11 +158,11 @@ namespace GLIB
 
 		std::sort(m_GLayers.begin(), m_GLayers.end());
 		for (m_GLayer = m_GLayers.begin(); m_GLayer != m_GLayers.end(); m_GLayer++) {
+			if (!m_GLayer->bIsEnabled) { continue; }
 			m_GLayer->OnDraw(m_pGApi);
 			m_DInfo.szShd = m_DInfo.szShd + m_GLayer->szShdData;
 			m_DInfo.szVtx = m_DInfo.szVtx + m_GLayer->szVtxData;
 			m_DInfo.szIdx = m_DInfo.szIdx + m_GLayer->szIdxData;
-			if (m_DInfo.unTex < m_GLayer->unTexCount) { m_DInfo.unTex = m_GLayer->unTexCount; }
 			m_DInfo.unDrawCalls += m_GLayer->unDrawCalls;
 		}
 		m_GLayer = m_GLayers.begin();

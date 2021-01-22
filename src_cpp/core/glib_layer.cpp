@@ -57,9 +57,10 @@ namespace GLIB
 		if (rDOData.pGMtl->GetShader() != pShader) { return; }
 		Drawables[rDOData.pGMtl].push_back(rDOData);
 	}
-	void GLayer::OnDraw(AGApi* pGApi)
+	UInt8 GLayer::OnDraw(AGApi* pGApi)
 	{
 		ResetData();
+		if (!bIsEnabled) { return 0; }
 		Camera.nAspectRatio = (xywhViewport.z - xywhViewport.x) / (xywhViewport.w - xywhViewport.y);
 
 		pGApi->SetViewport(xywhViewport.x, xywhViewport.y, xywhViewport.z, xywhViewport.w);
@@ -75,7 +76,7 @@ namespace GLIB
 
 		DSData.m4Proj = Camera.GetProjMatrix();
 		DSData.m4View = Camera.GetViewMatrix();
-		if (!UploadShdData(DSData)) { return; }
+		if (!UploadShdData(DSData)) { return 0; }
 
 		//pFrameBuf->Bind();
 		//pFrameBuf->Clear(FB_COLOR | FB_DEPTH | FB_STENCIL);
@@ -95,9 +96,11 @@ namespace GLIB
 			pVtxBuf->Unbind();
 			pShdBuf->Unbind();
 			itDrbs.first->Disable();
+			unDrawCalls++;
 		}
 		//pFrameBuf->Unbind();
 		Drawables.clear();
+		return unDrawCalls;
 	}
 	// --core_methods
 	bool GLayer::UploadVtxData(const DrawObjectData& rDOData)

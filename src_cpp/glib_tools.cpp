@@ -47,7 +47,7 @@ namespace GLIB
 		return true;
 	}
 
-	Int32 OGL_ErrLog_Shader(ShaderTypes shaderType, UInt32 shaderID)
+	Int32 OglErrLogShader(ShaderTypes shaderType, UInt32 shaderID)
 	{
 		if (shaderID == 0) return GLIB_ERR_UNKNOWN_ID;
 		Int32 success = 0;

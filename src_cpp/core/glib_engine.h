@@ -22,7 +22,7 @@ namespace GLIB
 		
 		// --getters
 		static inline GEngine& Get() { static GEngine s_GEngine; return s_GEngine; }
-		inline std::thread& GetRunThread() { return m_thrRun; }
+		inline std::thread* GetRunThread() { return &m_thrRun; }
 		inline AWindow* GetWindow() { return m_pWindow; }
 		inline AGApi* GetGApi() { return m_pGApi; }
 		const GEngineInfo& GetInfo() { return m_DInfo; }
@@ -61,6 +61,7 @@ namespace GLIB
 
 		AWindow* m_pWindow;
 		AGApi* m_pGApi;
+		GMaterial* m_pGMtlScreen;
 
 		Layers m_GLayers;
 		Layers::iterator m_GLayer;

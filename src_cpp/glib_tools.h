@@ -339,7 +339,7 @@ namespace GLIB
 }
 #endif	// GLIB_GAPI
 #if (GLIB_GAPI & GLIB_GAPI_OGL)
-#define GL_DEBUG_ERR_LOG(errType, objectID) (OGL_ErrLog_Shader(errType, objectID))
+#define GL_DEBUG_ERR_LOG(errType, objectID) (OglErrLogShader(errType, objectID))
 // Functions
 namespace GLIB
 {
@@ -349,7 +349,7 @@ namespace GLIB
 	/// Return suitable error message accordingly to glGetError()
 	extern bool OGL_ErrLog(const char* funcName, const char* file, int line);
 	/// Get compile and linking status return true if there are errors
-	extern int OGL_ErrLog_Shader(ShaderTypes ShaderType, UInt32 unShaderId);
+	extern int OglErrLogShader(ShaderTypes ShaderType, UInt32 unShaderId);
 }
 #endif // GLIB_GAPI
 #endif // GLIB_TOOLS_H

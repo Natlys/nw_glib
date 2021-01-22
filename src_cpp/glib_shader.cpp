@@ -98,7 +98,7 @@ namespace GLIB
 		const char* strSource = &m_strCode[0];
 		glShaderSource(m_unRId, 1, &strSource, nullptr);
 		glCompileShader(m_unRId);
-		if (OGL_ErrLog_Shader(m_shdType, m_unRId) != 0) { return false; }
+		if (OglErrLogShader(m_shdType, m_unRId) != 0) { return false; }
 		return true;
 	}
 	void SubShaderOgl::Reset() {
@@ -242,7 +242,7 @@ namespace GLIB
 			if (!rSub.Compile()) { return false; }
 		}
 		glLinkProgram(m_unRId);
-		if (OGL_ErrLog_Shader(ST_SHADER, m_unRId) != 0) return false;
+		if (OglErrLogShader(ST_SHADER, m_unRId) != 0) return false;
 		
 		return true;
 	}
