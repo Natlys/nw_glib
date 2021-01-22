@@ -2,14 +2,19 @@
 #include "glib_texture.h"
 
 #if (defined GLIB_GAPI)
+<<<<<<< HEAD
 #include <core/glib_engine.h>
 #include <core/glib_api.h>
+=======
+#include <glib_engine.h>
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 
 GLIB::UByte GLIB::ATexture::s_ClearColorData[4] = { 255, 255, 255, 255 };
 
 namespace GLIB
 {
 	ATexture::ATexture(const char* strName) :
+<<<<<<< HEAD
 		AGRes(strName),
 		m_unRId(0), m_unTexSlot(0),
 		m_TexInfo(TextureInfo()), m_ImgInfo(ImageInfo()) { GEngine::Get().AddGRes<ATexture>(this); }
@@ -60,18 +65,33 @@ namespace GLIB
 
 		return bSuccess;
 	}
+=======
+		m_strName(strName), m_unRId(0), m_unTexSlot(0),
+		m_TexInfo(TextureInfo()), m_ImgInfo(ImageInfo()) { }
+	ATexture::~ATexture() { }
+
+	// --==<ATexture1d>==--
+	ATexture1d::ATexture1d(const char* strName) :
+	ATexture(strName) { }
+	ATexture1d::~ATexture1d() { }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	// --==</ATexture1d>==--
 
 	// --==<ATexture2d>==--
 	ATexture2d::ATexture2d(const char* strName) :
 		ATexture(strName) { }
+<<<<<<< HEAD
 	ATexture2d::ATexture2d(ATexture2d& rCpy) : ATexture2d(&rCpy.m_strName[0]) {}
 	ATexture2d::~ATexture2d() { GEngine::Get().RmvGRes<ATexture2d>(GetId()); }
+=======
+	ATexture2d::~ATexture2d() { }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 
 	void ATexture2d::SetSubTexs(const DArray<SubTexture2d>& rSubTexs) {
 		m_SubTexs = rSubTexs;
 		for (auto& rSub : m_SubTexs) { rSub.pOverTex = this; rSub.whOverTexSize = { m_ImgInfo.nWidth, m_ImgInfo.nHeight }; }
 	}
+<<<<<<< HEAD
 	
 	// --data_methods
 	bool ATexture2d::SaveF(const char* strFPath) { return true; }
@@ -111,10 +131,13 @@ namespace GLIB
 
 		return bSuccess;
 	}
+=======
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	// --==</ATexture2d>==--
 
 	// --==<ATexture3d>==--
 	ATexture3d::ATexture3d(const char* strName) :
+<<<<<<< HEAD
 		ATexture(strName) { GEngine::Get().AddGRes<ATexture3d>(this); }
 	ATexture3d::ATexture3d(ATexture3d& rCpy) : ATexture3d(&rCpy.m_strName[0]) { }
 	ATexture3d::~ATexture3d() { GEngine::Get().RmvGRes<ATexture3d>(GetId()); }
@@ -157,6 +180,10 @@ namespace GLIB
 
 		return bSuccess;
 	}
+=======
+		ATexture(strName) { }
+	ATexture3d::~ATexture3d() { }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	// --==</ATexture3d>==--
 
 	ATexture1d* ATexture1d::Create(const char* strName) {

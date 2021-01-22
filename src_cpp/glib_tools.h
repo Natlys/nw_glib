@@ -6,7 +6,11 @@
 // Functions
 namespace GLIB
 {
+<<<<<<< HEAD
 	inline Size SDTypeGetSize(ShaderDataTypes sDataType, UInt32 unCount = 1) {
+=======
+	inline Size SDType_GetSize(ShaderDataTypes sDataType, UInt32 unCount = 1) {
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		Size szData = 0;
 		switch (sDataType) {
 		case SDT_BOOL:	case SDT_INT8:		case SDT_UINT8:		szData = 1;	break;
@@ -17,7 +21,11 @@ namespace GLIB
 		}
 		return szData * unCount;
 	}
+<<<<<<< HEAD
 	inline Size SDTypeGetAllignedSize(ShaderDataTypes sDataType, UInt32 unCount = 1) {
+=======
+	inline Size SDType_GetAllignedSize(ShaderDataTypes sDataType, UInt32 unCount = 1) {
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		Size szAll = 0;
 		switch (sDataType) {
 		case SDT_BOOL:	case SDT_INT8:	case SDT_UINT8:			szAll = 4;	break;
@@ -29,7 +37,11 @@ namespace GLIB
 		}
 		return szAll * ((unCount + (szAll - 1)) & ~(szAll - 1));
 	}
+<<<<<<< HEAD
 	inline const char* SDTypeGetString(ShaderDataTypes sdType) {
+=======
+	inline const char* SDType_GetString(ShaderDataTypes sdType) {
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		return sdType == SDT_BOOL ? "boolean" :
 			sdType == SDT_INT8 ? "byte" : sdType == SDT_UINT8 ? "unsigned byte" :
 			sdType == SDT_INT16 ? "short" : sdType == SDT_UINT16 ? "unsigned short" :
@@ -100,6 +112,7 @@ namespace GLIB
 	/// DrawObjectData struct
 	struct GLIB_API DrawObjectData
 	{
+<<<<<<< HEAD
 		DArray<UByte> vtxData = DArray<UByte>(1, 1);
 		DArray<UInt32> idxData = DArray<UInt32>(1, 1);
 		UInt8 unDrawOrder = 0;
@@ -111,6 +124,12 @@ namespace GLIB
 		inline Size GetVtxSize() const { return vtxData.size(); }
 		inline Size GetIdxSize() const { return idxData.size() * sizeof(UInt32); }
 		inline Size GetIdxCount() const { return idxData.size(); }
+=======
+		DArray<UByte> vtxData;
+		DArray<UInt32> IdxData;
+		UInt8 unDrawOrder = 0;
+		UInt32 unId = 0;
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		// --operators
 		inline bool operator>	(const DrawObjectData& rDOData)	const { return rDOData.unDrawOrder > unDrawOrder; }
 		inline bool operator>=	(const DrawObjectData& rDOData)	const { return rDOData.unDrawOrder >= unDrawOrder; }
@@ -125,7 +144,10 @@ namespace GLIB
 		Mat4f m4View;
 	public:
 		DrawSceneData() : pData(&m4Proj[0]), szData(sizeof(Mat4f) * 2) {}
+<<<<<<< HEAD
 		// --getters
+=======
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		inline const UByte* GetData() const { return static_cast<UByte*>(pData); }
 		inline Size GetDataSize() const { return szData; }
 	private:
@@ -173,7 +195,11 @@ namespace GLIB
 		ATexture* pTextures[GLIB_MAX_TEXTURES];
 		UInt8 unTexCount = 0;
 		// --objects
+<<<<<<< HEAD
 		AShader* pShader = nullptr;
+=======
+		GMaterial* pGMtl = nullptr;
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		AVertexBuf* pVtxBuf = nullptr;
 		AIndexBuf* pIdxBuf = nullptr;
 		AShaderBuf* pShdBuf = nullptr;
@@ -339,7 +365,11 @@ namespace GLIB
 }
 #endif	// GLIB_GAPI
 #if (GLIB_GAPI & GLIB_GAPI_OGL)
+<<<<<<< HEAD
 #define GL_DEBUG_ERR_LOG(errType, objectID) (OglErrLogShader(errType, objectID))
+=======
+#define GL_DEBUG_ERR_LOG(errType, objectID) (OGL_ErrLog_Shader(errType, objectID))
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 // Functions
 namespace GLIB
 {
@@ -349,7 +379,11 @@ namespace GLIB
 	/// Return suitable error message accordingly to glGetError()
 	extern bool OGL_ErrLog(const char* funcName, const char* file, int line);
 	/// Get compile and linking status return true if there are errors
+<<<<<<< HEAD
 	extern int OglErrLogShader(ShaderTypes ShaderType, UInt32 unShaderId);
+=======
+	extern int OGL_ErrLog_Shader(ShaderTypes ShaderType, UInt32 unShaderId);
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 }
 #endif // GLIB_GAPI
 #endif // GLIB_TOOLS_H

@@ -2,6 +2,7 @@
 #include "glib_shader.h"
 
 #if (defined GLIB_GAPI)
+<<<<<<< HEAD
 #include <core/glib_engine.h>
 #include <core/glib_api.h>
 #include <glib_buffer.h>
@@ -18,11 +19,26 @@ namespace GLIB
 	bool ASubShader::LoadF(const char* strFPath) { return true; }
 	// --==</data_methods>==--
 
+=======
+#include <glib_buffer.h>
+#include <glib_engine.h>
+namespace GLIB
+{
+	ASubShader::ASubShader(const char* strName, ShaderTypes sdType) :
+		m_unRId(0), m_shdType(sdType) { }
+	ASubShader::~ASubShader() { }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	ASubShader* ASubShader::Create(const char* strName, ShaderTypes sdType)
 	{
 		ASubShader* pSubShader = nullptr;
 		switch (GEngine::Get().GetGApi()->GetType()) {
+<<<<<<< HEAD
 	#if (GLIB_GAPI & GLIB_GAPI_OGL)
+=======
+	#if (GLIB_GAPI & GLIB_GAPI_COUT)
+		case GAPI_COUT: break;
+	#elif (GLIB_GAPI & GLIB_GAPI_OGL)
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		case GAPI_OPENGL: pSubShader = new SubShaderOgl(strName, sdType); break;
 	#endif // GLIB_GAPI
 		default: GLIB_ERR("Graphics Api is not defined"); break;
@@ -33,6 +49,7 @@ namespace GLIB
 namespace GLIB
 {
 	AShader::AShader(const char* strName) :
+<<<<<<< HEAD
 		AGRes(strName), m_unRId(0), m_strCode("") { GEngine::Get().AddGRes<AShader>(this); }
 	AShader::~AShader() { GEngine::Get().RmvGRes<AShader>(GetId()); }
 
@@ -56,12 +73,22 @@ namespace GLIB
 		return bSuccess;
 	}
 	// --==</data_methods>==--
+=======
+		m_unRId(0) { }
+	AShader::~AShader() { }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 
 	AShader* AShader::Create(const char* strName)
 	{
 		AShader* pShader = nullptr;
 		switch (GEngine::Get().GetGApi()->GetType()) {
+<<<<<<< HEAD
 	#if (GLIB_GAPI & GLIB_GAPI_OGL)
+=======
+	#if (GLIB_GAPI & GLIB_GAPI_COUT)
+		case GAPI_COUT: break;
+	#elif (GLIB_GAPI & GLIB_GAPI_OGL)
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		case GAPI_OPENGL: pShader = new ShaderOgl(strName); break;
 	#endif // GLIB_GAPI
 		default: GLIB_ERR("Graphics Api is not defined"); break;
@@ -98,7 +125,11 @@ namespace GLIB
 		const char* strSource = &m_strCode[0];
 		glShaderSource(m_unRId, 1, &strSource, nullptr);
 		glCompileShader(m_unRId);
+<<<<<<< HEAD
 		if (OglErrLogShader(m_shdType, m_unRId) != 0) { return false; }
+=======
+		if (OGL_ErrLog_Shader(m_shdType, m_unRId) != 0) { return false; }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		return true;
 	}
 	void SubShaderOgl::Reset() {
@@ -242,7 +273,11 @@ namespace GLIB
 			if (!rSub.Compile()) { return false; }
 		}
 		glLinkProgram(m_unRId);
+<<<<<<< HEAD
 		if (OglErrLogShader(ST_SHADER, m_unRId) != 0) return false;
+=======
+		if (OGL_ErrLog_Shader(ST_SHADER, m_unRId) != 0) return false;
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		
 		return true;
 	}

@@ -4,8 +4,12 @@
 #pragma warning(disable : 4312)
 
 #if (defined GLIB_GAPI)
+<<<<<<< HEAD
 #include <core/glib_engine.h>
 #include <core/glib_api.h>
+=======
+#include <glib_engine.h>
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 // Buffers
 namespace GLIB
 {
@@ -159,10 +163,13 @@ namespace GLIB
 	}
 
 	// --core_methods
+<<<<<<< HEAD
 	void ShaderBufOgl::Bind() const
 	{
 		for (auto& rBlock : m_BufLayout.GetBlocks()) { Bind(rBlock.unBindPoint, rBlock.szAll, rBlock.szOffset); }
 	}
+=======
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	void ShaderBufOgl::Bind(UInt32 unPoint) const {
 		glBindBuffer(GL_UNIFORM_BUFFER, m_unRId);
 		glBindBufferBase(GL_UNIFORM_BUFFER, unPoint, m_unRId);

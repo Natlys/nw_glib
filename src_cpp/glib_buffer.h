@@ -45,9 +45,17 @@ namespace GLIB
 	class GLIB_API VertexBufLayout
 	{
 	public:
+<<<<<<< HEAD
 		VertexBufLayout() : m_unStride(1) { }
 		VertexBufLayout(const DArray<BufferElement>& rBufElems) :
 			m_unStride(1) { SetElements(rBufElems); }
+=======
+		VertexBufLayout() : m_unStride(0) { }
+		VertexBufLayout(const DArray<BufferElement>& rBufElems) :
+			m_unStride(0) {
+			SetElements(rBufElems);
+		}
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 
 		// --getters
 		inline const BufferElement& GetElem(UInt8 unIdx) const { return m_BufElems.at(unIdx); }
@@ -68,7 +76,11 @@ namespace GLIB
 			m_unStride = 0;
 			for (auto& rBufElem : m_BufElems) {
 				rBufElem.unOffset = m_unStride;
+<<<<<<< HEAD
 				m_unStride += SDTypeGetSize(rBufElem.sdType, rBufElem.unCount);
+=======
+				m_unStride += SDType_GetSize(rBufElem.sdType, rBufElem.unCount);
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 			}
 		}
 	};
@@ -104,7 +116,11 @@ namespace GLIB
 				rBlock.szOffset = m_szData;
 				for (auto& rElem : rBlock.BufElems) {
 					rElem.unOffset += rBlock.szAll;
+<<<<<<< HEAD
 					rBlock.szAll += SDTypeGetAllignedSize(rElem.sdType, rElem.unCount);
+=======
+					rBlock.szAll += SDType_GetAllignedSize(rElem.sdType, rElem.unCount);
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 				}
 				m_szData += rBlock.szAll;
 			}
@@ -178,7 +194,10 @@ namespace GLIB
 		virtual void SetSubData(Size szData, const void* pData, Size szOffset = 0) = 0;
 		virtual void SetLayout(const ShaderBufLayout& rShdLayout) = 0;
 		// --core_methods
+<<<<<<< HEAD
 		virtual void Bind() const = 0;
+=======
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		virtual void Bind(UInt32 unPoint) const = 0;
 		virtual void Bind(UInt32 unPoint, Size szData, Size szOffset = 0) const = 0;
 		virtual void Unbind() const = 0;
@@ -250,7 +269,10 @@ namespace GLIB
 		virtual void SetSubData(Size szAlloc, const void* pVtxData, Size szOffset = 0) override;
 		virtual void SetLayout(const ShaderBufLayout& rBufLayout) override;
 		// --core_methods
+<<<<<<< HEAD
 		virtual void Bind() const override;
+=======
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		virtual void Bind(UInt32 unPoint) const override;
 		virtual void Bind(UInt32 unPoint, Size szData, Size szOffset = 0) const override;
 		virtual void Unbind() const override;

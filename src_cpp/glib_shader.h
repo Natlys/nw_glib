@@ -1,6 +1,10 @@
 #ifndef GLIB_ASHADER_H
 #define GLIB_ASHADER_H
+<<<<<<< HEAD
 #include <core/glib_res.h>
+=======
+
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 #include <glib_tools.h>
 #include <glib_buffer.h>
 
@@ -8,7 +12,11 @@
 namespace GLIB
 {
 	/// Abstract SubShader Class
+<<<<<<< HEAD
 	class GLIB_API ASubShader : public AGRes
+=======
+	class GLIB_API ASubShader
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	{
 	public:
 		using Attribs = HashMap<String, Int32>;
@@ -30,6 +38,7 @@ namespace GLIB
 		virtual void Detach() = 0;
 		virtual bool Compile() = 0;
 		virtual void Reset() = 0;
+<<<<<<< HEAD
 		// --data_methods
 		virtual bool SaveF(const char* strFPath) override;
 		virtual bool LoadF(const char* strFPath) override;
@@ -38,6 +47,14 @@ namespace GLIB
 	protected:
 		UInt32 m_unRId;
 		String m_strCode;
+=======
+
+		static ASubShader* Create(const char* strName, ShaderTypes sdType);
+	protected:
+		String m_strName;
+		String m_strCode;
+		UInt32 m_unRId;
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		ShaderTypes m_shdType;
 	};
 	/// Abstract Shader Class
@@ -55,7 +72,11 @@ namespace GLIB
 	/// Future:
 	/// -> Shader code preprocessing detects specific uniforms (lights/transform_matricies/...)
 	/// And uses them for setting without giving a particular sstrName
+<<<<<<< HEAD
 	class GLIB_API AShader : public AGRes
+=======
+	class GLIB_API AShader
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	{
 	public:
 		using Globals = HashMap<String, Int32>;
@@ -67,7 +88,11 @@ namespace GLIB
 		// --getters
 		inline UInt32 GetRenderId() const { return m_unRId; }
 		inline const char* GetCode() const { return &m_strCode[0]; }
+<<<<<<< HEAD
 		inline const VertexBufLayout& GetVtxLayout() const { return m_vtxLayout; }
+=======
+		inline const VertexBufLayout& GetVertexLayout() const { return m_vtxLayout; }
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		inline const ShaderBufLayout& GetShdLayout() const { return m_shdLayout; }
 		inline const Globals& GetGlobals() const { return m_Globals; }
 		inline const Blocks& GetBlocks() const { return m_Blocks; }
@@ -79,9 +104,12 @@ namespace GLIB
 		virtual void Disable() = 0;
 		virtual bool Compile() = 0;
 		virtual void Reset() = 0;
+<<<<<<< HEAD
 		// --data_methods
 		virtual bool SaveF(const char* strFPath) override;
 		virtual bool LoadF(const char* strFPath) override;
+=======
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 
 		static AShader* Create(const char* strName);
 
@@ -97,8 +125,14 @@ namespace GLIB
 		virtual void SetV4f(const char* strName, const V4f& value) const = 0;
 		virtual void SetM4f(const char* strName, const Mat4f& value) const = 0;
 	protected:
+<<<<<<< HEAD
 		UInt32 m_unRId;
 		String m_strCode;
+=======
+		String m_strName;
+		String m_strCode;
+		UInt32 m_unRId;
+>>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		VertexBufLayout m_vtxLayout;
 		ShaderBufLayout m_shdLayout;
 		mutable Globals m_Globals;
