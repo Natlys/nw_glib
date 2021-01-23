@@ -4,12 +4,8 @@
 #pragma warning(disable : 4312)
 
 #if (defined GLIB_GAPI)
-<<<<<<< HEAD
 #include <core/glib_engine.h>
 #include <core/glib_api.h>
-=======
-#include <glib_engine.h>
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 // Buffers
 namespace GLIB
 {
@@ -20,7 +16,7 @@ namespace GLIB
 	#if (GLIB_GAPI & GLIB_GAPI_OGL)
 		case GApiTypes::GAPI_OPENGL: pVB = new VertexBufOgl(); break;
 	#endif	// GLIB_GAPI
-		default: GLIB_ERR("There is no accessible API"); break;
+		default: NWL_ERR("There is no accessible API"); break;
 		}
 		pVB->SetData(szAlloc, pVtxData);
 		return pVB;
@@ -32,7 +28,7 @@ namespace GLIB
 	#if (GLIB_GAPI & GLIB_GAPI_OGL)
 		case GApiTypes::GAPI_OPENGL: pIB = new IndexBufOgl(); break;
 	#endif // GLIB_GAPI
-		default: GLIB_ERR("Graphics API is not defined"); break;
+		default: NWL_ERR("Graphics API is not defined"); break;
 		}
 		pIB->SetData(szAlloc, pIdxData);
 		return pIB;
@@ -43,7 +39,7 @@ namespace GLIB
 	#if (GLIB_GAPI & GLIB_GAPI_OGL)
 		case GApiTypes::GAPI_OPENGL: pSB = new ShaderBufOgl(); break;
 	#endif // GLIB_GAPI
-		default: GLIB_ERR("Graphics API is not defined"); break;
+		default: NWL_ERR("Graphics API is not defined"); break;
 		}
 		pSB->SetData(szAlloc, pIdxData);
 		return pSB;
@@ -163,13 +159,10 @@ namespace GLIB
 	}
 
 	// --core_methods
-<<<<<<< HEAD
 	void ShaderBufOgl::Bind() const
 	{
 		for (auto& rBlock : m_BufLayout.GetBlocks()) { Bind(rBlock.unBindPoint, rBlock.szAll, rBlock.szOffset); }
 	}
-=======
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	void ShaderBufOgl::Bind(UInt32 unPoint) const {
 		glBindBuffer(GL_UNIFORM_BUFFER, m_unRId);
 		glBindBufferBase(GL_UNIFORM_BUFFER, unPoint, m_unRId);

@@ -5,8 +5,8 @@
 #include <core/glib_engine.h>
 #include <glib_buffer.h>
 #include <glib_framebuf.h>
-#include <glib_shader.h>
 #include <glib_texture.h>
+#include <glib_shader.h>
 #include <glib_material.h>
 
 namespace GLIB
@@ -18,26 +18,24 @@ namespace GLIB
         fbInfo.unWidth = xywhViewport.z - xywhViewport.x;
         fbInfo.unHeight = xywhViewport.w - xywhViewport.y;
         fbInfo.unSamples = 1;
-		pFrameBuf = AFrameBuf::Create(&("fmb_" + this->strName)[0], fbInfo);
-		
-		pVtxBuf = AVertexBuf::Create(2 << 10);
-		pIdxBuf = AIndexBuf::Create(2 << 10);
-		pShdBuf = AShaderBuf::Create(2 << 10);
+		pFrameBuf.MakeRef<FrameBufOgl>(GEngine::Get().GetMemory(), &("fmb_" + this->strName)[0], fbInfo);
 
-		pVtxData = new UByte[pVtxBuf->GetDataSize()];
+		pVtxBuf.MakeRef<VertexBufOgl>(GEngine::Get().GetMemory());
+		pVtxBuf->SetData(2 << 10, nullptr);
+		pIdxBuf.MakeRef<IndexBufOgl>(GEngine::Get().GetMemory());
+		pIdxBuf->SetData(2 << 10, nullptr);
+		pShdBuf.MakeRef<ShaderBufOgl>(GEngine::Get().GetMemory());
+		pShdBuf->SetData(2 << 10, nullptr);
+
+		pVtxData = new Byte[pVtxBuf->GetDataSize()];
 		pIdxData = new UInt32[pIdxBuf->GetDataSize()];
-		pShdData = new UByte[pShdBuf->GetDataSize()];
+		pShdData = new Byte[pShdBuf->GetDataSize()];
 	}
 	GLayer::GLayer(const GLayer& rCpy) : GLayer(&rCpy.strName[0]) { }
 	GLayer::~GLayer() {
 		delete[] pVtxData;
 		delete[] pIdxData;
 		delete[] pShdData;
-
-		delete pFrameBuf;
-		delete pVtxBuf;
-		delete pIdxBuf;
-		delete pShdBuf;
 	}
 
 	// --setters
@@ -57,10 +55,24 @@ namespace GLIB
 		if (rDOData.pGMtl->GetShader() != pShader) { return; }
 		Drawables[rDOData.pGMtl].push_back(rDOData);
 	}
-	UInt8 GLayer::OnDraw(AGApi* pGApi)
+	void GLayer::OnDraw(AGApi* pGApi)
 	{
+		static auto fnDrawCall = [&](GMaterial* pGMtl)->void {
+			pGMtl->Enable();
+			pShdBuf->SetSubData(szShdData, pShdData);
+			pVtxBuf->SetSubData(szVtxData, pVtxData);
+			pIdxBuf->SetSubData(szIdxData, pIdxData);
+			pShdBuf->Bind();
+			pVtxBuf->Bind();
+			pIdxBuf->Bind();
+			pGApi->DrawIndexed(unIdxData);
+			pIdxBuf->Unbind();
+			pVtxBuf->Unbind();
+			pShdBuf->Unbind();
+			pGMtl->Disable();
+			unDrawCalls++;
+		};
 		ResetData();
-		if (!bIsEnabled) { return 0; }
 		Camera.nAspectRatio = (xywhViewport.z - xywhViewport.x) / (xywhViewport.w - xywhViewport.y);
 
 		pGApi->SetViewport(xywhViewport.x, xywhViewport.y, xywhViewport.z, xywhViewport.w);
@@ -76,31 +88,17 @@ namespace GLIB
 
 		DSData.m4Proj = Camera.GetProjMatrix();
 		DSData.m4View = Camera.GetViewMatrix();
-		if (!UploadShdData(DSData)) { return 0; }
+		if (!UploadShdData(DSData)) { return; }
 
-		//pFrameBuf->Bind();
-		//pFrameBuf->Clear(FB_COLOR | FB_DEPTH | FB_STENCIL);
+		pFrameBuf->Bind();
+		pFrameBuf->Clear(FB_COLOR | FB_DEPTH | FB_STENCIL);
 		for (auto& itDrbs : Drawables) {
 			std::sort(itDrbs.second.begin(), itDrbs.second.end());
-			for (auto& itDrb : itDrbs.second) { if (!UploadVtxData(itDrb)) { goto draw_call; } }
-		draw_call:
-			itDrbs.first->Enable();
-			pShdBuf->SetSubData(szShdData, pShdData);
-			pVtxBuf->SetSubData(szVtxData, pVtxData);
-			pIdxBuf->SetSubData(szIdxData, pIdxData);
-			pShdBuf->Bind();
-			pVtxBuf->Bind();
-			pIdxBuf->Bind();
-			pGApi->DrawIndexed(unIdxData);
-			pIdxBuf->Unbind();
-			pVtxBuf->Unbind();
-			pShdBuf->Unbind();
-			itDrbs.first->Disable();
-			unDrawCalls++;
+			for (auto& itDrb : itDrbs.second) { if (!UploadVtxData(itDrb)) { fnDrawCall(itDrbs.first); } }
+			fnDrawCall(itDrbs.first);
 		}
-		//pFrameBuf->Unbind();
+		pFrameBuf->Unbind();
 		Drawables.clear();
-		return unDrawCalls;
 	}
 	// --core_methods
 	bool GLayer::UploadVtxData(const DrawObjectData& rDOData)

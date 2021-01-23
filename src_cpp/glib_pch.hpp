@@ -44,12 +44,7 @@
 #endif
 // --</platform>--
 
-#if (GLIB_MATH & GLIB_MATH_GLM)
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/matrix.hpp>
-#endif	// GLIB_MATH
+#include <native_world_library.hpp>
+using namespace NWL;
 
 #endif	// GLIB_PCH_HPP

@@ -1,10 +1,6 @@
 #ifndef GLIB_AFRAME_BUFFER_H
 #define GLIB_AFRAME_BUFFER_H
-<<<<<<< HEAD
-#include <core/glib_res.h>
-=======
 
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 #include <glib_decl.hpp>
 
 #if (defined GLIB_GAPI)
@@ -19,11 +15,7 @@ namespace GLIB
 		bool bSwapChainTarget = false;
 	};
 	/// Abstract FrameBuf class
-<<<<<<< HEAD
-	class GLIB_API AFrameBuf : public AGRes
-=======
-	class GLIB_API AFrameBuf
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
+	class GLIB_API AFrameBuf : public ADataRes
 	{
 	public:
 		AFrameBuf(const char* strName, const FrameBufInfo& rFbInfo);
@@ -42,13 +34,10 @@ namespace GLIB
 		virtual void Remake() = 0;
 		virtual void Clear(UInt32 unAttachmentsMask = FB_COLOR | FB_DEPTH | FB_STENCIL) = 0;
 		
-<<<<<<< HEAD
 		// --data_methods
 		virtual bool SaveF(const char* strFPath) override { return true; }
 		virtual bool LoadF(const char* strFPath) override { return true; }
 
-=======
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 		static AFrameBuf* Create(const char* strName, const FrameBufInfo& rFbInfo);
 	protected:
 		UInt32 m_unRId;

@@ -1,5 +1,5 @@
-#ifndef GLIB_GLAYER_H
-#define GLIB_GLAYER_H
+#ifndef GLIB_LAYER_H
+#define GLIB_LAYER_H
 
 #include <glib_camera.h>
 #include <glib_tools.h>
@@ -19,9 +19,9 @@ namespace GLIB
 		using OnDrawData = HashMap<GMaterial*, DArray<DrawObjectData>>;
 	public:
 		String strName = "gel_default";
-		bool bIsEnabled = true;
+		Bit bIsEnabled = false;
 		UInt32 unDrawOrder = 0;
-		
+
 		DrawConfig DConfig;
 		OnDrawData Drawables;
 		DrawSceneData DSData;
@@ -31,8 +31,8 @@ namespace GLIB
 
 		UInt32 unDrawCalls = 0;
 		// --vertex_data
-		UByte* pVtxData = nullptr;
-		UByte* pVtxIter = nullptr;
+		Byte* pVtxData = nullptr;
+		Byte* pVtxIter = nullptr;
 		Size szVtxData = 0;
 		UInt32 unVtxData = 0;
 		// --index_data
@@ -41,15 +41,15 @@ namespace GLIB
 		Size szIdxData = 0;
 		UInt32 unIdxData = 0;
 		// --shader_data
-		UByte* pShdData = nullptr;
-		UByte* pShdIter = nullptr;
+		Byte* pShdData = nullptr;
+		Byte* pShdIter = nullptr;
 		Size szShdData = 0;
 		// --objects
 		AShader* pShader = nullptr;
-		AFrameBuf* pFrameBuf = nullptr;
-		AVertexBuf* pVtxBuf = nullptr;
-		AIndexBuf* pIdxBuf = nullptr;
-		AShaderBuf* pShdBuf = nullptr;
+		RefOwner<AFrameBuf> pFrameBuf;
+		RefOwner<AVertexBuf> pVtxBuf;
+		RefOwner<AIndexBuf> pIdxBuf;
+		RefOwner<AShaderBuf> pShdBuf;
 	public:
 		GLayer(const char* sName);
 		GLayer(const GLayer& rCpy);
@@ -60,7 +60,7 @@ namespace GLIB
 		void SetViewport(const V4f& xywhViewport);
 		void AddDrawData(const DrawObjectData& rDOData);
 		// --core_methods
-		UInt8 OnDraw(AGApi* pGApi);
+		void OnDraw(AGApi* pGApi);
 		bool UploadVtxData(const DrawObjectData& rDOData);
 		bool UploadShdData(const DrawSceneData& rDSData);
 		inline void ResetData();
@@ -79,4 +79,4 @@ namespace GLIB
 	}
 }
 
-#endif	// GLIB_GLAYER_H
+#endif	// GLIB_LAYER_H

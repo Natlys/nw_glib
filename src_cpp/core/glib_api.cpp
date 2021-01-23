@@ -3,7 +3,6 @@
 
 #if (defined GLIB_GAPI)
 #include <glib_core.hpp>
-#include <core/glib_context.h>
 #include <glib_framebuf.h>
 namespace GLIB
 {
@@ -14,7 +13,7 @@ namespace GLIB
 	#if (GLIB_GAPI & GLIB_GAPI_OGL)
 		case (GAPI_OPENGL): pGApi = new GApiOgl(); break;
 	#endif // GLIB_GAPI
-		default: GLIB_ERR("This graphics API is not defined"); break;
+		default: NWL_ERR("This graphics API is not defined"); break;
 		}
 		return pGApi;
 	}

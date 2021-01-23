@@ -47,11 +47,7 @@ namespace GLIB
 		return true;
 	}
 
-<<<<<<< HEAD
 	Int32 OglErrLogShader(ShaderTypes shaderType, UInt32 shaderID)
-=======
-	Int32 OGL_ErrLog_Shader(ShaderTypes shaderType, UInt32 shaderID)
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 	{
 		if (shaderID == 0) return GLIB_ERR_UNKNOWN_ID;
 		Int32 success = 0;
@@ -69,7 +65,7 @@ namespace GLIB
 				errLog.resize(errLogSize);
 
 				glGetShaderInfoLog(shaderID, errLogSize, NULL, &errLog[0]);
-				GLIB_ERR(errLog);
+				NWL_ERR(errLog);
 				return GLIB_ERR_SHADER_COMPILE;
 			}
 		}
@@ -82,7 +78,7 @@ namespace GLIB
 				errLog.resize(errLogSize);
 
 				glGetProgramInfoLog(shaderID, errLogSize, NULL, &errLog[0]);
-				GLIB_ERR(&errLog[0]);
+				NWL_ERR(&errLog[0]);
 				return GLIB_ERR_SHADER_LINK;
 			}
 		}

@@ -3,15 +3,12 @@
 
 #include <core/glib_api.h>
 
-#include <core/glib_window.h>
 #include <glib_framebuf.h>
 
 #include <glib_camera.h>
 #include <glib_shader.h>
 #include <glib_material.h>
 #include <glib_texture.h>
-
-#include <glib_event.h>
 
 #include <stb_image.h>
 
@@ -21,7 +18,7 @@ namespace GLIB
 {
 	GEngine::GEngine() :
 		m_bIsRunning(false),
-		m_pGApi(nullptr), m_pWindow(nullptr), m_pGMtlScreen(nullptr),
+		m_pGApi(nullptr), m_pGMtlScreen(nullptr),
 		m_DInfo(GEngineInfo()) { }
 	GEngine::~GEngine() { }
 
@@ -38,54 +35,12 @@ namespace GLIB
 		m_GLayers.erase(itDest);
 	}
 	// --==<core_methods>==--
-	bool GEngine::Init(WApiTypes WindowApiType, GApiTypes GraphicsApiType)
+	bool GEngine::Init(Size szMemory)
 	{
+		GetMemory() = MemArena(malloc(szMemory), szMemory);
 		m_bIsRunning = true;
 
-		WindowInfo WindowInfo{ "graphics_engine", 1200, 1200 / 4 * 3, true, nullptr };
-		m_pWindow = AWindow::Create(WindowInfo, WindowApiType);
-		if (!m_pWindow->Init()) { m_pWindow->OnQuit(); return false; }
-		m_pWindow->SetEventCallback([this](AEvent& rEvt)->void {
-			if (rEvt.EvtType == ET_MOUSE_PRESS) {
-				MouseEvent* pmEvt = static_cast<MouseEvent*>(&rEvt);
-				switch (pmEvt->nButton) {
-				case GLIB_MS_BTN_0:	break;
-				default: break;
-				}
-			}
-			else if (rEvt.EvtType == ET_MOUSE_RELEASE) {
-				MouseEvent* pmEvt = static_cast<MouseEvent*>(&rEvt);
-				switch (pmEvt->nButton) {
-				case GLIB_MS_BTN_0:	break;
-				default: break;
-				}
-			}
-			else if (rEvt.EvtType == ET_KEY_PRESS) {
-				KeyboardEvent* pkEvt = static_cast<KeyboardEvent*>(&rEvt);
-				switch (pkEvt->unKeyCode) {
-				case GLIB_KEY_ESCAPE_27: Quit(); break;
-				default: break;
-				}
-			}
-			else if (rEvt.EvtType == ET_KEY_RELEASE) {
-				KeyboardEvent* pkEvt = static_cast<KeyboardEvent*>(&rEvt);
-				switch (pkEvt->unKeyCode) {
-				case GLIB_KEY_ESCAPE_27: Quit(); break;
-				default: break;
-				}
-			}
-			else if (rEvt.EvtType == ET_WINDOW_CLOSE) { Quit(); }
-			else if (rEvt.EvtType == ET_WINDOW_RESIZE) {
-				WindowEvent* pwEvt = static_cast<WindowEvent*>(&rEvt);
-			}
-			else if (rEvt.EvtType == ET_WINDOW_FOCUS) {
-				WindowEvent* pwEvt = static_cast<WindowEvent*>(&rEvt);
-				if (pwEvt->bIsFocused) { m_pWindow->SetOpacity(1.0f); }
-				else { m_pWindow->SetOpacity(0.95f); }
-			}
-			});
-
-		m_pGApi = AGApi::Create(GraphicsApiType);
+		m_pGApi = AGApi::Create(GAPI_OPENGL);
 		m_pGApi->SetClearColor(0.1f, 0.2f, 0.3f);
 
 		if (true) {
@@ -98,31 +53,18 @@ namespace GLIB
 			ATexture2d::Create("tex_white")->LoadF("");
 			ImageInfo imgInfo;
 			TextureInfo texInfo;
-			if (LoadFImage("D:/dev/native_world/nw_glib/data/ico/nw_bat.png", &imgInfo)) {
-				m_pWindow->SetIcon(imgInfo.ClrData, imgInfo.nWidth, imgInfo.nHeight);
-				
-				ATexture2d::Create("tex_2d_bat");
-				texInfo.FilterMag = texInfo.FilterMag = TC_FILTER_NEAREST;
-				texInfo.InterFormat= texInfo.Format = TC_FORMAT_RGBA;
-				texInfo.WrapTypeS = texInfo.WrapTypeT = TC_WRAP_REPEAT;
-				GetGResource<ATexture>("tex_2d_bat")->SetInfo(imgInfo);
-				GetGResource<ATexture>("tex_2d_bat")->SetInfo(texInfo);
-				GetGResource<ATexture>("tex_2d_bat")->Remake();
-				
-				delete[] imgInfo.ClrData;
-			}
 		}
 		if (true) {
 			GMaterial* pGMtl = nullptr;
 			m_pGMtlScreen = pGMtl = new GMaterial("gmt_screen");
-			pGMtl->SetShader(GetGResource<AShader>("shd_screen"));
+			pGMtl->SetShader(ADataRes::GetDataRes<AShader>("shd_screen"));
 			pGMtl = new GMaterial("gmt_3d_batch");
-			pGMtl->SetShader(GetGResource<AShader>("shd_3d_batch"));
-			pGMtl->SetTexture(GetGResource<ATexture>("tex_2d_bat"));
+			pGMtl->SetShader(ADataRes::GetDataRes<AShader>("shd_3d_batch"));
+			pGMtl->SetTexture(ADataRes::GetDataRes<ATexture>("tex_2d_bat"));
 		}
 		AddLayer("gel_3d_batch");
 		m_GLayer = m_GLayers.begin();
-		m_GLayer->SetShader(GetGResource<AShader>("shd_3d_batch"));
+		m_GLayer->SetShader(ADataRes::GetDataRes<AShader>("shd_3d_batch"));
 
 		return true;
 	}
@@ -131,29 +73,28 @@ namespace GLIB
 		if (!m_bIsRunning) { return; }
 		m_bIsRunning = false;
 
+		free(GetMemory().GetDataBeg());
+		GetMemory() = MemArena(nullptr, 0);
+
 		if (true) {
-			delete GetGResource<GMaterial>("gmt_3d_batch");
+			delete ADataRes::GetDataRes<GMaterial>("gmt_3d_batch");
 		}
 		if (true) {
-			delete GetGResource<ATexture>("tex_white");
-			delete GetGResource<ATexture>("tex_2d_batch");
+			delete ADataRes::GetDataRes<ATexture>("tex_white");
+			delete ADataRes::GetDataRes<ATexture>("tex_2d_batch");
 		}
 		if (true) {
-			delete GetGResource<AShader>("shd_3d_batch");
+			delete ADataRes::GetDataRes<AShader>("shd_3d_batch");
 		}
 		
 		m_GLayers.clear();
 		delete m_pGApi;
-		m_pWindow->OnQuit();
-		delete m_pWindow;
 	}
 	void GEngine::Run() {
 		m_thrRun = std::thread([this]()->void { while (m_bIsRunning) { Update(); } });
 	}
 	inline void GEngine::Update()
 	{
-		m_pWindow->Update();
-
 		m_DInfo.Reset();
 
 		std::sort(m_GLayers.begin(), m_GLayers.end());
@@ -195,7 +136,7 @@ namespace GLIB
 			fStream.close();
 		}
 		catch (std::exception Ex){
-			GLIB_ERR(Ex.what());
+			NWL_ERR(Ex.what());
 			return false;
 		}
 		return true;

@@ -1,8 +1,6 @@
 #include <glib_pch.hpp>
 #include "glib_camera_lad.h"
 
-#include <glib_event.h>
-
 #if false
 namespace GLIB
 {

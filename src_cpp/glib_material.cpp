@@ -1,11 +1,8 @@
 #include <glib_pch.hpp>
 #include "glib_material.h"
 
-<<<<<<< HEAD
 #include <core/glib_engine.h>
 
-=======
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 #include <glib_buffer.h>
 #include <glib_texture.h>
 #include <glib_shader.h>
@@ -13,15 +10,10 @@
 namespace GLIB
 {
 	GMaterial::GMaterial(const char* strName) :
-<<<<<<< HEAD
-		AGRes(strName) { GEngine::Get().AddGRes<GMaterial>(this); }
+		ADataRes(strName) { ADataRes::AddDataRes<GMaterial>(this); }
 	GMaterial::GMaterial(GMaterial& rCpy) :
 		GMaterial(&rCpy.m_strName[0]) { }
-	GMaterial::~GMaterial() { GEngine::Get().RmvGRes<GMaterial>(GetId()); }
-=======
-	m_strName(strName) { }
-	GMaterial::~GMaterial() { }
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
+	GMaterial::~GMaterial() { ADataRes::RmvDataRes<GMaterial>(GetId()); }
 
 	// --setters
 	void GMaterial::SetShader(AShader* pShader) {
@@ -33,11 +25,7 @@ namespace GLIB
 			for (auto& itGlob : pShader->GetShdLayout().GetGlobals()) {
 				switch (itGlob.sdType) {
 				case SDT_FLOAT32: if (itGlob.unCount == 4) { m_Colors[itGlob.strName] = V4f{ 1.0f, 1.0f, 1.0f, 1.0f }; } break;
-<<<<<<< HEAD
-				case SDT_SAMPLER: m_Textures[itGlob.strName] = GEngine::Get().GetGResource<ATexture>("tex_white"); break;
-=======
-				case SDT_SAMPLER: m_Textures[itGlob.strName] = nullptr; break;
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
+				case SDT_SAMPLER: m_Textures[itGlob.strName] = ADataRes::GetDataRes<ATexture>("tex_white"); break;
 				}
 			}
 		}
@@ -72,10 +60,7 @@ namespace GLIB
 	{
 		m_pShader->Disable();
 	}
-<<<<<<< HEAD
 	// --data_methods
 	bool GMaterial::SaveF(const char* strFPath) { return true; }
 	bool GMaterial::LoadF(const char* strFPath) { return true; }
-=======
->>>>>>> 9ad0d477aed6a69908705117542e1a84eda465e1
 }
