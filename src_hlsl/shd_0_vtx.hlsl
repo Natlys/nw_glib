@@ -3,7 +3,15 @@
 // {return type} main({arg type} : {semantic}) : {semantic}
 // SV_Position - system value position
 // The bare minimum for rendering is vertex positions for rasterizing
-float4 main(float2 vtxCrd : coord) : SV_Position
+struct VS_OUT {
+	float3 vtxClr : color;
+	float4 vtxCrd : SV_Position;
+};
+
+VS_OUT main(float3 atb_vtxCrd : coord)
 {
-	return float4(vtxCrd.x, vtxCrd.y, 0.0f, 1.0f);
+	VS_OUT vs_out;
+	vs_out.vtxCrd = float4(atb_vtxCrd.x, atb_vtxCrd.y, atb_vtxCrd.z, 1.0f);
+	vs_out.vtxClr = float3(atb_vtxCrd.x, atb_vtxCrd.y, atb_vtxCrd.z);
+	return vs_out;
 }

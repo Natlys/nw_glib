@@ -7,8 +7,8 @@
 #if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
-	FrameBuf::FrameBuf(const char* strName, const FrameBufInfo& rInfo) :
-		GfxEntity(), TDataRes(strName),
+	FrameBuf::FrameBuf(GfxEngine& rGfx, const char* strName, const FrameBufInfo& rInfo) :
+		TEntity(), AGfxRes(rGfx), ADataRes(strName),
 		m_Info(rInfo),
 		m_rgbaClear{ 0.5f, 0.5f, 0.5f, 1.0f } { }
 	FrameBuf::~FrameBuf()
@@ -19,10 +19,10 @@ namespace NWG
 	// --setters
 	void FrameBuf::SetViewport(V4i rectViewport) { m_Info.rectViewport = rectViewport; }
 	void FrameBuf::SetClearColor(V4f rgbaClear) { m_rgbaClear = rgbaClear; }
-	void FrameBuf::AttachTexture(Texture& rTex) { m_Attachments.push_back(RefKeeper<Texture>{ *DataSys::GetDR(rTex.GetId()) }); }
+	void FrameBuf::AttachTexture(Texture& rTex) { m_Attachments.push_back(RefKeeper<Texture>{ *EntSys::GetEnt<Texture>(rTex.GetId()) }); }
 	void FrameBuf::DetachTexture(UInt32 unIdx) { m_Attachments.erase(m_Attachments.begin() + unIdx); }
 	// --==<core_methods>==--
-	void FrameBuf::Bind() const {
+	void FrameBuf::Bind() {
 		glBindFramebuffer(GL_FRAMEBUFFER, m_unRId);
 		glViewport(0, 0, GetWidth(), GetHeight());
 	}
@@ -104,5 +104,9 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
+namespace NWG
+{
+	//
+}
 #endif
 #endif // NWG_GAPI

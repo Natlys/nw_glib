@@ -1,9 +1,8 @@
 #include <nwg_pch.hpp>
 #include "nwg_tools.h"
-
 #pragma warning (disable: 4312)
-
 #if (defined NWG_GAPI)
+#include <nwg_loader.h>
 #if (NWG_GAPI & NWG_GAPI_OGL)
 #include <nwg_loader.h>
 // Functions
@@ -82,10 +81,21 @@ namespace NWG
 		return NWG_OK;
 	}
 }
-#endif // NWG_GAPI
-
-#if (NWG_GAPI & NWG_GAPI_DX)
-
 #endif
-
+#if (NWG_GAPI & NWG_GAPI_DX)
+namespace NWG
+{
+	DXGI_FORMAT SdToDxFormat(ShaderDataTypes sdType) {
+		switch (sdType) {
+		case SDT_BOOL:
+		case SDT_SINT8: return DXGI_FORMAT_R8_SINT; case SDT_UINT8: return DXGI_FORMAT_R8_UINT;
+		case SDT_SINT16: return DXGI_FORMAT_R8G8_SINT; case SDT_UINT16: return DXGI_FORMAT_R8G8_UINT;
+		case SDT_SINT32: return DXGI_FORMAT_R8G8B8A8_SINT; case SDT_UINT32: return DXGI_FORMAT_R8G8B8A8_UINT;
+		case SDT_FLOAT32: return DXGI_FORMAT_R32G32_FLOAT;
+		default: break;
+		}
+		return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	}
+}
+#endif
 #endif	// NWG_GAPI

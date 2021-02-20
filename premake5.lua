@@ -13,7 +13,6 @@ project "nw_gfx"
 		"%{dir_cpp.own}**.c**",
 		"%{dir_cpp.own}**.h**",
 		dir_data,
-		dir_lua.."**.**",
 		dir_glsl.."**.**",
 		dir_hlsl.."**.**",
 		dir_data.."**.h", dir_data.."**.rc",  dir_data.."**.aps",
@@ -32,8 +31,6 @@ project "nw_gfx"
 	links
 	{
 		"nw_lib",
-		"opengl32.lib",
-		"d3d11.lib",
 	}
 	filter "system:windows"
 		systemversion "latest"

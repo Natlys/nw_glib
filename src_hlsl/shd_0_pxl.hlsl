@@ -3,7 +3,7 @@
 // output is four component color rgba
 // after the function follows render target sematic
 // arguments are optional
-float4 main() : SV_Target
+float4 main(float3 vtxClr : color) : SV_Target
 {
-	return float4(0.3f, 0.4f, 1.0f, 1.0f);
+	return float4(vtxClr.x, vtxClr.y, vtxClr.z, 1.0f);
 }

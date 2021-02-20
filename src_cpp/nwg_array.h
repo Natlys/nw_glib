@@ -6,28 +6,30 @@
 namespace NWG
 {
 	/// VertexArray class
-	class VertexArr : public GfxEntity
+	class VertexArr : public TEntity<VertexArr>, public AGfxRes
 	{
+		friend class GfxEngine;
 	public:
-		VertexArr();
+		VertexArr(GfxEngine& rGfx);
 		virtual ~VertexArr();
 		// --getters
-		inline VertexBufLayout& GetLayout() { return m_vtxLayout; }
 		inline GfxPrimitives GetDrawPrimitive() const { return m_gpType; }
-		inline VertexBuf* GetVtxBuffer(UInt32 unIdx = 0) { return m_vtxBufs[unIdx].GetRef(); }
-		inline IndexBuf* GetIdxBuffer() { return m_idxBuf.GetRef(); }
 		// --setters
-		inline void SetDrawPrimitive(GfxPrimitives gpType) { m_gpType = gpType; }
+		void SetDrawPrimitive(GfxPrimitives gpType);
+		void AddVtxBuf(const GfxDataInfo& rInfo);
+		void RmvVtxBuf(UInt32 nIdx = 0);
+		void AddIdxBuf(const GfxDataInfo& rInfo);
+		void RmvIdxBuf();
 		// --core_methods
-		void Bind() const;
-		void Remake(const VertexBufLayout& rVtxLayout);
-		void CreateVtxBuffer();
-		void CreateIdxBuffer();
+		virtual void Bind() override;
 	private:
-		VertexBufLayout m_vtxLayout;
 		GfxPrimitives m_gpType;
-		DArray<RefKeeper<VertexBuf>> m_vtxBufs;
-		RefKeeper<IndexBuf> m_idxBuf;
+		DArray<GfxDataInfo> m_vtxInfo;
+		GfxDataInfo m_idxInfo;
+#if(NWG_GAPI & NWG_GAPI_DX)
+		DArray<ID3D11Buffer*> m_vtxBufs;
+		ID3D11Buffer* m_idxBuf;
+#endif
 	};
 }
 #endif	// NWG_GAPI

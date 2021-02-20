@@ -2,7 +2,9 @@
 #define NWG_MATERIAL_H
 #include <nwg_core.hpp>
 #if (defined NWG_GAPI)
+#include <nwg_res.h>
 #include <nwg_tools.h>
+#pragma warning(disable:4267)
 namespace NWG
 {
 	/// GraphicsMaterial Class
@@ -11,17 +13,16 @@ namespace NWG
 	/// -- Graphics material is responsible for colors and maps settings
 	/// -- There are also few attributes it needs to set,
 	/// but generally this is concerned about drawable object properties
-	class NWG_API GfxMaterial : public TDataRes<GfxMaterial>
+	class NWG_API GfxMaterial : public TEntity<GfxMaterial>, public AGfxRes, public ADataRes
 	{
 	public:
 		using Textures = HashMap<String, Texture*>;
 		using Colors = HashMap<String, V4f>;
 	public:
-		GfxMaterial(const char* strName);
+		GfxMaterial(GfxEngine& rGfx, const char* strName);
 		virtual ~GfxMaterial();
-
 		// --getters
-		inline Shader* GetShader() { return m_pShader; }
+		inline ShaderProgram* GetShaderProg() { return m_pshdProg; }
 		inline UInt8 GetTexCount() { return m_Textures.size(); }
 		inline Textures& GetTextures() { return m_Textures; }
 		inline Colors& GetColors() { return m_Colors; }
@@ -36,17 +37,17 @@ namespace NWG
 			return itClr == m_Colors.end() ? nullptr : &itClr->second;
 		}
 		// --setters
-		void SetShader(Shader* pShader);
+		void SetShaderProg(ShaderProgram* pshdProg);
 		void SetTexture(Texture* pTex, const char* strType = "");
 		void SetColor(const V4f& rgbaClr, const char* strType = "");
 		// --core_methods
-		void Enable();
+		virtual void Bind() override;
 		// --data_methods
 		virtual bool SaveF(const char* strFPath) override;
 		virtual bool LoadF(const char* strFPath) override;
 	private:
 		String m_strName;
-		Shader* m_pShader;
+		ShaderProgram* m_pshdProg;
 		Textures m_Textures;
 		Colors m_Colors;
 	};

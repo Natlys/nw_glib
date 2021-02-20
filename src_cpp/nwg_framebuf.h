@@ -2,7 +2,7 @@
 #define NWG_FRAME_BUFFER_H
 #include <nwg_core.hpp>
 #if (defined NWG_GAPI)
-#include <nwg_entity.h>
+#include <nwg_res.h>
 #include <nwg_texture.h>
 namespace NWG
 {
@@ -25,10 +25,10 @@ namespace NWG
 namespace NWG
 {
 	/// FrameBuffer class
-	class NWG_API FrameBuf : public GfxEntity, public TDataRes<FrameBuf>
+	class NWG_API FrameBuf : public TEntity<FrameBuf>, public AGfxRes, public ADataRes
 	{
 	public:
-		FrameBuf(const char* strName, const FrameBufInfo& rFbInfo);
+		FrameBuf(GfxEngine& rGfx, const char* strName, const FrameBufInfo& rFbInfo);
 		virtual ~FrameBuf();
 		// --getters
 		inline Int32 GetWidth() const { return m_Info.GetWidth(); }
@@ -43,7 +43,7 @@ namespace NWG
 		void AttachTexture(Texture& rTex);
 		void DetachTexture(UInt32 unIdx);
 		// --core_methods
-		virtual void Bind() const override;
+		virtual void Bind() override;
 		void Remake();
 		void Clear(UInt32 bitMask = FB_COLOR | FB_DEPTH | FB_STENCIL);
 		void ReadPixels(Ptr pData, UInt32 unAttachIdx, Int32 nX, Int32 nY, Int32 nWidth = 1, Int32 nHeight = 1);

@@ -6,7 +6,7 @@
 namespace NWG
 {
 	Texture::Texture(const char* strName, TextureTypes texType) :
-		TDataRes<Texture>(strName), GfxEntity(),
+		TEntity(), AGfxRes(), ADataRes(strName),
 		m_texType(texType), m_unTexSlot(0),
 		m_texInfo(TextureInfo()), m_imgInfo(ImageInfo())
 	{
@@ -14,9 +14,7 @@ namespace NWG
 	}
 	Texture::~Texture() { m_imgInfo.nWidth = -1; Remake(); }
 	// --setters
-	void Texture::SetInfo(const TextureInfo& rTexInfo) {
-		m_texInfo = rTexInfo;
-	}
+	void Texture::SetInfo(const TextureInfo& rTexInfo) { m_texInfo = rTexInfo; }
 	void Texture::SetInfo(const ImageInfo& rImgInfo) {
 		if ((m_texType == TXT_1D || m_texType == TXT_2D || m_texType == TXT_3D) && (m_imgInfo.nWidth < 1)) { return; }
 		else if ((m_texType == TXT_2D || m_texType == TXT_3D) && (m_imgInfo.nWidth < 1 || m_imgInfo.nHeight < 1)) { return; }
@@ -24,7 +22,7 @@ namespace NWG
 		m_imgInfo = rImgInfo;
 	}
 	// --==<core_methods>==--
-	void Texture::Bind() const {
+	void Texture::Bind() {
 		glActiveTexture(GL_TEXTURE0 + m_unTexSlot);
 		glBindTexture(m_texType, m_unRId);
 	}
@@ -140,22 +138,23 @@ namespace NWG
 #if (NWG_GAPI & NWG_GAPI_DX)
 namespace NWG
 {
+	Texture::Texture(GfxEngine& rGfx, const char* strName, TextureTypes texType) :
+		TEntity(), AGfxRes(rGfx), ADataRes(strName),
+		m_texType(texType), m_unTexSlot(0),
+		m_texInfo(TextureInfo()), m_imgInfo(ImageInfo()) { Remake(); }
+	Texture::~Texture() { m_imgInfo.nWidth = -1; Remake(); }
+	// --setters
+	void Texture::SetInfo(const TextureInfo& rTexInfo) { m_texInfo = rTexInfo; }
+	void Texture::SetInfo(const ImageInfo& rImgInfo) {
+		if ((m_texType == TXT_1D || m_texType == TXT_2D || m_texType == TXT_3D) && (m_imgInfo.nWidth < 1)) { return; }
+		else if ((m_texType == TXT_2D || m_texType == TXT_3D) && (m_imgInfo.nWidth < 1 || m_imgInfo.nHeight < 1)) { return; }
+		else if ((m_texType == TXT_3D) && (m_imgInfo.nWidth < 1 || m_imgInfo.nHeight < 1 || m_imgInfo.nDepth < 1)) { return; }
+		m_imgInfo = rImgInfo;
+	}
 	// --==<core_methods>==--
-	void Texture::Bind(UInt32 unTexSlot) {
-		if (m_bIsBound) { return; }
-		m_unTexSlot = unTexSlot;
-		m_bIsBound = true;
-	}
-	void Texture::Unbind()
-	{
-		if (!m_bIsBound) { return; }
-		m_unTexSlot = 0;
-		m_bIsBound = false;
-	}
+	void Texture::Bind() { }
 	void Texture::Remake()
 	{
-		Unbind();
-		if (m_unRId != 0) { m_unRId = 0; }
 		if (m_imgInfo.nWidth == -1) { return; }
 		switch (m_texType) {
 		case TXT_1D:

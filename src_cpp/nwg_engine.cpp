@@ -5,10 +5,12 @@
 #include <nwg_framebuf.h>
 #include <nwg_drawable.h>
 #include <nwg_camera.h>
+#include <nwg_array.h>
 #include <nwg_shader.h>
 #include <nwg_material.h>
 #include <nwg_texture.h>
 #include <nwg_loader.h>
+#pragma warning(disable:4244)
 #if (NWG_GAPI & NWG_GAPI_OGL)
 #include <../src_glsl/shd_screen.glsl>
 namespace NWG
@@ -142,35 +144,16 @@ namespace NWG
 	}
 	void GfxEngine::BeginDraw()
 	{
-		//
+		m_gTools.Reset();
 	}
 	void GfxEngine::EndDraw()
 	{
-		//
-	}
-	void GfxEngine::CreateVtxBuf(RefKeeper<VertexBuf>& rBuf)
-	{
-		rBuf.MakeRef<VertexBuf>();
-	}
-	void GfxEngine::CreateIdxBuf(RefKeeper<IndexBuf>& rBuf)
-	{
-		rBuf.MakeRef<IndexBuf>();
-	}
-	void GfxEngine::CreateShdBuf(RefKeeper<ShaderBuf>& rBuf)
-	{
-		rBuf.MakeRef<ShaderBuf>();
-	}
-	void GfxEngine::CreateTexture(RefKeeper<Texture>& rTexture, const char* strName, TextureTypes texType)
-	{
-		rTexture.MakeRef<Texture>(strName, texType);
-	}
-	void GfxEngine::CreateFrameBuf(RefKeeper<FrameBuf>& rFrameBuf, const char* strName, FrameBufInfo& rInfo)
-	{
-		rFrameBuf.MakeRef<FrameBuf>(strName, rInfo);
-	}
-	void GfxEngine::CreateShader(RefKeeper<Shader>& rShader, const char* strName)
-	{
-		rShader.MakeRef<Shader>(strName);
+		if (m_gTools.unIdx > 0) {
+			glDrawElements(m_gTools.gPrimitive, m_gTools.unIdx, m_gTools.sdIdx, nullptr);
+		}
+		else if (m_gTools.unVtx > 0) {
+			glDrawVertices(m_gTools.gPrimitive, m_gTools.unVtxCount);
+		}
 	}
 	void GfxEngine::Create(RefKeeper<GfxEngine>& rEngine, HWND& rWindow)
 	{
@@ -185,172 +168,44 @@ namespace NWG
 {
 	GfxEngine::GfxEngine(HWND pWindow) :
 		m_pWindow(pWindow),
-		m_pDevice(nullptr), m_pContext(nullptr), m_pSwap(nullptr), m_pTarget(nullptr),
-		m_pVtxBuf(nullptr), m_pVtxShd(nullptr)
+		m_pDevice(nullptr), m_pContext(nullptr), m_pSwap(nullptr), m_pTarget(nullptr)
 	{
 		if (m_pWindow == nullptr) { NWL_ERR("The window handler is not correct"); return; }
-		{	// describe a swapchain
-			DXGI_SWAP_CHAIN_DESC swapDesc{ 0 };
-			swapDesc.BufferDesc.Width = 0;
-			swapDesc.BufferDesc.Height = 0;
-			swapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-			swapDesc.BufferDesc.RefreshRate.Numerator = 0;
-			swapDesc.BufferDesc.RefreshRate.Denominator = 0;
-			swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-			swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			swapDesc.SampleDesc.Count = 1;
-			swapDesc.SampleDesc.Quality = 0;
-			swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swapDesc.BufferCount = 1;
-			swapDesc.OutputWindow = m_pWindow;
-			swapDesc.Windowed = TRUE;
-			swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-			swapDesc.Flags = 0;
-
-			D3D11CreateDeviceAndSwapChain(
-				nullptr,					// default adapter
-				D3D_DRIVER_TYPE_HARDWARE,	// hardware device
-				nullptr,					// the hmodule binary we want to load
-				D3D11_CREATE_DEVICE_DEBUG,	// flags; one of them is for debug layer
-				nullptr,					// any feature levels
-				NULL,						// any levels...
-				D3D11_SDK_VERSION,			// soft development kit version of the system
-				&swapDesc,					// descriptor for the swap chain
-				&m_pSwap,					// swap chain pointer to pointer
-				&m_pDevice,					// device pointer to pointer
-				nullptr,					// output feature level pointer
-				&m_pContext					// prt to prt for the context
-			);
-		}
-		{	// get a swapchain texture buffer and create render target view from it
-			ID3D11Resource* pBackBuf = nullptr;
-			m_pSwap->GetBuffer(
-				NULL,
-				__uuidof(ID3D11Resource),
-				reinterpret_cast<Ptr*>(&pBackBuf)
-			);
-			// create a texture where we do render
-			m_pDevice->CreateRenderTargetView(
-				pBackBuf,			// where is source
-				nullptr,			// how is it described
-				&m_pTarget
-			);
-		}
-		{
-			const V2f vtxDataTrig[] = {
-				{ -1.0f, -1.0f },
-				{ 0.0f, 1.0f },
-				{ 1.0f, 0.0f }
-			};
-			const UInt32 szStride = sizeof(V2f);
-			const UInt32 szOffset = 0u;
-
-			// specify this abstract buffer
-			D3D11_BUFFER_DESC vbDesc = { 0 };
-			vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;	// how to bind this
-			vbDesc.Usage = D3D11_USAGE_DEFAULT;				// same as OpenGL STATIC/DYNAMIC/STREAM draw
-			vbDesc.ByteWidth = sizeof(vtxDataTrig);			// size of the buffer
-			vbDesc.MiscFlags = NULL;						// unknown stuff
-			vbDesc.StructureByteStride = szStride;			// every next vertex throught sizeof(V2f)
-
-			D3D11_SUBRESOURCE_DATA subData = { 0 };
-			subData.pSysMem = &vtxDataTrig[0];		// address in the cpu
-			subData.SysMemPitch;					// unknown black box
-			subData.SysMemSlicePitch;				// unknown
-
-			m_pDevice->CreateBuffer(
-				&vbDesc,		// how to set up the buffer
-				&subData,		// cpy data to load into the gpu buffer
-				&m_pVtxBuf		// the buffer location
-			);
-			// bind buffers to the pipeline
-			m_pContext->IASetVertexBuffers(
-				0,				// start: start from the first one
-				1,				// count: set only one
-				&m_pVtxBuf,		// buffers: use the address of our buffer
-				&szStride,		// strides: the offsets between verices of every buffer
-				&szOffset		// offset: the offsets from the beginning of every buffer
-			);
-		}
-		{	// create shaders
-			// load some compiled code of the vertex shader
-			ID3DBlob* pBlob = nullptr;
-			D3DReadFileToBlob(L"bin/shd_0_vtx.cso", &pBlob);
-			// create shader object with the source code
-			m_pDevice->CreateVertexShader(
-				pBlob->GetBufferPointer(),	// void* ptr to a bunch of bytes
-				pBlob->GetBufferSize(),		// the size of compiled blob
-				nullptr,					// no class linkage
-				&m_pVtxShd					// where to create
-			);
-			// bind the shader to pipeline: shader ptr itself, class instances, num of instances
-			m_pContext->VSSetShader(m_pVtxShd, nullptr, NULL);
-			{	// input vertex layout
-				D3D11_INPUT_ELEMENT_DESC elemDesc{ 0 };
-				elemDesc.SemanticName = "coord";						// default vertex semantic
-				elemDesc.SemanticIndex = 0;								// there can be Position1/2/3
-				elemDesc.Format = DXGI_FORMAT_R32G32_FLOAT;				// how the data is represented: 2 floats in 32 bit each
-				elemDesc.InputSlot = 0;									// bind to the first
-				elemDesc.AlignedByteOffset = 0;							// offset from the beginning of this structure
-				elemDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	// can be set for instanced rendering
-				elemDesc.InstanceDataStepRate = 0;						// doesn't matter
-				// array pointer->size->bytecode_of_shader->byte_code_length->where_is_layout
-				m_pDevice->CreateInputLayout(&elemDesc, 1, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &m_pVtxLayout);
-				m_pContext->IASetInputLayout(m_pVtxLayout);
-			}
-			pBlob->Release();
-		}
-		{	// same applies for the pixel shader
-			ID3DBlob* pBlob = nullptr;
-			D3DReadFileToBlob(L"bin/shd_0_pxl.cso", &pBlob);
-			m_pDevice->CreatePixelShader(
-				pBlob->GetBufferPointer(),
-				pBlob->GetBufferSize(),
-				nullptr,
-				&m_pPxlShd
-			);
-			pBlob->Release();
-			m_pContext->PSSetShader(m_pPxlShd, nullptr, NULL);
-		}
-		{	// bind our target view to the render target; setup viewport
-			m_pContext->OMSetRenderTargets(1u, &m_pTarget, nullptr);
-			// set the rasterizer's viewports
-			SetViewport(0, 0, 800, 600);
-			// set the primitive typology
-			SetPrimitive(GPT_TRIANGLES);
-		}
+		DXGI_SWAP_CHAIN_DESC swapDesc{ 0 };
+		swapDesc.BufferDesc.Width = 0;
+		swapDesc.BufferDesc.Height = 0;
+		swapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		swapDesc.BufferDesc.RefreshRate.Numerator = 0;
+		swapDesc.BufferDesc.RefreshRate.Denominator = 0;
+		swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapDesc.SampleDesc.Count = 1;
+		swapDesc.SampleDesc.Quality = 0;
+		swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapDesc.BufferCount = 1;
+		swapDesc.OutputWindow = m_pWindow;
+		swapDesc.Windowed = TRUE;
+		swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		swapDesc.Flags = 0;
+		D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG,
+			nullptr, NULL, D3D11_SDK_VERSION, &swapDesc, &m_pSwap, &m_pDevice, nullptr, &m_pContext);
+	
+		ID3D11Resource* pBackBuf = nullptr;
+		m_pSwap->GetBuffer(NULL, __uuidof(ID3D11Resource), reinterpret_cast<Ptr*>(&pBackBuf));
+		m_pDevice->CreateRenderTargetView(pBackBuf, nullptr, &m_pTarget);
+		m_pContext->OMSetRenderTargets(1u, &m_pTarget, nullptr);
+		SetViewport(0, 0, 800, 600);
+		SetPrimitive(GPT_DEFAULT);
 	}
 	GfxEngine::~GfxEngine()
 	{
-		if (m_pVtxBuf != nullptr) {
-			m_pVtxBuf->Release();
-		}
-		if (m_pVtxLayout != nullptr) {
-			m_pVtxLayout->Release();
-		}
-		if (m_pVtxShd != nullptr) {
-			m_pVtxShd->Release();
-		}
-		if (m_pPxlShd != nullptr) {
-			m_pPxlShd->Release();
-		}
-		if (m_pTarget != nullptr) {
-			m_pTarget->Release();
-		}
-		if (m_pDevice != nullptr) {
-			m_pDevice->Release();
-		}
-		if (m_pContext != nullptr) {
-			m_pContext->Release();
-		}
-		if (m_pSwap != nullptr) {
-			m_pSwap->Release();
-		}
+		if (m_pTarget != nullptr) { m_pTarget->Release(); }
+		if (m_pDevice != nullptr) { m_pDevice->Release(); }
+		if (m_pContext != nullptr) { m_pContext->Release(); }
+		if (m_pSwap != nullptr) { m_pSwap->Release(); }
 	}
 	// --==<setters>==--
-	void GfxEngine::SetPrimitive(GfxPrimitives gfxPrimitiveTopology) {
-		m_pContext->IASetPrimitiveTopology(static_cast<D3D11_PRIMITIVE_TOPOLOGY>(gfxPrimitiveTopology));
-	}
+	void GfxEngine::SetPrimitive(GfxPrimitives gPrimitive) { m_pContext->IASetPrimitiveTopology(static_cast<D3D11_PRIMITIVE_TOPOLOGY>(gPrimitive)); }
 	void GfxEngine::SetModes(Bit bEnable, ProcessingModes pmModes) {
 
 		switch (pmModes) {
@@ -384,11 +239,12 @@ namespace NWG
 		m_gConfig.General.PolyMode.dMode = dMode;
 		m_gConfig.General.PolyMode.facePlane = facePlane;
 	}
-	void GfxEngine::SetLineWidth(Float32 nLineWidth) {
-		m_gConfig.General.nLineWidth = nLineWidth;
-	}
-	void GfxEngine::SetPixelSize(Float32 nPxSize) {
-		m_gConfig.General.nPixelSize = nPxSize;
+	void GfxEngine::SetVariable(GfxVariables gfxVar, Float32 nValue) {
+		switch(gfxVar) {
+		case GV_LINE_WIDTH: m_gConfig.General.nLineWidth = nValue; break;
+		case GV_POINT_SIZE: m_gConfig.General.nPixelSize = nValue; break;
+		default: break;
+		}
 	}
 	void GfxEngine::SetBlendFunc(BlendConfigs bcSrcFactor, BlendConfigs bcDestFactor) {
 		m_gConfig.Blending.FactorSrc = bcSrcFactor;
@@ -410,34 +266,30 @@ namespace NWG
 		const Float32 rgbaClear[] = { 0.0f, sinf(TimeSys::GetCurrS()), cosf(TimeSys::GetCurrS()), 1.0f };
 		
 		hresInfo = m_pSwap->Present(m_gConfig.General.unSwapInterval, 0u);
-		if (hresInfo == DXGI_ERROR_DEVICE_REMOVED) { throw CodeException("device has been removed", hresInfo, __FILE__, __LINE__); }
+		if (hresInfo == DXGI_ERROR_DEVICE_REMOVED) { throw Exception("device has been removed", hresInfo, __FILE__, __LINE__); }
 		m_pContext->ClearRenderTargetView(m_pTarget, rgbaClear);
-		
-		m_pContext->Draw(3u, 0u);
 	}
-	void GfxEngine::CreateVtxBuf(RefKeeper<VertexBuf>& rBuf)
+	void GfxEngine::BeginDraw()
 	{
-		//
+		m_dInfo.Reset();
 	}
-	void GfxEngine::CreateIdxBuf(RefKeeper<IndexBuf>& rBuf)
+	void GfxEngine::EndDraw()
 	{
-		//
+		if (m_dInfo.unIdx > 0) { m_pContext->DrawIndexed(m_dInfo.unIdx, 0u, 0u); }
+		else if (m_dInfo.unVtx > 0) { m_pContext->Draw(m_dInfo.unVtx, 0u); }
 	}
-	void GfxEngine::CreateShdBuf(RefKeeper<ShaderBuf>& rBuf)
+	void GfxEngine::OnDraw(VertexedDrawable& rDrb)
 	{
-		//
+		rDrb.Draw();
 	}
-	void GfxEngine::CreateTexture(RefKeeper<Texture>& rTex, const char* strName, TextureTypes texType)
+	void GfxEngine::OnDraw(IndexedDrawable& rDrb)
 	{
-		//
+		rDrb.Draw();
 	}
-	void GfxEngine::CreateFrameBuf(RefKeeper<FrameBuf>& rFrameBuf, const char* strName, FrameBufInfo& rInfo)
+	void GfxEngine::Create(RefKeeper<GfxEngine>& rEngine, HWND& rWindow)
 	{
-		//
-	}
-	void GfxEngine::CreateShader(RefKeeper<Shader>& rShader, const char* strName)
-	{
-		//
+		if (rWindow == nullptr) { throw Exception("Window is not initialized!"); return; }
+		rEngine.MakeRef<GfxEngine>(rWindow);
 	}
 	// --==</core_methods>==--
 }

@@ -3,73 +3,93 @@
 #if (defined NWG_GAPI)
 #include <nwg_engine.h>
 #include <nwg_loader.h>
-namespace NWG
-{
-}
+#include <nwg_layout.h>
+#pragma warning(disable:4267)
 #if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
-	VertexArr::VertexArr() :
-		GfxEntity(), m_gpType(GPT_TRIANGLES)
-	{
-		glCreateVertexArrays(1, &m_unRId);
-	}
+	VertexArr::VertexArr(GfxEngine& rGfx) :
+		TEntity(), AGfxRes(rGfx), m_gpType(GPT_TRIANGLES) { glCreateVertexArrays(1, &m_unRId); }
 	VertexArr::~VertexArr() { glDeleteVertexArrays(1, &m_unRId); }
 	// --setters
 	// --==<core_methods>==--
-	void VertexArr::Bind() const { glBindVertexArray(m_unRId); }
-	void VertexArr::Remake(const VertexBufLayout& rvtxLayout) {
-		if (m_idxBuf.GetRef() != nullptr) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_idxBuf->GetRenderId()); }
-		else { glBindBuffer(GBT_INDEX, 0); }
-		for (auto& itBuf : m_vtxBufs) { glBindBuffer(GL_ARRAY_BUFFER, itBuf->GetRenderId()); }
-		for (UInt32 ati = 0; ati < m_vtxLayout.GetElems().size(); ati++) { glDisableVertexAttribArray(ati); }
-		m_vtxLayout = rvtxLayout;
-		for (UInt32 ati = 0; ati < m_vtxLayout.GetElems().size(); ati++) {
-			const BufferElement& rBufElem = m_vtxLayout.GetElem(ati);
-			glEnableVertexAttribArray(ati);
-			glVertexAttribPointer(ati, rBufElem.unCount, rBufElem.sdType,
-				rBufElem.bNormalized ? GL_TRUE : GL_FALSE, m_vtxLayout.GetStride(), reinterpret_cast<Ptr>(rBufElem.szOffset));
-		}
+	void VertexArr::Bind() {
+		glBindVertexArray(m_unRId);
 	}
-	void VertexArr::CreateVtxBuffer()
+	void VertexArr::CreateVtxBuffer(Size szData, Ptr pData)
 	{
-		RefKeeper<VertexBuf> vtxBuf;
-		vtxBuf.MakeRef<VertexBuf>();
-		m_vtxBufs.push_back(vtxBuf);
 	}
-	void VertexArr::CreateIdxBuffer()
+	void VertexArr::CreateIdxBuffer(Size szData, Ptr pData)
 	{
-		m_idxBuf.MakeRef<IndexBuf>();
 	}
 	// --==</core_methods>==--
+	// --==<implementation_methods>==--
+	// --==</implementation_methods>==--
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
 namespace NWG
 {
-	VertexArrDx::VertexArrDx(GfxEngineDx& rGfx) :
-		VertexArr(), GfxEntityDx(rGfx) { }
-	VertexArrDx::~VertexArrDx() { }
+	VertexArr::VertexArr(GfxEngine& rGfx) :
+		TEntity(), AGfxRes(rGfx),
+		m_gpType(GPT_DEFAULT), m_idxBuf(nullptr) { }
+	VertexArr::~VertexArr() { while (!m_vtxBufs.empty()) { RmvVtxBuf(); } RmvIdxBuf(); }
+	// --setters
+	void VertexArr::AddVtxBuf(const GfxDataInfo& rInfo) {
+		m_vtxBufs.push_back(nullptr);
+		m_vtxInfo.push_back(rInfo);
+		
+		D3D11_BUFFER_DESC bufDesc = { 0 };
+		bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufDesc.Usage = rInfo.pData == nullptr ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+		bufDesc.CPUAccessFlags = rInfo.pData == nullptr ? D3D11_CPU_ACCESS_WRITE : 0u;
+		bufDesc.MiscFlags = NULL;
+		bufDesc.ByteWidth = rInfo.szData;
+		bufDesc.StructureByteStride = rInfo.szStride;
 
+		D3D11_SUBRESOURCE_DATA subData = { 0 };
+		subData.pSysMem = rInfo.pData;
+
+		m_pGfx->GetDevice()->CreateBuffer(&bufDesc, &subData, &m_vtxBufs.back());
+	}
+	void VertexArr::RmvVtxBuf(UInt32 nIdx) {
+		if (m_vtxBufs[nIdx] != nullptr) { m_vtxBufs[nIdx]->Release(); }
+		m_vtxBufs.erase(m_vtxBufs.begin() + nIdx);
+		m_vtxInfo.erase(m_vtxInfo.begin() + nIdx);
+	}
+	void VertexArr::AddIdxBuf(const GfxDataInfo& rInfo) {
+		RmvIdxBuf();
+		m_idxInfo = rInfo;
+
+		D3D11_BUFFER_DESC bufDesc = { 0 };
+		bufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		bufDesc.Usage = rInfo.pData == nullptr ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+		bufDesc.CPUAccessFlags = rInfo.pData == nullptr ? D3D11_CPU_ACCESS_WRITE : 0;
+		bufDesc.MiscFlags = NULL;
+		bufDesc.ByteWidth = rInfo.szData;
+		bufDesc.StructureByteStride = rInfo.szStride;
+
+		D3D11_SUBRESOURCE_DATA subData = { 0 };
+		subData.pSysMem = rInfo.pData;
+
+		m_pGfx->GetDevice()->CreateBuffer(&bufDesc, &subData, &m_idxBuf);
+	}
+	void VertexArr::RmvIdxBuf() { if (m_idxBuf != nullptr) { m_idxBuf->Release(); m_idxBuf = nullptr;  } }
 	// --==<core_methods>==--
-	void VertexArrDx::Bind() const {
-	}
-	void VertexArrDx::Unbind() const {
-	}
-
-	void VertexArrDx::Remake(const VertexBufLayout& rvtxLayout) {
-	}
-	void VertexArrDx::CreateVtxBuffer()
-	{
-		RefKeeper<VertexBuf> vtxBuf;
-		vtxBuf.MakeRef<VertexBufDx>();
-		AddVtxBuffer(vtxBuf);
-	}
-	void VertexArrDx::CreateIdxBuffer()
-	{
-		RefKeeper<IndexBuf> idxBuf;
-		idxBuf.MakeRef<IndexBufDx>();
-		SetIdxBuffer(idxBuf);
+	void VertexArr::Bind() {
+		m_pGfx->GetContext()->IASetPrimitiveTopology(static_cast<D3D11_PRIMITIVE_TOPOLOGY>(m_gpType));
+		if (m_vtxBufs.size() > 0) {
+			for (auto& itInfo : m_vtxInfo) {
+				m_pGfx->GetDrawInfo().szVtx += itInfo.szData;
+				m_pGfx->GetDrawInfo().unVtx += itInfo.szData / itInfo.szStride;
+			}
+			m_pGfx->GetContext()->IASetVertexBuffers(0, m_vtxBufs.size(), &m_vtxBufs[0], &m_vtxInfo[0].szStride, &m_vtxInfo[0].szOffset);
+		}
+		if (m_idxBuf != nullptr) {
+			m_pGfx->GetDrawInfo().szIdx += m_idxInfo.szData;
+			m_pGfx->GetDrawInfo().unIdx += m_idxInfo.szData / m_idxInfo.szStride;
+			m_pGfx->GetContext()->IASetIndexBuffer(m_idxBuf, static_cast<DXGI_FORMAT>(m_idxInfo.sdType), 0);
+		}
 	}
 	// --==</core_methods>==--
 }

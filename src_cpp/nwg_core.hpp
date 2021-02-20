@@ -17,8 +17,10 @@
 // --graphics api choice
 #define NWG_GAPI_OGL	1 << 1
 #define NWG_GAPI_DX		1 << 2
-#define NWG_GAPI		NWG_GAPI_OGL
+#define NWG_GAPI		NWG_GAPI_DX
 // --==</configurations>==--
+
+#pragma warning(disable:4005)
 
 #if (NWG_GAPI & NWG_GAPI_OGL)
 // --==<data_types_ogl>==--
@@ -39,11 +41,11 @@
 #define NWG_ZERO			0
 #define NWG_ONE				1
 #define NWG_BOOL			GL_BOOL
-#define NWG_INT16			GL_SHORT
-#define NWG_UINT16			GL_UNSIGNED_SHORT
-#define NWG_INT8			GL_BYTE
+#define NWG_SINT8			GL_BYTE
 #define NWG_UINT8			GL_UNSIGNED_BYTE
-#define NWG_INT32			GL_INT
+#define NWG_SINT16			GL_SHORT
+#define NWG_UINT16			GL_UNSIGNED_SHORT
+#define NWG_SINT32			GL_INT
 #define NWG_UINT32			GL_UNSIGNED_INT
 #define NWG_FLOAT32			GL_FLOAT
 #define NWG_FLOAT64			GL_DOUBLE
@@ -280,23 +282,23 @@
 // --==</pixel_formats_ogl>==--
 
 // --==<pixel_formats_nw>==--
-#define NWG_RED				GL_RED
-#define NWG_GREEN			GL_GREEN
-#define NWG_BLUE			GL_BLUE
-#define NWG_ALPHA			GL_ALPHA
-#define NWG_RGB				GL_RGB
-#define NWG_RGBA			GL_RGBA
-#define NWG_RED_INT			GL_RED_INTEGER
-#define NWG_GREEN_INT		GL_GREEN_INTEGER
-#define NWG_BLUE_INT		GL_BLUE_INTEGER
-#define NWG_RGB_INT			GL_RGB_INTEGER
-#define NWG_RGBA_INT		GL_RGBA_INTEGER
-#define NWG_DEPTH			GL_DEPTH
-#define NWG_STENCIL			GL_STENCIL
-#define NWG_RED_INT32		GL_R32I
-#define NWG_RED_UINT32		GL_R32UI
-#define NWG_RGBA8			GL_RGBA8
-#define NWG_DEPTH24			GL_DEPTH
+#define NWG_RED					GL_RED
+#define NWG_GREEN				GL_GREEN
+#define NWG_BLUE				GL_BLUE
+#define NWG_ALPHA				GL_ALPHA
+#define NWG_RGB					GL_RGB
+#define NWG_RGBA				GL_RGBA
+#define NWG_RED_INT				GL_RED_INTEGER
+#define NWG_GREEN_INT			GL_GREEN_INTEGER
+#define NWG_BLUE_INT			GL_BLUE_INTEGER
+#define NWG_RGB_INT				GL_RGB_INTEGER
+#define NWG_RGBA_INT			GL_RGBA_INTEGER
+#define NWG_DEPTH				GL_DEPTH
+#define NWG_STENCIL				GL_STENCIL
+#define NWG_RED_INT32			GL_R32I
+#define NWG_RED_UINT32			GL_R32UI
+#define NWG_RGBA8				GL_RGBA8
+#define NWG_DEPTH24				GL_DEPTH
 #define NWG_STENCIL8			GL_STENCIL
 #define NWG_DEPTH24_STENCIL8	GL_DEPTH24_STENCIL8
 // --==</pixel_formats_nw>==--
@@ -329,7 +331,7 @@
 #define NWG_TEXTURE_2D_MULTISAMPLE		GL_TEXTURE_2D_MULTISAMPLE
 #define NWG_TEXTURE_3D_MULTISAMPLE		GL_TEXTURE_2D_MULTISAMPLE_ARRAY
 #define NWG_DEPTH_STENCIL				GL_DEPTH_STENCIL
-#define NWG_DEPTH_STENCIL_ATTACHMENT		GL_DEPTH_STENCIL_ATTACHMENT
+#define NWG_DEPTH_STENCIL_ATTACHMENT	GL_DEPTH_STENCIL_ATTACHMENT
 // --filters
 #define NWG_TEXTURE_MAG_FILTER			GL_TEXTURE_MAG_FILTER
 #define NWG_TEXTURE_MIN_FILTER			GL_TEXTURE_MIN_FILTER
@@ -352,7 +354,7 @@
 
 // --==<gbuffers_nw>==--
 #define NWG_BUFFER_VERTEX		GL_ARRAY_BUFFER
-#define NWG_BUFFER_INDEX			GL_ELEMENT_ARRAY_BUFFER
+#define NWG_BUFFER_INDEX		GL_ELEMENT_ARRAY_BUFFER
 #define NWG_BUFFER_SHADER		GL_UNIFORM_BUFFER
 // --==</gbuffers_nw>==--
 
@@ -370,10 +372,10 @@
 
 // --==<framebuffers_nw>==--
 #define NWG_FRAMEBUF_IN			GL_DRAW_BUFFER
-#define NWG_FRAMEBUF_OUT			GL_READ_BUFFER
+#define NWG_FRAMEBUF_OUT		GL_READ_BUFFER
 #define NWG_FRAMEBUF_IN_OUT		GL_FRAMEBUFFER
-#define NWG_BUFFER_COLOR_BIT		GL_COLOR_BUFFER_BIT
-#define NWG_BUFFER_DEPTH_BIT		GL_DEPTH_BUFFER_BIT
+#define NWG_BUFFER_COLOR_BIT	GL_COLOR_BUFFER_BIT
+#define NWG_BUFFER_DEPTH_BIT	GL_DEPTH_BUFFER_BIT
 #define NWG_BUFFER_STENCIL_BIT	GL_STENCIL_BUFFER_BIT
 // --==</framebuffers_nw>==--
 
@@ -386,7 +388,7 @@
 // --==<data_load_types_nw>==--
 #define NWG_STATIC_DRAW		GL_STATIC_DRAW 
 #define NWG_STREAM_DRAW		GL_STREAM_DRAW 
-#define NWG_DYNAMIC_DRAW		GL_DYNAMIC_DRAW
+#define NWG_DYNAMIC_DRAW	GL_DYNAMIC_DRAW
 // --==</data_load_types_nw>==--
 
 // --==<error_codes_ogl>==--
@@ -401,7 +403,7 @@
 
 // --==<error_codes_nw>==--
 #define NWG_OK					GL_NO_ERROR         
-#define NWG_INVALID_ENUM			GL_INVALID_ENUM     
+#define NWG_INVALID_ENUM		GL_INVALID_ENUM     
 #define NWG_INVALID_VALUE		GL_INVALID_VALUE    
 #define NWG_INVALID_OPERATION	GL_INVALID_OPERATION
 #define NWG_STACK_OVERFLOW		GL_STACK_OVERFLOW   
@@ -427,98 +429,149 @@
 // --==</info_nw>==--
 #endif // NWG_GAPI
 #if (NWG_GAPI & NWG_GAPI_DX)
-// --==<data_types_dx11>==--
-// --==</data_types_dx11>==--
 
-// --==<data_types_nw>==--
-#define NWG_ZERO			0
-#define NWG_ONE			1
-#define NWG_BOOL			2
-#define NWG_INT16		3
-#define NWG_UINT16		4
-#define NWG_INT8			5
-#define NWG_UINT8		6
-#define NWG_INT32		7
-#define NWG_UINT32		8
-#define NWG_FLOAT32		9
-#define NWG_FLOAT64		10
-#define NWG_FLOAT32_VEC2	11
-#define NWG_FLOAT32_VEC3	12
-#define NWG_FLOAT32_VEC4	13
-#define NWG_FLOAT32_MAT2	14
-#define NWG_FLOAT32_MAT3	15
-#define NWG_FLOAT32_MAT4	16
-#define NWG_SAMPLER_1D	17
-#define NWG_UINT24_8		18
-// --==</data_types_nw>==--
+// --==<draw_modes_dx>==--
+#define DX_R32G32B32A32_FLOAT	2
+#define DX_R32G32B32A32_UINT	3
+#define DX_R32G32B32A32_SINT	4
+#define DX_R32G32B32_FLOAT		6
+#define DX_R32G32B32_UINT		7
+#define DX_R32G32B32_SINT		8
+#define DX_R16G16B16A16_FLOAT	10
+#define DX_R16G16B16A16_UNORM	11
+#define DX_R16G16B16A16_UINT	12
+#define DX_R16G16B16A16_SNORM	13
+#define DX_R16G16B16A16_SINT	14
+#define DX_R32G32_FLOAT			16
+#define DX_R32G32_UINT			17
+#define DX_R32G32_SINT			18
+#define DX_R8G8B8A8_UNORM		28
+#define DX_R8G8B8A8_UNORM_SRGB	29
+#define DX_R8G8B8A8_UINT		30
+#define DX_R8G8B8A8_SNORM		31
+#define DX_R8G8B8A8_SINT		32
+#define DX_R16G16_FLOAT			34
+#define DX_R16G16_UNORM			35
+#define DX_R16G16_UINT			36
+#define DX_R16G16_SNORM			37
+#define DX_R16G16_SINT			38
+#define DX_D32_FLOAT			40
+#define DX_R32_FLOAT			41
+#define DX_R32_UINT				42
+#define DX_R32_SINT				43
+#define DX_R8G8_UNORM			49
+#define DX_R8G8_UINT			50
+#define DX_R8G8_SNORM			51
+#define DX_R8G8_SINT			52
+#define DX_R16_FLOAT			54
+#define DX_D16_UNORM			55
+#define DX_R16_UNORM			56
+#define DX_R16_UINT				57
+#define DX_R16_SNORM			58
+#define DX_R16_SINT				59
+#define DX_R8_UNORM				61
+#define DX_R8_UINT				62
+#define DX_R8_SNORM				63
+#define DX_R8_SINT				64
+#define DX_A8_UNORM				65
+#define DX_G8R8_G8B8_UNORM		69
+#define DX_B8G8R8A8_UNORM		87
+#define DX_B4G4R4A4_UNORM		115
+// --==<draw_modes_dx>==--
 
-// --==<draw_modes_dx11>==--
+// --==<bind_flags_dx>==--
+#define DX_BIND_VERTEX_BUFFER		0x1L
+#define DX_BIND_INDEX_BUFFER		0x2L
+#define DX_BIND_CONSTANT_BUFFER		0x4L
+#define DX_BIND_SHADER_RESOURCE		0x8L
+#define DX_BIND_STREAM_OUTPUT		0x10L
+#define DX_BIND_RENDER_TARGET		0x20L
+#define DX_BIND_DEPTH_STENCIL		0x40L
+#define DX_BIND_UNORDERED_ACCESS	0x80L
+#define DX_BIND_DECODER				0x200L
+#define DX_BIND_VIDEO_ENCODER		0x400L
+// --==</bind_flags_dx>==--
+
+// --==<draw_modes_dx>==--
 // --primitives
-#define	D3D_PT_UNDEFINED			0
-#define	D3D_PT_POINTLIST			1
-#define	D3D_PT_LINELIST				2
-#define	D3D_PT_LINESTRIP			3
-#define	D3D_PT_TRIANGLELIST			4
-#define	D3D_PT_TRIANGLESTRIP		5
-#define	D3D_PT_LINELIST_ADJ			10
-#define	D3D_PT_LINESTRIP_ADJ		11
-#define	D3D_PT_TRIANGLELIST_ADJ		12
-#define	D3D_PT_TRIANGLESTRIP_ADJ	13
-// --==</draw_modes_dx11>==--
+#define	DX_PT_UNDEFINED			0
+#define	DX_PT_POINTLIST			1
+#define	DX_PT_LINELIST			2
+#define	DX_PT_LINESTRIP			3
+#define	DX_PT_TRIANGLELIST		4
+#define	DX_PT_TRIANGLESTRIP		5
+#define	DX_PT_LINELIST_ADJ		10
+#define	DX_PT_LINESTRIP_ADJ		11
+#define	DX_PT_TRIANGLELIST_ADJ	12
+#define	DX_PT_TRIANGLESTRIP_ADJ	13
+// --==</draw_modes_dx>==--
+
+// --==<data_formats_nw>==--
+#define NWG_ZERO			0
+#define NWG_ONE				1
+#define NWG_BOOL			997
+#define NWG_SINT8			DX_R8_SINT
+#define NWG_UINT8			DX_R8_UINT
+#define NWG_SINT16			DX_R16_SINT
+#define NWG_UINT16			DX_R16_UINT
+#define NWG_SINT32			DX_R32_SINT
+#define NWG_UINT32			DX_R32_UINT
+#define NWG_FLOAT32			DX_R32_FLOAT
+#define NWG_FLOAT64			998
+#define NWG_FLOAT32_VEC2	DX_R32G32_FLOAT
+#define NWG_FLOAT32_VEC3	DX_R32G32B32_FLOAT
+#define NWG_FLOAT32_VEC4	DX_R32G32B32A32_FLOAT
+#define NWG_FLOAT32_MAT2	DX_R32G32_FLOAT
+#define NWG_FLOAT32_MAT3	DX_R32G32B32_FLOAT
+#define NWG_FLOAT32_MAT4	DX_R32G32B32A32_FLOAT
+#define NWG_SAMPLER_1D		999
+#define NWG_UINT24_8		DX_R16G16_SINT
+// --==</data_formats_nw>==--
 
 // --==<draw_modes_nw>==--
-#define NWG_POINT		3
+#define NWG_POINT			3
 #define NWG_LINE			2
 #define NWG_FILL			1
 // --primitives
-#define NWG_POINTS			D3D_PT_POINTLIST
-#define NWG_LINES			D3D_PT_LINELIST
-#define NWG_LINE_STRIP		D3D_PT_LINESTRIP
-#define NWG_LINE_LOOP		D3D_PT_LINESTRIP_ADJ
-#define NWG_TRIANGLES		D3D_PT_TRIANGLELIST
-#define NWG_TRIANGLE_STRIP	D3D_PT_TRIANGLESTRIP
-#define NWG_TRIANGLE_FAN		D3D_PT_TRIANGLESTRIP_ADJ
+#define NWG_POINTS			DX_PT_POINTLIST
+#define NWG_LINES			DX_PT_LINELIST
+#define NWG_LINE_STRIP		DX_PT_LINESTRIP
+#define NWG_LINE_LOOP		DX_PT_LINESTRIP_ADJ
+#define NWG_TRIANGLES		DX_PT_TRIANGLELIST
+#define NWG_TRIANGLE_STRIP	DX_PT_TRIANGLESTRIP
+#define NWG_TRIANGLE_FAN	DX_PT_TRIANGLESTRIP_ADJ
 // --==</draw_modes_nw>==--
-
-// --==<planes_dx11>==--
-// --==</planes_dx11>==--
 
 // --==<planes_nw>==--
 #define NWG_FRONT			5
-#define NWG_BACK				4
-#define NWG_LEFT				3
+#define NWG_BACK			4
+#define NWG_LEFT			3
 #define NWG_RIGHT			2
 #define NWG_FRONT_AND_BACK	1
 // --==</planes_nw>==--
-
-// --==<shaders_dx11>==--
-// --==<shaders_dx11>==--
 
 // --==<shaders_nw>==--
 #define NWG_SHADER				4
 #define NWG_SHADER_VERTEX		3
 #define NWG_SHADER_GEOMETRY		2
-#define NWG_SHADER_PIXEL			1
+#define NWG_SHADER_PIXEL		1
 // --==</shaders_nw>==--
 
-// --==<configurations_dx11>==--
-// --==</configurations_dx11>==--
-
 // --==<configurations_nw>==--
-#define NWG_POINT_SIZE			8
-#define NWG_LINE_SMOOTH			7
-#define NWG_LINE_WIDTH			6
+#define NWG_POINT_SIZE	8
+#define NWG_LINE_SMOOTH	7
+#define NWG_LINE_WIDTH	6
 
-#define NWG_CULL_FACE			5
-#define NWG_CULL_FACE_MODE		4
-#define NWG_FRONT_FACE			3
-#define NWG_CW					2
-#define NWG_CCW					1
+#define NWG_CULL_FACE		5
+#define NWG_CULL_FACE_MODE	4
+#define NWG_FRONT_FACE		3
+#define NWG_CW				2
+#define NWG_CCW				1
 
-#define NWG_DEPTH_TEST			51
-#define NWG_DEPTH_FUNC			52
-#define NWG_STENCIL_TEST			53
-#define NWG_STENCIL_FUNC			54
+#define NWG_DEPTH_TEST		51
+#define NWG_DEPTH_FUNC		52
+#define NWG_STENCIL_TEST	53
+#define NWG_STENCIL_FUNC	54
 
 #define NWG_BLEND				1
 #define NWG_BLEND_DST			2
@@ -535,38 +588,32 @@
 
 #define NWG_MULTISAMPLE			0
 
-#define NWG_KEEP					0
-#define NWG_REPLACE				0
-#define NWG_INCR					0
-#define NWG_DECR					0
+#define NWG_KEEP	0
+#define NWG_REPLACE	0
+#define NWG_INCR	0
+#define NWG_DECR	0
 // --==</configurations_nw>==--
-
-// --==<expressions_dx11>==--
-// --constants
-// --conditions
-// --logic
-// --==</expressions_dx11>==--
 
 // --==<expressions_nw>==--
 // --constants
-#define NWG_NONE		0
+#define NWG_NONE	0
 #define NWG_FALSE	0
-#define NWG_TRUE		1
+#define NWG_TRUE	1
 // --conditions
 #define NWG_NEVER		0x0200
-#define NWG_LESS			0x0201
+#define NWG_LESS		0x0201
 #define NWG_EQUAL		0x0202
 #define NWG_LEQUAL		0x0203
 #define NWG_GREATER		0x0204
-#define NWG_NOTEQUAL		0x0205
+#define NWG_NOTEQUAL	0x0205
 #define NWG_GEQUAL		0x0206
 #define NWG_ALWAYS		0x0207
 // --logic
 #define NWG_AND				0x1501
 #define NWG_AND_REVERSE		0x1502
-#define NWG_COPY				0x1503
-#define NWG_AND_INVERTED		0x1504
-#define NWG_NOOP				0x1505
+#define NWG_COPY			0x1503
+#define NWG_AND_INVERTED	0x1504
+#define NWG_NOOP			0x1505
 #define NWG_XOR				0x1506
 #define NWG_OR				0x1507
 #define NWG_NOR				0x1508
@@ -575,24 +622,21 @@
 #define NWG_OR_REVERSE		0x150B
 #define NWG_COPY_INVERTED	0x150C
 #define NWG_OR_INVERTED		0x150D
-#define NWG_NAND				0x150E
+#define NWG_NAND			0x150E
 // --==</expressions_nw>==--
-
-// --==<pixel_formats_dx11>==--
-// --==</pixel_formats_dx11>==--
 
 // --==<pixel_formats_nw>==--
 #define NWG_RED				1
 #define NWG_GREEN			2
-#define NWG_BLUE				3
+#define NWG_BLUE			3
 #define NWG_ALPHA			4
 #define NWG_RGB				5
-#define NWG_RGBA				6
-#define NWG_RED_INT			7
-#define NWG_GREEN_INT		8
-#define NWG_BLUE_INT			9
-#define NWG_RGB_INT			10
-#define NWG_RGBA_INT			11
+#define NWG_RGBA			6
+#define NWG_RED_SINT		7
+#define NWG_GREEN_SINT		8
+#define NWG_BLUE_SINT		9
+#define NWG_RGB_SINT		10
+#define NWG_RGBA_SINT		11
 #define NWG_DEPTH			12
 #define NWG_STENCIL			13
 #define NWG_RED_INT32		14
@@ -603,8 +647,8 @@
 #define NWG_DEPTH24_STENCIL8	19
 // --==</pixel_formats_nw>==--
 
-// --==<textures_dx11>==--
-// --==</textures_dx11>==--
+// --==<textures_dx>==--
+// --==</textures_dx>==--
 
 // --==<textures_nw>==--
 // --types
@@ -614,7 +658,7 @@
 #define NWG_TEXTURE_2D_MULTISAMPLE		4
 #define NWG_TEXTURE_3D_MULTISAMPLE		5
 #define NWG_DEPTH_STENCIL				6
-#define NWG_DEPTH_STENCIL_ATTACHMENT		7
+#define NWG_DEPTH_STENCIL_ATTACHMENT	7
 // --filters
 #define NWG_TEXTURE_MAG_FILTER			1
 #define NWG_TEXTURE_MIN_FILTER			2
@@ -628,105 +672,46 @@
 #define NWG_TEXTURE_WRAP_REPEAT			9
 // --==</textures_nw>==--
 
-// --==<gbuffers_dx11>==--
-// --==</gbuffers_dx11>==--
-
-
 // --==<gbuffers_nw>==--
-#define NWG_BUFFER_VERTEX	1
-#define NWG_BUFFER_INDEX	2
-#define NWG_BUFFER_SHADER	3
+#define NWG_BUFFER_VERTEX	DX_BIND_VERTEX_BUFFER
+#define NWG_BUFFER_INDEX	DX_BIND_INDEX_BUFFER
+#define NWG_BUFFER_SHADER	DX_BIND_CONSTANT_BUFFER
 // --==</gbuffers_nw>==--
-
-// --==<framebuffers_dx11>==--
-// --==</framebuffers_dx11>==--
 
 // --==<framebuffers_nw>==--
 #define NWG_FRAMEBUF_IN			1
-#define NWG_FRAMEBUF_OUT			2
+#define NWG_FRAMEBUF_OUT		2
 #define NWG_FRAMEBUF_IN_OUT		3
-#define NWG_BUFFER_COLOR_BIT		4
-#define NWG_BUFFER_DEPTH_BIT		5
+#define NWG_BUFFER_COLOR_BIT	4
+#define NWG_BUFFER_DEPTH_BIT	5
 #define NWG_BUFFER_STENCIL_BIT	6
 // --==</framebuffers_nw>==--
-
-// --==<data_load_types_dx11>==--
-// --==</data_load_types_dx11>==--
 
 // --==<data_load_types_nw>==--
 #define NWG_STATIC_DRAW		1
 #define NWG_STREAM_DRAW		2
-#define NWG_DYNAMIC_DRAW		3
+#define NWG_DYNAMIC_DRAW	3
 // --==</data_load_types_nw>==--
-
-// --==<error_codes_dx11>==--
-// --==</error_codes_dx11>==--
 
 // --==<error_codes_nw>==--
 #define NWG_OK					0
-#define NWG_INVALID_ENUM			1
+#define NWG_INVALID_ENUM		1
 #define NWG_INVALID_VALUE		2
 #define NWG_INVALID_OPERATION	3
 #define NWG_STACK_OVERFLOW		4
 #define NWG_STACK_UNDERFLOW		5
 #define NWG_OUT_OF_MEMORY		6
 // --==</error_codes_nw>==--
-
-// --==<info_dx11>==--
-// --==</info_dx11>==--
+// --==</info_dx>==--
 
 // --==<info_nw>==--
 #define NWG_COMPILE_STATUS		7
 #define NWG_LINK_STATUS			8
 // --==</info_nw>==--
-
-// --==<types_dx>==--
-struct IDXGISwapChain;
-struct ID3D11Device;
-struct ID3D11DeviceContext;
-struct ID3D11RenderTargetView;
-struct ID3D11Buffer;
-struct ID3D11InputLayout;
-struct ID3D11VertexShader;
-struct ID3D11PixelShader;
-// --==</types_dx>==--
 #endif	// NWG_GAPI
 
 #include <nwg_pch.hpp>
 
-namespace NWG
-{
-	class NWG_API GfxEngine;
-
-	class NWG_API Shader;
-	class NWG_API Texture;
-	class NWG_API GfxMaterial;
-
-	class NWG_API FrameBuf;
-
-	class NWG_API VertexBufLayout;
-	class NWG_API ShaderBufLayout;
-
-	class NWG_API VertexBuf;
-	class NWG_API IndexBuf;
-	class NWG_API ShaderBuf;
-	class NWG_API VertexArr;
-}
-namespace NWG
-{
-	struct NWG_API Drawable;
-
-	struct NWG_API GfxCamera;
-
-	struct NWG_API FrameBufInfo;
-	struct NWG_API TextureInfo;
-
-	struct NWG_API BufferElement;
-
-	struct NWG_API SubTexture1d;
-	struct NWG_API SubTexture2d;
-	struct NWG_API SubTexture3d;
-}
 namespace NWG
 {
 	enum GfxApiTypes : UInt32 {
@@ -764,10 +749,15 @@ namespace NWG
 	};
 	enum ShaderDataTypes : UInt32 {
 		SDT_DEFAULT = NWG_FLOAT32,
-		SDT_BOOL = NWG_BOOL, SDT_INT8 = NWG_INT8, SDT_UINT8 = NWG_UINT8,
-		SDT_INT16 = NWG_INT16, SDT_UINT16 = NWG_UINT16,
-		SDT_INT32 = NWG_INT32, SDT_UINT32 = NWG_UINT32,
-		SDT_FLOAT32 = NWG_FLOAT32, SDT_FLOAT64 = NWG_FLOAT64,
+		SDT_BOOL = NWG_BOOL,
+		SDT_SINT8 = NWG_SINT8, SDT_UINT8 = NWG_UINT8,
+		SDT_SINT16 = NWG_SINT16, SDT_UINT16 = NWG_UINT16,
+		SDT_SINT32 = NWG_SINT32, SDT_UINT32 = NWG_UINT32,
+		SDT_FLOAT32 = NWG_FLOAT32,
+		SDT_FLOAT32_VEC2 = NWG_FLOAT32_VEC2,
+		SDT_FLOAT32_VEC3 = NWG_FLOAT32_VEC3,
+		SDT_FLOAT32_VEC4 = NWG_FLOAT32_VEC4,
+		SDT_FLOAT64 = NWG_FLOAT64,
 
 		SDT_SAMPLER = NWG_SAMPLER_1D
 	};
@@ -842,24 +832,49 @@ namespace NWG
 		TXF_NONE = 0,
 		TXF_RED = NWG_RED, TXF_GREEN = NWG_GREEN, TXF_BLUE = NWG_BLUE,
 		TXF_RGB = NWG_RGB, TXF_RGBA = NWG_RGBA,
-		TXF_RED_INT = NWG_RED_INT, TXF_GREEN_INT = NWG_GREEN_INT, TXF_BLUE_INT = NWG_BLUE_INT,
-		TXF_RGB_INT = NWG_RGB_INT, TXF_RGBA_INT = NWG_RGBA_INT,
+		TXF_RED_SINT = NWG_RED_SINT, TXF_GREEN_SINT = NWG_GREEN_SINT, TXF_BLUE_SINT = NWG_BLUE_SINT,
+		TXF_RGB_SINT = NWG_RGB_SINT, TXF_RGBA_SINT = NWG_RGBA_SINT,
 		TXF_DEPTH = NWG_DEPTH, TXF_STENCIL = NWG_STENCIL,
 		TXF_DEPTH_STENCIL = NWG_DEPTH_STENCIL,
 	};
 	enum TextureInterFormats : UInt32 {
-		TXFI_RED_UINT32 = NWG_RED_UINT32, TXFI_RED_INT32 = NWG_RED_INT32,
+		TXFI_RED_UINT32 = NWG_RED_UINT32, TXFI_RED_SINT32 = NWG_RED_INT32,
 		TXFI_RGB = NWG_RGB, TXFI_RGBA8 = NWG_RGBA8,
 		TXFI_DEPTH24 = NWG_DEPTH24, TXFI_STENCIL8 = NWG_STENCIL8,
 		TXFI_DEPTH24_STENCIL8 = NWG_DEPTH24_STENCIL8,
 	};
 	enum PixelFormats : UInt32 {
 		FBAT_DEFAULT = 0,
-		PXF_INT8 = NWG_INT8, PXF_UINT8 = NWG_UINT8,
-		PXF_INT32 = NWG_INT32, PXF_UINT32 = NWG_UINT32,
+		PXF_SINT8 = NWG_SINT8, PXF_UINT8 = NWG_UINT8,
+		PXF_SINT32 = NWG_SINT32, PXF_UINT32 = NWG_UINT32,
 		PXF_UINT24_8 = NWG_UINT24_8
 	};
 	//	--==</enums>==--
+}
+
+namespace NWG
+{
+	class NWG_API GfxEngine;
+	class NWG_API ADrawable;
+	class NWG_API VertexedDrawable;
+	class NWG_API IndexedDrawable;
+
+	class NWG_API VertexBuf;
+	template<typename VType> class TVertexBuf;
+	class NWG_API IndexBuf;
+	template<typename IType> class TIndexBuf;
+
+	class NWG_API ShaderProgram;
+	class NWG_API Shader;
+	class NWG_API VertexShader;
+	class NWG_API PixelShader;
+	class NWG_API GeometryShader;
+
+	class NWG_API Texture;
+}
+namespace NWG
+{
+	struct NWG_API GfxCamera;
 }
 
 #endif	// NWG_CORE_HPP

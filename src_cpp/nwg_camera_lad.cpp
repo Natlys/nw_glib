@@ -1,6 +1,8 @@
 #include <nwg_pch.hpp>
 #include "nwg_camera_lad.h"
 
+#pragma warning(disable:4244)
+
 namespace NWG
 {
 	GfxCameraLad::GfxCameraLad() :
@@ -76,7 +78,7 @@ namespace NWG
 			}
 			else if (rCamera.GetMode() == GCM_3D) {
 				float nYaw_deg = rCamera.nYaw - m_crs->GetMoveDeltaX() * nRtnSpeed * TimeSys::GetDeltaS();
-				float nPitch_deg = rCamera.nPitch - m_crs->GetMoveDeltaY() * nRtnSpeed * TimeSys::GetDeltaS();
+				float nPitch_deg = rCamera.nPitch - static_cast<Float32>(m_crs->GetMoveDeltaY()) * nRtnSpeed * TimeSys::GetDeltaS();
 
 				if (nYaw_deg < -nMaxYaw) { rCamera.nYaw = nMaxYaw; }
 				else if (nYaw_deg > nMaxYaw) { rCamera.nYaw = -nMaxYaw; }

@@ -6,21 +6,21 @@
 #include <nwg_shader.h>
 namespace NWG
 {
-	GfxMaterial::GfxMaterial(const char* strName) :
-		TDataRes(strName) { }
+	GfxMaterial::GfxMaterial(GfxEngine& rGfx, const char* strName) :
+		TEntity(), AGfxRes(rGfx), ADataRes(strName) { }
 	GfxMaterial::~GfxMaterial() { }
 
 	// --setters
-	void GfxMaterial::SetShader(Shader* pShader) {
-		m_pShader = pShader;
+	void GfxMaterial::SetShaderProg(ShaderProgram* pshdProg) {
+		m_pshdProg = pshdProg;
 		m_Textures.clear();
 		m_Colors.clear();
 
-		if (pShader != nullptr) {
-			for (auto& itGlob : pShader->GetShdLayout().GetGlobals()) {
+		if (pshdProg != nullptr) {
+			for (auto& itGlob : pshdProg->GetShdLayout().GetBlock().Elems) {
 				switch (itGlob.sdType) {
 				case SDT_FLOAT32: if (itGlob.unCount == 4) { m_Colors[itGlob.strName] = V4f{ 1.0f, 1.0f, 1.0f, 1.0f }; } break;
-				case SDT_SAMPLER: m_Textures[itGlob.strName] = DataSys::GetDR<Texture>("tex_white_solid"); break;
+				case SDT_SAMPLER: m_Textures[itGlob.strName] = EntSys::GetEnt<Texture>(0); break; //"tex_white_solid"); break;
 				}
 			}
 		}
@@ -31,24 +31,24 @@ namespace NWG
 		if (pTex == nullptr) { return; }
 		if (strcmp(strType, "") == 0) { m_Textures.begin()->second = pTex; }
 		if (m_Textures.find(strType) != m_Textures.end()) { m_Textures[strType] = pTex; }
-		else { m_pShader->SetInt(strType, pTex->GetTexSlot()); }
+		else { m_pshdProg->SetInt(strType, pTex->GetTexSlot()); }
 	}
 	void GfxMaterial::SetColor(const V4f& rgbaClr, const char* strType) {
 		if (strcmp(strType, "") == 0) { m_Colors.begin()->second = rgbaClr; }
 		if (m_Colors.find(strType) == m_Colors.end()) {	m_Colors[strType] = rgbaClr; }
-		else { m_pShader->SetV4f(strType, rgbaClr); }
+		else { m_pshdProg->SetV4f(strType, rgbaClr); }
 	}
 
 	// --core_methods
-	void GfxMaterial::Enable()
+	void GfxMaterial::Bind()
 	{
-		m_pShader->Bind();
-		for (auto itClr : m_Colors) { m_pShader->SetV4f(&itClr.first[0], itClr.second); }
+		m_pshdProg->Bind();
+		for (auto itClr : m_Colors) { m_pshdProg->SetV4f(&itClr.first[0], itClr.second); }
 		auto itTex = m_Textures.begin();
 		for (UInt8 txi = 0; txi < m_Textures.size(); txi++) {
 			itTex->second->SetSlot(txi);
 			itTex->second->Bind();
-			m_pShader->SetInt(&itTex->first[0], itTex->second->GetTexSlot());
+			m_pshdProg->SetInt(&itTex->first[0], itTex->second->GetTexSlot());
 			itTex++;
 		}
 	}

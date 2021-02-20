@@ -1,7 +1,7 @@
 #ifndef NWG_TEXTURE_H
 #define NWG_TEXTURE_H
 #include <nwg_core.hpp>
-#include <nwg_entity.h>
+#include <nwg_res.h>
 #if (defined NWG_GAPI)
 #include <nwg_tools.h>
 namespace NWG
@@ -20,7 +20,6 @@ namespace NWG
 		UInt32 unSamples = 1;
 	};
 }
-#if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
 	/// Texture class
@@ -28,11 +27,11 @@ namespace NWG
 	/// -> Set props and data -> LoadData -> MakeTexture -> Bind drawing stuff
 	/// -> Enable -> Draw -> Disable
 	/// --It's a wrapping image which has to wrap a mesh
-	class NWG_API Texture : public GfxEntity, public TDataRes<Texture>
+	class NWG_API Texture : public TEntity<Texture>, public AGfxRes, public ADataRes
 	{
 	public:
-		Texture(const char* strName, TextureTypes texTypes);
-		~Texture();
+		Texture(GfxEngine& rGfx, const char* strName, TextureTypes texTypes);
+		virtual ~Texture();
 		// --getters
 		inline UInt32 GetTexSlot() const { return m_unTexSlot; }
 		inline TextureTypes GetType() const { return m_texType; }
@@ -43,7 +42,7 @@ namespace NWG
 		void SetInfo(const TextureInfo& rTexInfo);
 		void SetInfo(const ImageInfo& rImgInfo);
 		// --core_methods
-		virtual void Bind() const override;
+		virtual void Bind() override;
 		virtual void Remake();
 		virtual void Clear(Ptr pValue);
 		// --data_methods
@@ -56,35 +55,5 @@ namespace NWG
 		ImageInfo m_imgInfo;
 	};
 }
-#endif
-#if (NWG_GAPI & NWG_GAPI_DX)
-namespace NWG
-{
-	/// Texture class
-	/// Description:
-	/// -> Set props and data -> LoadData -> MakeTexture -> Bind drawing stuff
-	/// -> Enable -> Draw -> Disable
-	/// --It's a wrapping image which has to wrap a mesh
-	class NWG_API Texture : public TDataRes<Texture>, public GfxEntity
-	{
-	public:
-		Texture(const char* strName, TextureTypes texTypes);
-		virtual ~Texture();
-		// --core_methods
-		virtual void Bind() const override;
-		void Unbind();
-		void Remake();
-		void Clear(Ptr pValue);
-		// --data_methods
-		virtual bool SaveF(const char* strFPath);
-		virtual bool LoadF(const char* strFPath);
-	private:
-		TextureTypes m_texType;
-		UInt32 m_unTexSlot;
-		TextureInfo m_texInfo;
-		ImageInfo m_imgInfo;
-	};
-}
-#endif
 #endif	// NWG_GAPI
 #endif // GFX_TEXTURE_H

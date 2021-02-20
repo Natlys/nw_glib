@@ -3,7 +3,7 @@
 #if (defined NWG_GAPI)
 	#if (NWG_GAPI & NWG_GAPI_OGL)
 		//#include <gl/gl.h>
-		#include <../ext/glad/glad.h>
+		#include <glad/glad.h>
 		#pragma comment(lib, "opengl32.lib")
 	#endif
 	#if (NWG_GAPI & NWG_GAPI_DX)
