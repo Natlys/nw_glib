@@ -11,13 +11,13 @@ namespace NWG
 	{
 	public:
 		V4i rectViewport = { 0, 0, 1, 1 };
-		Bit bSwapChain = false;
+		Bit bSwapTarget = false;
 		Bit bResizable = true;
-		UInt32 unColorCount = 0;
 		Bit bHasDepth = false;
 		Bit bHasStencil = false;
-
+		UInt32 unColorCount = 0u;
 	public:
+		// --getters
 		inline Int32 GetWidth() const { return { rectViewport.z - rectViewport.x }; }
 		inline Int32 GetHeight() const { return { rectViewport.w - rectViewport.y }; }
 	};
@@ -45,12 +45,12 @@ namespace NWG
 		// --core_methods
 		virtual void Bind() override;
 		void Remake();
-		void Clear(UInt32 bitMask = FB_COLOR | FB_DEPTH | FB_STENCIL);
+		void Clear();
 		void ReadPixels(Ptr pData, UInt32 unAttachIdx, Int32 nX, Int32 nY, Int32 nWidth = 1, Int32 nHeight = 1);
 		void WritePixels(Ptr pData, UInt32 unAttachIdx, Int32 nX, Int32 nY, Int32 nWidth = 1, Int32 nHeight = 1);
 		// --data_methods
-		virtual bool SaveF(const char* strFPath) override { return true; }
-		virtual bool LoadF(const char* strFPath) override { return true; }
+		virtual bool SaveF(const char* strFPath) override;
+		virtual bool LoadF(const char* strFPath) override;
 	protected:
 		FrameBufInfo m_Info;
 		V4f m_rgbaClear;

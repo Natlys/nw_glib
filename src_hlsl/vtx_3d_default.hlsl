@@ -15,8 +15,8 @@ VS_INFO main(float3 atb_vtxCrd : vtx_crd, float2 atb_texCrd : tex_crd, float3 at
 	vso.texCrd = atb_texCrd;
 	vso.nrmCrd = atb_nrmCrd;
 	vso.vtxCrd = float4(atb_vtxCrd.x, atb_vtxCrd.y, atb_vtxCrd.z, 1.0f);
-	vso.vtxCrd = mul(vso.vtxCrd, cst_matProj);
-	vso.vtxCrd = mul(vso.vtxCrd, cst_matView);
 	vso.vtxCrd = mul(vso.vtxCrd, cst_matModel);
+	vso.vtxCrd = mul(vso.vtxCrd, cst_matView);
+	vso.vtxCrd = mul(vso.vtxCrd, cst_matProj);
 	return vso;
 }

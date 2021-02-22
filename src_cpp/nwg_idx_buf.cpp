@@ -6,22 +6,22 @@
 #if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
-	IndexBuf::IndexBuf() : TEntity(), AGfxRes(), m_szData(0), m_sdType(DT_UINT32) { }
-	IndexBuf::~IndexBuf() { SetData(0, nullptr); }
+	IndexBuf::IndexBuf(GfxEngine& rGfx) :
+		TEntity(), AGfxRes(rGfx),
+		m_gdInfo(GfxBufInfo()) { }
+	IndexBuf::~IndexBuf() { if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; } }
 	// --setters
-	void IndexBuf::SetSubData(Size szData, const Ptr pVtxData, Size szOffset) {
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, szOffset, szData, pVtxData);
-	}
-	void IndexBuf::SetData(Size szData, const Ptr pVtxData) {
-		m_szData = szData;
+	void IndexBuf::SetSubData(Size szData, const Ptr pData, Size szOffset) { glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, szOffset, szData, pData); }
+	// --core_methods
+	void IndexBuf::Bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_unRId); }
+	bool IndexBuf::Remake(const GfxBufInfo& rInfo) {
+		m_gdInfo = rInfo;
 		if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; }
-		if (szData == 0) { return; }
+		if (rInfo.szData == 0) { return false; }
 		glGenBuffers(1, &m_unRId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_unRId);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, szData, pVtxData, pVtxData == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-	}
-	void IndexBuf::Bind() {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_unRId);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, rInfo.szData, rInfo.pData, rInfo.pData == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		return true;
 	}
 }
 
@@ -30,7 +30,7 @@ namespace NWG
 namespace NWG
 {
 	IndexBuf::IndexBuf(GfxEngine& rGfx) :
-		TEntity(), AGfxRes(rGfx), m_gdInfo(GfxDataInfo()),
+		TEntity(), AGfxRes(rGfx), m_gdInfo(GfxBufInfo()),
 		m_pNative(nullptr) { }
 	IndexBuf::~IndexBuf() {
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
@@ -46,10 +46,10 @@ namespace NWG
 	void IndexBuf::Bind() {
 		m_pGfx->GetContext()->IASetIndexBuffer(m_pNative, ConvertEnum<DataTypes, DXGI_FORMAT>(m_gdInfo.sdType), 0);
 	}
-	void IndexBuf::Remake(const GfxDataInfo& rInfo) {
+	bool IndexBuf::Remake(const GfxBufInfo& rInfo) {
 		m_gdInfo = rInfo;
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
-		if (m_gdInfo.szData == 0) { return; }
+		if (m_gdInfo.szData == 0) { return false; }
 
 		D3D11_BUFFER_DESC bufDesc{ 0 };
 		bufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -71,7 +71,8 @@ namespace NWG
 		subData.pSysMem = m_gdInfo.pData;
 
 		m_pGfx->GetDevice()->CreateBuffer(&bufDesc, &subData, &m_pNative);
-		if (m_pNative == nullptr) { throw Exception("Failed to create buffer!"); }
+		if (m_pNative == nullptr) { throw Exception("failed to create buffer!"); }
+		return true;
 	}
 }
 #endif

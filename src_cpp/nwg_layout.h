@@ -11,7 +11,7 @@ namespace NWG
 	struct NWG_API BufElem
 	{
 	public:
-		Char strName[128] = "none";
+		Char strName[128] = "default";
 		DataTypes sdType = DT_DEFAULT;
 		UInt32 unCount = 0;
 		UInt32 unNum = 0;
@@ -34,12 +34,8 @@ namespace NWG
 		Size szOffset;
 		Size szAll;
 	public:
-		ShaderBlock() : strName(""), unBindPoint(0), szOffset(0), szAll(0) {};
-		ShaderBlock(const char* sName, UInt8 BindPoint) :
-			strName(""),
-			unBindPoint(BindPoint), szAll(0), szOffset(0) {
-			strcpy(strName, sName);
-		}
+		ShaderBlock() = default;
+		ShaderBlock(const char* sName, UInt8 unBindPoint);
 	};
 }
 namespace NWG
@@ -66,20 +62,26 @@ namespace NWG
 	class NWG_API ShaderLayout
 	{
 	public:
+		ShaderLayout();
 		// --getters
-		inline const ShaderBlock& GetBlock(UInt8 unIdx = 0) const { return m_Blocks.at(unIdx); }
-		inline const DArray<ShaderBlock>& GetBlocks() const { return m_Blocks; }
+		inline Size GetDataSize() const { return m_szData; }
+		inline ShaderBlock& GetBlock(UInt8 unIdx = 0) { return m_Blocks.at(unIdx); }
+		inline DArray<ShaderBlock>& GetBlocks() { return m_Blocks; }
 		// --setters
 		void SetBlocks(const DArray<ShaderBlock>& rBlocks);
 		void AddBlock(const ShaderBlock& rBlock, Int8 nElems = 1);
 		void Remake();
 	private:
+		Size m_szData;
 		DArray<ShaderBlock> m_Blocks;
 	};
 }
 namespace NWG
 {
 	/// InputLayout class
+	/// Description:
+	/// --default input assembler tool for vertex shaders;
+	/// --equivalent to the vertex array in opengl;
 	class NWG_API InputLayout : public TEntity<InputLayout>, public AGfxRes
 	{
 	public:
@@ -91,7 +93,7 @@ namespace NWG
 		void SetShader(VertexShader* pShader);
 		// --core_methods
 		virtual void Bind() override;
-		void Remake();
+		bool Remake();
 	private:
 		VertexShader* m_pShader;
 #if (NWG_GAPI & NWG_GAPI_DX)

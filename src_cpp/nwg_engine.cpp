@@ -9,7 +9,7 @@
 namespace NWG
 {
 	GfxEngine::GfxEngine(HWND pWindow) :
-		m_gInfo(GfxInfo()), m_gConfig(GfxConfig()),
+		m_gInfo(GfxContextInfo()), m_gConfig(GfxConfig()), m_dInfo(GfxDrawInfo()),
 		m_pWindow(pWindow),
 		m_pDevice(nullptr), m_pContext(nullptr)
 	{
@@ -53,6 +53,9 @@ namespace NWG
 		strcpy(&m_gInfo.strVendor[0], &((const char*)glGetString(GL_VENDOR))[0]);
 		strcpy(&m_gInfo.strShdLang[0], &((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION))[0]);
 		std::cout << m_gInfo;
+
+		SetPrimitive(GPT_TRIANGLES);
+		m_dInfo.sdIdx = DT_UINT32;
 	}
 	GfxEngine::~GfxEngine()
 	{
@@ -67,35 +70,27 @@ namespace NWG
 	}
 	// --==<setters>==--
 	void GfxEngine::SetPrimitive(GfxPrimitives gfxPrimitiveTopology) {
+		m_gConfig.General.DrawMode.gPrimitive = gfxPrimitiveTopology;
 	}
 	void GfxEngine::SetModes(Bit bEnable, ProcessingModes pmModes) {
 
 		switch (pmModes) {
-		case PM_BLEND:
-			m_gConfig.Blending.bEnable = bEnable;
-			break;
-		case PM_DEPTH_TEST:
-			m_gConfig.DepthTest.bEnable = bEnable;
-			break;
-		case PM_CULL_FACE:
-			m_gConfig.Culling.bEnable = bEnable;
-			break;
+		case PM_BLEND: m_gConfig.Blending.bEnable = bEnable; break;
+		case PM_DEPTH_TEST: m_gConfig.DepthTest.bEnable = bEnable; break;
+		case PM_CULL_FACE: m_gConfig.Culling.bEnable = bEnable; break;
 		default: break;
 		}
-		if (bEnable) {
-			glEnable(pmModes);
-		}
-		else {
-			glDisable(pmModes);
-		}
+		if (bEnable) { glEnable(ConvertEnum<ProcessingModes, UInt32>(pmModes)); }
+		else { glDisable(ConvertEnum<ProcessingModes, UInt32>(pmModes)); }
 	}
-	void GfxEngine::SetViewport(Int32 nX, Int32 nY, Int32 nW, Int32 nH) {
-		glViewport(nX, nY, nW, nH);
+	void GfxEngine::SetViewport(Int32 nX0, Int32 nY0, Int32 nX1, Int32 nY1) {
+		m_gConfig.General.rectViewport = { nX0, nY0, nX1, nY1 };
+		glViewport(nX0, nY0, nX1, nY1);
 	}
 	void GfxEngine::SetDrawMode(DrawModes dMode, FacePlanes facePlane) {
-		m_gConfig.General.PolyMode.dMode = dMode;
-		m_gConfig.General.PolyMode.facePlane = facePlane;
-		glPolygonMode(facePlane, dMode);
+		m_gConfig.General.DrawMode.dMode = dMode;
+		m_gConfig.General.DrawMode.facePlane = facePlane;
+		glPolygonMode(ConvertEnum<FacePlanes, UInt32>(facePlane), ConvertEnum<DrawModes, UInt32>(dMode));
 	}
 	void GfxEngine::SetVariable(GfxVariables gfxVar, Float32 nValue) {
 		switch (gfxVar) {
@@ -104,7 +99,7 @@ namespace NWG
 			glLineWidth(nValue);
 			break;
 		case GV_POINT_SIZE:
-		m_gConfig.General.nPixelSize = nValue;
+			m_gConfig.General.nPixelSize = nValue;
 			glPointSize(nValue);
 			break;
 		default:	break;
@@ -113,17 +108,17 @@ namespace NWG
 	void GfxEngine::SetBlendFunc(BlendConfigs bcSrcFactor, BlendConfigs bcDestFactor) {
 		m_gConfig.Blending.FactorSrc = bcSrcFactor;
 		m_gConfig.Blending.FactorDest = bcDestFactor;
-		glBlendFunc(bcSrcFactor, bcDestFactor);
+		glBlendFunc(ConvertEnum<BlendConfigs, UInt32>(bcSrcFactor), ConvertEnum<BlendConfigs, UInt32>(bcDestFactor));
 	}
 	void GfxEngine::SetDepthFunc(DepthConfigs dcFunc) {
 		m_gConfig.DepthTest.Func = dcFunc;
-		glDepthFunc(dcFunc);
+		glDepthFunc(ConvertEnum<DepthConfigs, UInt32>(dcFunc));
 	}
 	void GfxEngine::SetStencilFunc(StencilConfigs scFunc, UInt32 unRefValue, UInt8 unBitMask) {
 		m_gConfig.StencilTest.Func = scFunc;
 		m_gConfig.StencilTest.nBitMask = unBitMask;
 		m_gConfig.StencilTest.nRefValue = unRefValue;
-		glStencilFunc(scFunc, unRefValue, unBitMask);
+		glStencilFunc(ConvertEnum<StencilConfigs, UInt32>(scFunc), unRefValue, unBitMask);
 	}
 	// --==</setters>==--
 
@@ -131,21 +126,29 @@ namespace NWG
 	void GfxEngine::Update()
 	{
 		SwapBuffers(m_pDevice);
-		glClearColor(0.0f, sinf(TimeSys::GetCurrS()), cosf(TimeSys::GetCurrS()), 1.0f);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(sinf(TimeSys::GetCurr(0.1)), sinf(TimeSys::GetCurr(1.0)), cosf(TimeSys::GetCurr(0.5)), 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	void GfxEngine::BeginDraw()
 	{
-		m_gTools.Reset();
+		m_dInfo.Reset();
 	}
 	void GfxEngine::EndDraw()
 	{
-		if (m_gTools.unIdx > 0) {
-			glDrawElements(m_gTools.gPrimitive, m_gTools.unIdx, m_gTools.sdIdx, nullptr);
+		if (m_dInfo.unIdx > 0) {
+			glDrawElements(ConvertEnum<GfxPrimitives, UInt32>(m_gConfig.General.DrawMode.gPrimitive),
+				m_dInfo.unIdx, ConvertEnum<DataTypes, UInt32>(m_dInfo.sdIdx), nullptr);
 		}
-		else if (m_gTools.unVtx > 0) {
-			glDrawVertices(m_gTools.gPrimitive, m_gTools.unVtxCount);
+		else if (m_dInfo.unVtx > 0) {
+			glDrawArrays(ConvertEnum<GfxPrimitives, UInt32>(m_gConfig.General.DrawMode.gPrimitive),
+				m_dInfo.unVtx, m_dInfo.szVtx);
+		}
+	}
+	void GfxEngine::OnDraw(Drawable& rDrb)
+	{
+		rDrb.Bind();
+		for (auto& itRef : rDrb.GetResources()) {
 		}
 	}
 	void GfxEngine::Create(RefKeeper<GfxEngine>& rEngine, HWND& rWindow)
@@ -178,13 +181,13 @@ namespace NWG
 		swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapDesc.BufferCount = 1;
 		swapDesc.OutputWindow = m_pWindow;
-		//swapDesc.Windowed = TRUE;
-		swapDesc.Windowed = FALSE;
+		swapDesc.Windowed = TRUE;
+		//swapDesc.Windowed = FALSE;
 		swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		swapDesc.Flags = 0;
 		D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG,
 			nullptr, NULL, D3D11_SDK_VERSION, &swapDesc, &m_pSwap, &m_pDevice, nullptr, &m_pContext);
-		if (m_pDevice == nullptr || m_pContext == nullptr || m_pSwap == nullptr) { throw WinException("graphics engine is not initialized"); }
+		if (m_pDevice == nullptr || m_pContext == nullptr || m_pSwap == nullptr) { throw Exception("graphics engine is not initialized"); }
 
 		ID3D11Resource* pBackBuf = nullptr;
 		m_pSwap->GetBuffer(NULL, __uuidof(ID3D11Resource), reinterpret_cast<Ptr*>(&pBackBuf));
@@ -221,12 +224,13 @@ namespace NWG
 		else {
 		}
 	}
-	void GfxEngine::SetViewport(Int32 nX, Int32 nY, Int32 nW, Int32 nH) {
+	void GfxEngine::SetViewport(Int32 nX0, Int32 nY0, Int32 nX1, Int32 nY1) {
+		m_gConfig.General.rectViewport = { nX0, nY0, nX1, nY1 };
 		D3D11_VIEWPORT vp{ 0 };
-		vp.TopLeftX = static_cast<Float32>(nX);
-		vp.TopLeftY = static_cast<Float32>(nY);
-		vp.Width = static_cast<Float32>(nW);
-		vp.Height = static_cast<Float32>(nH);
+		vp.TopLeftX = static_cast<Float32>(nX0);
+		vp.TopLeftY = static_cast<Float32>(nY0);
+		vp.Width = static_cast<Float32>(nX1 - nX0);
+		vp.Height = static_cast<Float32>(nY1 - nY0);
 		vp.MaxDepth = 1.0f;
 		vp.MinDepth = 0.0f;
 		m_pContext->RSSetViewports(1, &vp);
@@ -259,7 +263,7 @@ namespace NWG
 	void GfxEngine::Update()
 	{
 		HRESULT hresInfo;
-		const Float32 rgbaClear[] = { 0.0f, sinf(TimeSys::GetCurrS()), cosf(TimeSys::GetCurrS()), 1.0f };
+		const Float32 rgbaClear[] = { sinf(TimeSys::GetCurr(0.1)), sinf(TimeSys::GetCurr(0.5)), cosf(TimeSys::GetCurr(0.3)), 1.0f };
 		
 		hresInfo = m_pSwap->Present(m_gConfig.General.unSwapInterval, 0u);
 		if (hresInfo == DXGI_ERROR_DEVICE_REMOVED) { throw Exception("device has been removed", hresInfo, __FILE__, __LINE__); }
@@ -274,7 +278,7 @@ namespace NWG
 		if (m_dInfo.unIdx > 0) { m_pContext->DrawIndexed(m_dInfo.unIdx, 0u, 0u); }
 		else if (m_dInfo.unVtx > 0) { m_pContext->Draw(m_dInfo.unVtx, 0u); }
 	}
-	void GfxEngine::OnDraw(ADrawable& rDrb)
+	void GfxEngine::OnDraw(Drawable& rDrb)
 	{
 		rDrb.Bind();
 		for (auto& itBuf : rDrb.GetVtxBufs()) { }

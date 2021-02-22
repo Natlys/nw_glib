@@ -38,11 +38,14 @@ namespace NWG
 		void Update();
 		void BeginDraw();
 		void EndDraw();
-		void OnDraw(ADrawable& rDrb);
+		void OnDraw(Drawable& rDrb);
+		/// create resource for particular reference
 		template<class RType, typename ... Args>
 		void CreateRes(RefKeeper<RType>& rRes, Args&& ... Arguments);
+		/// create resource for abstract reference
 		template<class ARType, class RType, typename ... Args>
 		void CreateRes(RefKeeper<ARType>& rRes, Args&& ... Arguments);
+		/// create the instance of the engine
 		static void Create(RefKeeper<GfxEngine>& rEngine, HWND& rWindow);
 	private:
 		GfxContextInfo m_gInfo;

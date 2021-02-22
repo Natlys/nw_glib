@@ -4308,7 +4308,7 @@ GLAPI PFNGLUSEPROGRAMSTAGESPROC glad_glUseProgramStages;
 #define glUseProgramStages glad_glUseProgramStages
 typedef void (APIENTRYP PFNGLACTIVESHADERPROGRAMPROC)(GLuint, GLuint);
 GLAPI PFNGLACTIVESHADERPROGRAMPROC glad_glActiveShaderProgram;
-#define glActiveShaderProgram glad_glActiveShaderProgram
+#define glActiveShaderProg glad_glActiveShaderProgram
 typedef GLuint (APIENTRYP PFNGLCREATESHADERPROGRAMVPROC)(GLenum, GLsizei, const GLchar**);
 GLAPI PFNGLCREATESHADERPROGRAMVPROC glad_glCreateShaderProgramv;
 #define glCreateShaderProgramv glad_glCreateShaderProgramv

@@ -14,7 +14,7 @@
 
 #define NWG_GAPI_OGL	1 << 1
 #define NWG_GAPI_DX		1 << 2
-#define NWG_GAPI		NWG_GAPI_DX
+#define NWG_GAPI		NWG_GAPI_OGL
 // --==</configurations>==--
 
 #include <nwg_pch.hpp>
@@ -35,9 +35,9 @@ namespace NWG
 		FBT_IN = 1, FBT_OUT = 2, FBT_IN_OUT = 3,
 	};
 	enum ShaderTypes : UInt32 {
-		ST_DEFAULT = 0,
-		ST_VERTEX = 1, ST_PIXEL = 2, ST_GEOMETRY = 3,
-		ST_SHADER = 4,
+		SHD_DEFAULT = 0,
+		SHD_VERTEX = 1, SHD_PIXEL = 2, SHD_GEOMETRY = 3,
+		SHD_SHADER = 4,
 	};
 	enum FrameBufAttachments : UInt32 {
 		FB_DEFAULT = 0,
@@ -105,16 +105,16 @@ namespace NWG
 	class NWG_API GfxEngine;
 	class NWG_API FrameBuf;
 
-	class NWG_API ADrawable;
-	class NWG_API VertexedDrawable;
-	class NWG_API IndexedDrawable;
-	class NWG_API GfxMesh;
+	class NWG_API Drawable;
+	class NWG_API VtxDrawable;
+	class NWG_API IdxDrawable;
+	class NWG_API MeshDrawable;
 
 	class NWG_API VertexBuf;
 	class NWG_API IndexBuf;
 	class NWG_API ShaderBuf;
 
-	class NWG_API ShaderProgram;
+	class NWG_API ShaderProg;
 	class NWG_API Shader;
 	class NWG_API VertexShader;
 	class NWG_API PixelShader;

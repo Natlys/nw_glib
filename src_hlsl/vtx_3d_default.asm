@@ -69,10 +69,10 @@ mov r2.xyz, v0.xyzx  // r2.x <- vso.vtxCrd.x; r2.y <- vso.vtxCrd.y; r2.z <- vso.
 mov r2.w, l(1.000000)  // r2.w <- vso.vtxCrd.w
 
 #line 18
-dp4 r3.x, r2.xyzw, cb0[8].xyzw  // r3.x <- vso.vtxCrd.x
-dp4 r3.y, r2.xyzw, cb0[9].xyzw  // r3.y <- vso.vtxCrd.y
-dp4 r3.z, r2.xyzw, cb0[10].xyzw  // r3.z <- vso.vtxCrd.z
-dp4 r3.w, r2.xyzw, cb0[11].xyzw  // r3.w <- vso.vtxCrd.w
+dp4 r3.x, r2.xyzw, cb0[0].xyzw  // r3.x <- vso.vtxCrd.x
+dp4 r3.y, r2.xyzw, cb0[1].xyzw  // r3.y <- vso.vtxCrd.y
+dp4 r3.z, r2.xyzw, cb0[2].xyzw  // r3.z <- vso.vtxCrd.z
+dp4 r3.w, r2.xyzw, cb0[3].xyzw  // r3.w <- vso.vtxCrd.w
 
 #line 19
 dp4 r2.x, r3.xyzw, cb0[4].xyzw  // r2.x <- vso.vtxCrd.x
@@ -81,10 +81,10 @@ dp4 r2.z, r3.xyzw, cb0[6].xyzw  // r2.z <- vso.vtxCrd.z
 dp4 r2.w, r3.xyzw, cb0[7].xyzw  // r2.w <- vso.vtxCrd.w
 
 #line 20
-dp4 r3.x, r2.xyzw, cb0[0].xyzw  // r3.x <- vso.vtxCrd.x
-dp4 r3.y, r2.xyzw, cb0[1].xyzw  // r3.y <- vso.vtxCrd.y
-dp4 r3.z, r2.xyzw, cb0[2].xyzw  // r3.z <- vso.vtxCrd.z
-dp4 r3.w, r2.xyzw, cb0[3].xyzw  // r3.w <- vso.vtxCrd.w
+dp4 r3.x, r2.xyzw, cb0[8].xyzw  // r3.x <- vso.vtxCrd.x
+dp4 r3.y, r2.xyzw, cb0[9].xyzw  // r3.y <- vso.vtxCrd.y
+dp4 r3.z, r2.xyzw, cb0[10].xyzw  // r3.z <- vso.vtxCrd.z
+dp4 r3.w, r2.xyzw, cb0[11].xyzw  // r3.w <- vso.vtxCrd.w
 
 #line 21
 mov o2.xyzw, r3.xyzw

@@ -7,7 +7,7 @@ namespace NWG
 	template<typename DType> DataTypes DtGet();
 	template<typename NwEnum, typename ConvType> ConvType ConvertEnum(NwEnum nwEnum);
 	
-	const char* DtGetStr(DataTypes sdType);
+	UInt32 DtGetCount(DataTypes sDataType);
 	Size DtGetSize(DataTypes sDataType, UInt32 unCount = 1);
 	Size DtGetAlignedSize(DataTypes sDataType, UInt32 unCount = 1);
 }
@@ -21,8 +21,12 @@ namespace NWG
 		Int32 nActiveTextureId = 0;
 		Int32 nMaxTextures = 0;
 	public:
-		OStream& operator<<(OStream& rStream);
+		GfxContextInfo() = default;
+		GfxContextInfo(const char* sRenderer, const char* sVersion, const char* sShaderLanguage);
+		// --operators
+		OutStream& operator<<(OutStream& rStream) const;
 	};
+	OutStream& operator<<(OutStream& rStream, const GfxContextInfo& rInfo);
 	struct NWG_API GfxDrawInfo
 	{
 	public:
@@ -34,7 +38,7 @@ namespace NWG
 	public:
 		void Reset() { szVtx = szIdx = 0; unIdx = unVtx = 0; }
 	};
-	struct NWG_API GfxDataInfo
+	struct NWG_API GfxBufInfo
 	{
 	public:
 		Size szData = 0;
@@ -43,25 +47,28 @@ namespace NWG
 		Ptr pData = nullptr;
 		DataTypes sdType = DT_DEFAULT;
 	public:
-		GfxDataInfo() = default;
-		GfxDataInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset,
+		GfxBufInfo() = default;
+		GfxBufInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset,
 			Ptr ptrToData, DataTypes dataType);
-		GfxDataInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset, Ptr ptrToData);
+		GfxBufInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset, Ptr ptrToData);
 		// --operators
-		OStream& operator<<(OStream& rStream);
+		OutStream& operator<<(OutStream& rStream) const;
 	};
+	OutStream& operator<<(OutStream& rStream, const GfxBufInfo& rInfo);
 }
 namespace NWG
 {
 	struct NWG_API GfxConfig {
 		struct {
 			struct {
-				DrawModes dMode = DM_FILL;
+				DrawModes dMode = DM_DEFAULT;
 				FacePlanes facePlane = FACE_DEFAULT;
-			} PolyMode;
+				GfxPrimitives gPrimitive = GPT_DEFAULT;
+			} DrawMode;
 			Float32 nLineWidth = 0.5f;
 			Float32 nPixelSize = 0.5f;
 			UInt32 unSwapInterval = 1u;
+			V4i rectViewport = { 0, 0, 800, 600 };
 		} General;
 		struct {
 			Bit bEnable = false;
@@ -95,7 +102,8 @@ namespace NWG
 	int OglErrLogShader(ShaderTypes ShaderType, UInt32 unShaderId);
 }
 	#if (defined NWG_DEBUG)
-			#define NWG_DEBUG_CALL(code) ( OglClearErr(); (code) NWL_ASSERT(OglErrLog(#call, __FILE__, __LINE__, "GL_ERROR: "))
+			#define NWG_DEBUG_CALL(code) ( OglClearErr(); code		\
+			if (OglErrLog(#code, __FILE__, __LINE__, "GL_ERROR: ") == false) { NWL_BREAK(); } )
 	#else
 		#define NWG_DEBUG_CALL(code) (code)
 	#endif
@@ -108,7 +116,7 @@ namespace NWG
 	bool DxErrLog(const char* strInfo, const char* strFile, int nLine);
 }
 	#if (defined NWG_DEBUG)
-		#define NWG_DEBUG_CALL(call) ( DxClearErr(); (call) NWL_ASSERT(DxErrLog(#call, __FILE__, __LINE__, "GL_ERROR: "))
+		#define NWG_DEBUG_CALL(code) ( DxClearErr(); (code) NWL_ASSERT(DxErrLog(##code, __FILE__, __LINE__, "GL_ERROR: "))
 	#else
 		#define NWG_DEBUG_CALL(code) (code)
 	#endif

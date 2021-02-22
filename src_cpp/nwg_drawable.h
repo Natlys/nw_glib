@@ -10,54 +10,69 @@
 namespace NWG
 {
 	/// Abstract Drawable class
-	class NWG_API ADrawable : public TEntity<ADrawable>, public AGfxRes
+	class NWG_API Drawable : public TEntity<Drawable>, public AGfxRes
 	{
-		using VtxBufs = DArray<RefKeeper<VertexBuf>>;
+		using Resources = DArray<RefKeeper<AGfxRes>>;
 	public:
-		ADrawable(GfxEngine& rGfx);
-		virtual ~ADrawable();
+		Drawable(GfxEngine& rGfx);
+		virtual ~Drawable();
 		// --getters
 		inline UInt8 GetOrder() const { return m_unOrder; }
-		inline RefKeeper<GfxMaterial>& GetMaterial() { return m_gMtl; }
-		inline VtxBufs& GetVtxBufs() { return m_vtxBufs; }
-		inline RefKeeper<VertexBuf>& GetVtxBuf(UInt8 nIdx) { return m_vtxBufs[nIdx % m_vtxBufs.size()]; }
+		inline Resources& GetResources() { return m_Resources; }
+		inline RefKeeper<AGfxRes>& GetResoruce(UInt8 unIdx) { return m_Resources[unIdx % m_Resources.size()]; }
 		// --setters
 		void SetOrder(UInt8 unOrder);
-		void SetMaterial(RefKeeper<GfxMaterial>& rgMtl);
-		void AddVtxBuf(RefKeeper<VertexBuf>& rBuf);
-		void RmvVtxBuf(UInt8 nIdx);
+		void AddResource(RefKeeper<AGfxRes>& rRes);
+		void RmvResource(UInt8 unIdx);
+		template<class RType> void AddResource(RefKeeper<RType>& rRes);
 		// --core_methods
-		virtual void Bind() = 0;
+		virtual void Bind() override;
 	protected:
 		UInt8 m_unOrder;
-		RefKeeper<GfxMaterial> m_gMtl;
-		VtxBufs m_vtxBufs;
+		Resources m_Resources;
 	};
+	template<class RType> void Drawable::AddResource(RefKeeper<RType>& rRes) {
+		RefKeeper<AGfxRes> aRes; aRes.SetRef<RType>(rRes); AddResource(aRes);
+	}
 }
 namespace NWG
 {
-	/// VertexedDrawable class
-	class NWG_API VertexedDrawable : public ADrawable
+	/// VtxDrawable class
+	class NWG_API VtxDrawable : public Drawable
 	{
+		using VtxBufs = DArray<RefKeeper<VertexBuf>>;
 	public:
-		VertexedDrawable(GfxEngine& rGfx);
-		template<typename VType> VertexedDrawable(GfxEngine& rGfx, UInt32 unVtxCount, VType* pVtxData);
+		VtxDrawable(GfxEngine& rGfx);
+		template<typename VType>
+		VtxDrawable(GfxEngine& rGfx, UInt32 unVtxCount, VType* pVtxData = nullptr);
+		// --getters
+		inline VtxBufs& GetVtxBufs() { return m_vtxBufs; }
+		inline RefKeeper<VertexBuf>& GetVtxBuf(UInt8 unIdx) { return m_vtxBufs[unIdx % m_vtxBufs.size()]; }
+		// --setters
+		void AddVtxBuf(RefKeeper<VertexBuf>& rBuf);
+		void RmvVtxBuf(UInt8 unIdx);
 		// --core_methods
 		virtual void Bind() override;
+	protected:
+		VtxBufs m_vtxBufs;
 	};
-	template<typename VType> VertexedDrawable::VertexedDrawable(GfxEngine& rGfx, UInt32 unVtxCount, VType* pVtxData = nullptr) :
-		ADrawable(rGfx)
+	template<typename VType>
+	VtxDrawable::VtxDrawable(GfxEngine& rGfx, UInt32 unVtxCount, VType* pVtxData) :
+		Drawable(rGfx)
 	{
 		m_vtxBufs.push_back(RefKeeper<VertexBuf>());
 		m_pGfx->CreateRes<VertexBuf>(m_vtxBufs.back());
 		m_vtxBufs.back()->SetData<VType>(unVtxCount, pVtxData);
 	}
-	/// IndexedDrawable class
-	class NWG_API IndexedDrawable : public ADrawable
+	/// IdxDrawable class
+	class NWG_API IdxDrawable : public Drawable
 	{
 	public:
-		IndexedDrawable(GfxEngine& rGfx);
-		template<typename IType> IndexedDrawable(GfxEngine& rGfx, UInt32 unIdxCount, IType* pIdxData);
+		IdxDrawable(GfxEngine& rGfx);
+		template<typename IType>
+		IdxDrawable(GfxEngine& rGfx, UInt32 unIdxCount, IType* pIdxData = nullptr);
+		template<typename IType, typename VType>
+		IdxDrawable(GfxEngine& rGfx, UInt32 unIdxCount, IType* pIdxData, UInt32 unVtxCount, VType* pVtxData = nullptr);
 		// --getters
 		inline IndexBuf* GetIdxBuf() { return m_idxBuf; }
 		// --setters
@@ -67,11 +82,22 @@ namespace NWG
 	protected:
 		RefKeeper<IndexBuf> m_idxBuf;
 	};
-	template<typename IType> IndexedDrawable::IndexedDrawable(GfxEngine& rGfx, UInt32 unIdxCount, IType* pIdxData = nullptr) :
-		ADrawable(rGfx)
-	{
+	template<typename IType>
+	IdxDrawable::IdxDrawable(GfxEngine& rGfx, UInt32 unIdxCount, IType* pIdxData) :
+		Drawable(rGfx) {
+		m_idxBuf = RefKeeper<IndexBuf>();
 		m_pGfx->CreateRes<IndexBuf>(m_idxBuf);
 		m_idxBuf->SetData<IType>(unIdxCount, pIdxData);
+	}
+	template<typename IType, typename VType>
+	IdxDrawable::IdxDrawable(GfxEngine& rGfx, UInt32 unIdxCount, IType* pIdxData, UInt32 unVtxCount, VType* pVtxData) :
+		IdxDrawable(rGfx, unIdxCount, pIdxData)
+	{
+		m_Resources.push_back(RefKeeper<AGfxRes>());
+		RefKeeper<VertexBuf> vtxBuf;
+		m_pGfx->CreateRes<VertexBuf>(vtxBuf);
+		vtxBuf->SetData<VType>(unVtxCount, pVtxData);
+		m_Resources.back().SetRef<VertexBuf>(vtxBuf);
 	}
 }
 #endif

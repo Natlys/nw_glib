@@ -2,17 +2,29 @@
 #include "nwg_material.h"
 #if (defined NWG_GAPI)
 #include <nwg_texture.h>
-#include <nwg_shader.h>
+#include <nwg_shader_prog.h>
+namespace NWG
+{
+	OutStream& GfxMaterialInfo::operator<<(OutStream& rStream) const {
+		return rStream;
+	}
+	InStream& GfxMaterialInfo::operator>>(InStream& rStream) {
+		return rStream;
+	}
+	
+	OutStream& operator<<(OutStream& rStream, const GfxMaterialInfo& rInfo) { return rInfo.operator<<(rStream); }
+	InStream& operator>>(InStream& rStream, GfxMaterialInfo& rInfo) { return rInfo.operator>>(rStream); }
+}
 namespace NWG
 {
 	GfxMaterial::GfxMaterial(GfxEngine& rGfx, const char* strName) :
 		TEntity(), AGfxRes(rGfx), ADataRes(strName) { m_Textures["tex_default"] = RefKeeper<Texture>(); }
-	GfxMaterial::GfxMaterial(GfxEngine& rGfx, const char* strName, RefKeeper<ShaderProgram>& rshdProg) :
+	GfxMaterial::GfxMaterial(GfxEngine& rGfx, const char* strName, RefKeeper<ShaderProg>& rshdProg) :
 		TEntity(), AGfxRes(rGfx), ADataRes(strName) { SetShaderProg(rshdProg); }
 	GfxMaterial::~GfxMaterial() { }
 
 	// --setters
-	void GfxMaterial::SetShaderProg(RefKeeper<ShaderProgram>& rshdProg) {
+	void GfxMaterial::SetShaderProg(RefKeeper<ShaderProg>& rshdProg) {
 		m_pshdProg = rshdProg;
 		m_Textures.clear();
 		m_Colors.clear();
@@ -42,10 +54,12 @@ namespace NWG
 	// --core_methods
 	void GfxMaterial::Bind()
 	{
+		if (!m_pshdProg.IsValid()) { return; }
 		m_pshdProg->Bind();
 		for (auto itClr : m_Colors) { }
 		auto& itTex = m_Textures.begin();
 		for (UInt8 txi = 0; txi < m_Textures.size(); txi++) {
+			if (!itTex->second.IsValid()) { return; }
 			itTex->second->SetSlot(txi);
 			itTex->second->Bind();
 			itTex++;

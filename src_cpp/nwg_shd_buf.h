@@ -38,23 +38,23 @@ namespace NWG
 		// --setters
 		template<typename CType> void SetData(CType* pData = nullptr);
 		void SetSubData(Size szData, const Ptr pData, Size szOffset = 0);
-		void SetLayout(const ShaderLayout& rShdLayout);
+		void SetLayout(ShaderLayout& rShdLayout);
 		// --core_methods
 		virtual void Bind() override;
 		void Bind(UInt32 unPoint);
 		void Bind(UInt32 unPoint, Size szData, Size szOffset = 0);
 	private:
-		void Remake(const GfxDataInfo& rInfo);
+		bool Remake(const GfxBufInfo& rInfo);
 	private:
-		GfxDataInfo m_gdInfo;
+		GfxBufInfo m_gdInfo;
 #if (NWG_GAPI & NWG_GAPI_DX)
 		ID3D11Buffer* m_pNative;
+#endif
 	};
 	template<typename CType> void ShaderBuf::SetData(CType* pData) {
-		GfxDataInfo gdInfo(sizeof(CType), sizeof(CType), 0, pData);
+		GfxBufInfo gdInfo(sizeof(CType), sizeof(CType), 0, pData);
 		Remake(gdInfo);
 	}
-#endif
 }
 #endif	// NWG_GAPI
 #endif	// NWG_BUFFER_H

@@ -6,22 +6,24 @@
 #if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
-	VertexBuf::VertexBuf() : TEntity(), AGfxRes(), m_szData(0), m_sdType(DT_FLOAT32) { }
-	VertexBuf::~VertexBuf() { SetData(0, nullptr); }
+	VertexBuf::VertexBuf(GfxEngine& rGfx) :
+		TEntity(), AGfxRes(rGfx),
+		m_gdInfo(GfxBufInfo()) { }
+	VertexBuf::~VertexBuf() { if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; } }
 	// --setters
 	void VertexBuf::SetSubData(Size szData, const Ptr pVtxData, Size szOffset) {
 		glBufferSubData(GL_ARRAY_BUFFER, szOffset, szData, pVtxData);
 	}
-	void VertexBuf::SetData(Size szData, const Ptr pVtxData) {
-		m_szData = szData;
+	// --core_methods
+	void VertexBuf::Bind() { glBindBuffer(GL_ARRAY_BUFFER, m_unRId); }
+	bool VertexBuf::Remake(const GfxBufInfo& rInfo) {
+		m_gdInfo = rInfo;
 		if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; }
-		if (szData == 0) { return; }
+		if (rInfo.szData == 0) { return false; }
 		glGenBuffers(1, &m_unRId);
 		glBindBuffer(GL_ARRAY_BUFFER, m_unRId);
-		glBufferData(GL_ARRAY_BUFFER, szData, pVtxData, pVtxData == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-	}
-	void VertexBuf::Bind() {
-		glBindBuffer(GL_ARRAY_BUFFER, m_unRId);
+		glBufferData(GL_ARRAY_BUFFER, rInfo.szData, rInfo.pData, rInfo.pData == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		return true;
 	}
 }
 #endif
@@ -30,7 +32,7 @@ namespace NWG
 {
 	VertexBuf::VertexBuf(GfxEngine& rGfx) :
 		TEntity(), AGfxRes(rGfx),
-		m_gdInfo(GfxDataInfo()),
+		m_gdInfo(GfxBufInfo()),
 		m_pNative(nullptr) { }
 	VertexBuf::~VertexBuf()
 	{
@@ -44,14 +46,11 @@ namespace NWG
 		m_pGfx->GetContext()->Unmap(m_pNative, 0u);
 	}
 	// --core_methods
-	void VertexBuf::Bind()
-	{
-		m_pGfx->GetContext()->IASetVertexBuffers(0, 1, &m_pNative, &m_gdInfo.szStride, &m_gdInfo.szOffset);
-	}
-	void VertexBuf::Remake(const GfxDataInfo& rInfo) {
+	void VertexBuf::Bind() { m_pGfx->GetContext()->IASetVertexBuffers(0, 1, &m_pNative, &m_gdInfo.szStride, &m_gdInfo.szOffset); }
+	bool VertexBuf::Remake(const GfxBufInfo& rInfo) {
 		m_gdInfo = rInfo;
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
-		if (m_gdInfo.szData == 0) { return; }
+		if (m_gdInfo.szData == 0) { return false; }
 
 		D3D11_BUFFER_DESC bufDesc{ 0 };
 		bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -74,6 +73,7 @@ namespace NWG
 
 		m_pGfx->GetDevice()->CreateBuffer(&bufDesc, &subData, &m_pNative);
 		if (m_pNative == nullptr) { throw Exception("Failed to create buffer!"); }
+		return true;
 	}
 }
 #endif

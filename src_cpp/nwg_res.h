@@ -2,11 +2,10 @@
 #define NWG_RESOURCE_H
 #include <nwg_core.hpp>
 #if (defined NWG_GAPI)
-#if (NWG_GAPI & NWG_GAPI_DX)
 namespace NWG
 {
 	/// Abstract GraphicsResource class
-	class NWG_API AGfxRes : public AMemSysUser
+	class NWG_API AGfxRes : public AMemUser
 	{
 		friend class GfxEngine;
 	protected:
@@ -26,6 +25,5 @@ namespace NWG
 #endif
 	};
 }
-#endif
 #endif	// NWG_GAPI
 #endif	// NWG_RESOURCE_H

@@ -16,7 +16,7 @@ namespace NWG
 	{
 		rCamera.nAspectRatio = whBounds.x / whBounds.y;
 		if (!(m_crs->GetMode() & CRS_CAPTURED)) { return; }
-		float MoveSpeed = this->nMoveSpeed * TimeSys::GetDeltaS();
+		float MoveSpeed = this->nMoveSpeed * TimeSys::GetDelta();
 		if (rCamera.GetMode() == GCM_2D)
 		{
 			if (m_kbd->GetHeld(KC_W)) { rCamera.xyzCrd.y += MoveSpeed; }
@@ -50,17 +50,17 @@ namespace NWG
 		case EVT_CURSOR_MOVE:
 			if (rCamera.GetMode() == GCM_2D) {
 				if (m_crs->GetHeld(CRS_RIGHT)) {
-					rCamera.xyzCrd.x += -m_crs->GetMoveDeltaX() * TimeSys::GetDeltaS() * nMoveSpeed;
-					rCamera.xyzCrd.y += m_crs->GetMoveDeltaY() * TimeSys::GetDeltaS() * nMoveSpeed;
+					rCamera.xyzCrd.x += -m_crs->GetMoveDeltaX() * TimeSys::GetDelta() * nMoveSpeed;
+					rCamera.xyzCrd.y += m_crs->GetMoveDeltaY() * TimeSys::GetDelta() * nMoveSpeed;
 				}
-				float nRoll_deg = rCamera.xyzRtn.z + m_crs->GetMoveDeltaX() * nRtnSpeed * TimeSys::GetDeltaS();
+				float nRoll_deg = rCamera.xyzRtn.z + m_crs->GetMoveDeltaX() * nRtnSpeed * TimeSys::GetDelta();
 				if (nRoll_deg < -nMaxRoll) { rCamera.xyzRtn.z = nMaxRoll; }
 				else if (nRoll_deg > nMaxRoll) { rCamera.xyzRtn.z = -nMaxRoll; }
 				else { rCamera.xyzRtn.z = nRoll_deg; }
 			}
 			else if (rCamera.GetMode() == GCM_3D) {
-				float nYaw_deg = rCamera.xyzRtn.y - m_crs->GetMoveDeltaX() * nRtnSpeed * TimeSys::GetDeltaS();
-				float nPitch_deg = rCamera.xyzRtn.x - static_cast<Float32>(m_crs->GetMoveDeltaY()) * nRtnSpeed * TimeSys::GetDeltaS();
+				float nYaw_deg = rCamera.xyzRtn.y - m_crs->GetMoveDeltaX() * nRtnSpeed * TimeSys::GetDelta();
+				float nPitch_deg = rCamera.xyzRtn.x - static_cast<Float32>(m_crs->GetMoveDeltaY()) * nRtnSpeed * TimeSys::GetDelta();
 
 				if (nYaw_deg < -nMaxYaw) { rCamera.xyzRtn.y = nMaxYaw; }
 				else if (nYaw_deg > nMaxYaw) { rCamera.xyzRtn.y = -nMaxYaw; }
@@ -73,7 +73,7 @@ namespace NWG
 			break;
 		case EVT_CURSOR_SCROLL:
 			if (!(m_crs->GetMode() & CRS_CAPTURED)) return;
-			float nZoom = -rcEvt.nY * nZoomSpeed * TimeSys::GetDeltaS();
+			float nZoom = -rcEvt.nY * nZoomSpeed * TimeSys::GetDelta();
 			if (rCamera.GetType() == GCT_ORTHO) {
 				float nScale = rCamera.nViewScale + nZoom * rCamera.nViewScale / 40.0f + 0.01f;
 				if (nScale > 0.0f) rCamera.nViewScale = nScale;

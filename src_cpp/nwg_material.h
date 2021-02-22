@@ -4,8 +4,22 @@
 #if (defined NWG_GAPI)
 #include <nwg_res.h>
 #include <nwg_tools.h>
-#include <nwg_shader.h>
-#pragma warning(disable:4267)
+#include <nwg_shader_prog.h>
+namespace NWG
+{
+	struct NWG_API GfxMaterialInfo
+	{
+	public:
+		Char strName[256] = "default";
+		Char strGApi[8] = "default";
+	public:
+		// --operation
+		OutStream& operator<<(OutStream& rStream) const;
+		InStream& operator>>(InStream& rStream);
+	};
+	OutStream& operator<<(OutStream& rStream, const GfxMaterialInfo& rInfo);
+	InStream& operator>>(InStream& rStream, GfxMaterialInfo& rInfo);
+}
 namespace NWG
 {
 	/// GraphicsMaterial Class
@@ -21,17 +35,17 @@ namespace NWG
 		using Colors = HashMap<String, V4f>;
 	public:
 		GfxMaterial(GfxEngine& rGfx, const char* strName);
-		GfxMaterial(GfxEngine& rGfx, const char* strName, RefKeeper<ShaderProgram>& rshdProg);
+		GfxMaterial(GfxEngine& rGfx, const char* strName, RefKeeper<ShaderProg>& rshdProg);
 		virtual ~GfxMaterial();
 		// --getters
-		inline RefKeeper<ShaderProgram>& GetShaderProg() { return m_pshdProg; }
+		inline RefKeeper<ShaderProg>& GetShaderProg() { return m_pshdProg; }
 		inline UInt8 GetTexCount() { return m_Textures.size(); }
 		inline Textures& GetTextures() { return m_Textures; }
 		inline Colors& GetColors() { return m_Colors; }
 		inline RefKeeper<Texture>& GetTexture(const char* strType = "");
 		inline V4f* GetColor(const char* strType = "");
 		// --setters
-		void SetShaderProg(RefKeeper<ShaderProgram>& rshdProg);
+		void SetShaderProg(RefKeeper<ShaderProg>& rshdProg);
 		void SetTexture(RefKeeper<Texture>& rTex, const char* strType = "");
 		void SetColor(const V4f& rgbaClr, const char* strType = "");
 		// --core_methods
@@ -41,7 +55,7 @@ namespace NWG
 		virtual bool LoadF(const char* strFPath) override;
 	private:
 		String m_strName;
-		RefKeeper<ShaderProgram> m_pshdProg;
+		RefKeeper<ShaderProg> m_pshdProg;
 		Textures m_Textures;
 		Colors m_Colors;
 	};

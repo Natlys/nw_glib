@@ -10,6 +10,11 @@ namespace NWG
 	{
 		V2f vtxCrd = { 0.0f, 0.0f };
 	};
+	struct Vtx2f2f
+	{
+		V2f vtxCrd = { 0.0f, 0.0f };
+		V2f texCrd = { 0.0f, 0.0f };
+	};
 	struct Vtx2f2f4u8
 	{
 		V2f vtxCrd = { 0.0f, 0.0f };
@@ -46,16 +51,16 @@ namespace NWG
 		// --core_methods
 		virtual void Bind() override;
 	private:
-		void Remake(const GfxDataInfo& rInfo);
+		bool Remake(const GfxBufInfo& rInfo);
 	private:
-		GfxDataInfo m_gdInfo;
+		GfxBufInfo m_gdInfo;
 #if (NWG_GAPI & NWG_GAPI_DX)
 		ID3D11Buffer* m_pNative;
 #endif
 	};
 	template<typename VType>
 	void VertexBuf::SetData(UInt32 unCount, VType* pData) {
-		GfxDataInfo gInfo(unCount * sizeof(VType), sizeof(VType), 0, pData, DT_DEFAULT);
+		GfxBufInfo gInfo(unCount * sizeof(VType), sizeof(VType), 0, pData, DT_DEFAULT);
 		Remake(gInfo);
 	}
 }

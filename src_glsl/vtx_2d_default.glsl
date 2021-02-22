@@ -1,12 +1,9 @@
 #version 400 core
 
-layout(location = 0) in vec2 atb_vtxCrd;
-layout(location = 1) in vec2 atb_texCrd;
+layout(location=0)in vec2 atb_vtxCrd;
+layout(location=1)in vec2 atb_texCrd;
 
-layout(std140)uniform unf_mat {
-	mat4 unf_matProj;
-	mat4 unf_matView;
-};
+layout(std140)uniform unf_tform{mat4 unf_matProj;mat4 unf_matView;};
 
 out VS_INFO {
 	vec2 vtxCrd;

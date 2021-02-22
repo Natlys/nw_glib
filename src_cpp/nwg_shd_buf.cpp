@@ -6,27 +6,28 @@
 #if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
-	ShaderBuf::ShaderBuf() : TEntity(), AGfxRes(), m_szData(0), m_sdType(DT_FLOAT32) { }
-	ShaderBuf::~ShaderBuf() { SetData(0, nullptr); }
+	ShaderBuf::ShaderBuf(GfxEngine& rGfx) :
+		TEntity(), AGfxRes(rGfx),
+		m_gdInfo(GfxBufInfo()) { }
+	ShaderBuf::~ShaderBuf() { if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; } }
 	// --setters
-	void ShaderBuf::SetSubData(Size szData, const Ptr pVtxData, Size szOffset) {
-		glBufferSubData(GL_UNIFORM_BUFFER, szOffset, szData, pVtxData);
+	void ShaderBuf::SetLayout(ShaderLayout& rBufLayout) {
+		if (GetDataSize() < rBufLayout.GetDataSize()) { Remake(GfxBufInfo(rBufLayout.GetDataSize(), 0, 0, nullptr)); }
+		for (auto& rBlock : rBufLayout.GetBlocks()) { Bind(rBlock.unBindPoint, rBlock.szAll, rBlock.szOffset); }
 	}
-	void ShaderBuf::SetData(Size szData, const Ptr pVtxData) {
-		m_szData = szData;
-		if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; }
-		if (szData == 0) { return; }
-		glGenBuffers(1, &m_unRId);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_unRId);
-		glBufferData(GL_UNIFORM_BUFFER, szData, pVtxData, pVtxData == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-	}
+	void ShaderBuf::SetSubData(Size szData, const Ptr pVtxData, Size szOffset) { glBufferSubData(GL_UNIFORM_BUFFER, szOffset, szData, pVtxData); }
 	// --core_methods
 	void ShaderBuf::Bind() { glBindBuffer(GL_UNIFORM_BUFFER, m_unRId); }
-	void ShaderBuf::Bind(UInt32 unPoint) const { glBindBufferBase(GL_UNIFORM_BUFFER, unPoint, m_unRId); }
-	void ShaderBuf::Bind(UInt32 unPoint, Size szData, Size szOffset) const { glBindBufferRange(GL_UNIFORM_BUFFER, unPoint, m_unRId, szOffset, szData); }
-	void ShaderBuf::Remake(const ShaderLayout& rBufLayout) {
-		if (m_szData < rBufLayout.GetSize()) { SetData(rBufLayout.GetSize()); }
-		for (auto& rBlock : rBufLayout.GetBlocks()) { Bind(rBlock.unBindPoint, rBlock.szAll, rBlock.szOffset); }
+	void ShaderBuf::Bind(UInt32 unPoint) { glBindBufferBase(GL_UNIFORM_BUFFER, unPoint, m_unRId); }
+	void ShaderBuf::Bind(UInt32 unPoint, Size szData, Size szOffset) { glBindBufferRange(GL_UNIFORM_BUFFER, unPoint, m_unRId, szOffset, szData); }
+	bool ShaderBuf::Remake(const GfxBufInfo& rInfo) {
+		m_gdInfo = rInfo;
+		if (m_unRId != 0) { glDeleteBuffers(1, &m_unRId); m_unRId = 0; }
+		if (rInfo.szData == 0) { return false; }
+		glGenBuffers(1, &m_unRId);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_unRId);
+		glBufferData(GL_UNIFORM_BUFFER, rInfo.szData, rInfo.pData, rInfo.pData == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		return true;
 	}
 }
 #endif
@@ -35,7 +36,7 @@ namespace NWG
 {
 	ShaderBuf::ShaderBuf(GfxEngine& rGfx) :
 		TEntity(), AGfxRes(rGfx),
-		m_gdInfo(GfxDataInfo()), m_pNative(nullptr) { }
+		m_gdInfo(GfxBufInfo()), m_pNative(nullptr) { }
 	ShaderBuf::~ShaderBuf() { if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; } }
 	// --setters
 	void ShaderBuf::SetSubData(Size szData, const Ptr pData, Size szOffset) {
@@ -55,10 +56,10 @@ namespace NWG
 	void ShaderBuf::Bind(UInt32 unPoint) {
 	}
 	void ShaderBuf::Bind(UInt32 unPoint, Size szData, Size szOffset) { }
-	void ShaderBuf::Remake(const GfxDataInfo& rInfo) {
+	bool ShaderBuf::Remake(const GfxBufInfo& rInfo) {
 		m_gdInfo = rInfo;
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
-		if (m_gdInfo.szData == 0) { return; }
+		if (m_gdInfo.szData == 0) { return true; }
 
 		D3D11_BUFFER_DESC bufDesc{ 0 };
 		bufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -80,7 +81,8 @@ namespace NWG
 		subData.pSysMem = m_gdInfo.pData;
 
 		m_pGfx->GetDevice()->CreateBuffer(&bufDesc, &subData, &m_pNative);
-		if (m_pNative == nullptr) { throw Exception("Failed to create buffer!"); }
+		if (m_pNative == nullptr) { throw Exception("failed to create buffer!"); }
+		return true;
 	}
 }
 #endif

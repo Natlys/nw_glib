@@ -12,5 +12,5 @@ uniform sampler2D unf_texIdx;
 
 void main()
 {
-	pso_pxClr = vec4(texture(unf_texIdx, psi.texCrd).rgba * unf_abdClr);
+	pso_pxlClr = vec4(texture(unf_texIdx, psi.texCrd).rgba * unf_abdClr);
 }

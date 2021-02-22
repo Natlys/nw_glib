@@ -23,16 +23,16 @@ namespace NWG
 		// --core_methods
 		virtual void Bind() override;
 	private:
-		void Remake(const GfxDataInfo& rInfo);
+		bool Remake(const GfxBufInfo& rInfo);
 	private:
-		GfxDataInfo m_gdInfo;
+		GfxBufInfo m_gdInfo;
 #if (NWG_GAPI & NWG_GAPI_DX)
 		ID3D11Buffer* m_pNative;
 #endif
 	};
 	template<typename IType>
 	void IndexBuf::SetData(UInt32 unCount, IType* pData) {
-		GfxDataInfo gInfo(unCount * sizeof(IType), sizeof(IType), 0, pData, DtGet<IType>());
+		GfxBufInfo gInfo(unCount * sizeof(IType), sizeof(IType), 0, pData, DtGet<IType>());
 		Remake(gInfo);
 	}
 }
