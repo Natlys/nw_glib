@@ -2,46 +2,101 @@
 #include "nwg_tools.h"
 #pragma warning (disable: 4312)
 #if (defined NWG_GAPI)
-#include <nwg_loader.h>
 namespace NWG
 {
-	template<>DataTypes DtGet<Int8>()	{ return DT_SINT8; }
-	template<>DataTypes DtGet<V2i8>()	{ return DT_VEC2_SINT8; }
-	template<>DataTypes DtGet<V3i8>()	{ return DT_VEC3_SINT8; }
-	template<>DataTypes DtGet<V4i8>()	{ return DT_VEC4_SINT8; }
+	GfxContextInfo::GfxContextInfo(const char* sRenderer, const char* sVersion, const char* sShaderLanguage) :
+		strRenderer("default"), strVersion("default"), strShdLang("default")
+	{
+		strcpy_s(&strRenderer[0], 256, &sRenderer[0]);
+		strcpy_s(&strVersion[0], 256, &sVersion[0]);
+		strcpy_s(&strShdLang[0], 256, &sShaderLanguage[0]);
+	}
+	// --operators
+	OutStream& GfxContextInfo::operator<<(OutStream& rStream) const {
+		return rStream <<
+			"--==<graphics_context_info>==--" << std::endl <<
+			"graphics context: " << &strVersion[0] << std::endl <<
+			"renderer: " << &strRenderer[0] << std::endl <<
+			"version: " << &strVersion[0] << std::endl <<
+			"vendor: " << &strVendor[0] << std::endl <<
+			"shading language: " << &strShdLang[0] << std::endl <<
+			"--==</graphics_info>==--" << std::endl;
+	}
+	OutStream& operator<<(OutStream& rStream, const GfxContextInfo& rInfo) { return rInfo.operator<<(rStream); }
+}
+namespace NWG
+{
+	GfxBufInfo::GfxBufInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset,
+		Ptr ptrToData, DataTypes dataType) :
+		szData(sizeOfData), szStride(sizeOfStride), szOffset(sizeOfOffset),
+		pData(ptrToData), sdType(dataType) { }
+	GfxBufInfo::GfxBufInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset, Ptr ptrToData) :
+		szData(sizeOfData), szStride(static_cast<UInt32>(sizeOfStride)), szOffset(static_cast<UInt32>(sizeOfOffset)),
+		pData(ptrToData), sdType(DT_DEFAULT) { }
+	// --operators
+	OutStream& GfxBufInfo::operator<<(OutStream& rStream) const {
+		return rStream <<
+			"--==<graphics_data_info>==--" << std::endl <<
+			"--==</graphics_data_info>==--" << std::endl;
+	}
+	OutStream& operator<<(OutStream& rStream, const GfxBufInfo& rInfo) { return rInfo.operator<<(rStream); }
+}
+namespace NWG
+{
+	void GfxConfig::Reset() {
+		General.DrawMode.dMode = DM_FILL;
+		General.DrawMode.facePlane = FACE_DEFAULT;
 
-	template<>DataTypes DtGet<UInt8>()	{ return DT_SINT8; }
-	template<>DataTypes DtGet<V2u8>()	{ return DT_VEC2_UINT8; }
-	template<>DataTypes DtGet<V3u8>()	{ return DT_VEC3_UINT8; }
-	template<>DataTypes DtGet<V4u8>()	{ return DT_VEC4_UINT8; }
+		General.nLineWidth = 0.5f;
+		General.nPixelSize = 0.5f;
 
-	template<>DataTypes DtGet<Int16>()	{ return DT_SINT16; }
-	template<>DataTypes DtGet<V2i16>()	{ return DT_VEC2_SINT16; }
-	template<>DataTypes DtGet<V3i16>()	{ return DT_VEC3_SINT16; }
-	template<>DataTypes DtGet<V4i16>()	{ return DT_VEC4_SINT16; }
+		Blending.bEnable = false;
+		Blending.FactorSrc = BC_SRC_ALPHA;
+		Blending.FactorDest = BC_ONE_MINUS_SRC_ALPHA;
 
-	template<>DataTypes DtGet<UInt16>()	{ return DT_UINT16; }
-	template<>DataTypes DtGet<V2u16>()	{ return DT_VEC2_UINT16; }
-	template<>DataTypes DtGet<V3u16>()	{ return DT_VEC3_UINT16; }
-	template<>DataTypes DtGet<V4u16>()	{ return DT_VEC4_UINT16; }
+		DepthTest.bEnable = false;
+		DepthTest.Func = DTC_GREATER;
+	}
+}
+namespace NWG
+{
+	template<>DataTypes DtGet<Int8>() { return DT_SINT8; }
+	template<>DataTypes DtGet<V2i8>() { return DT_VEC2_SINT8; }
+	template<>DataTypes DtGet<V3i8>() { return DT_VEC3_SINT8; }
+	template<>DataTypes DtGet<V4i8>() { return DT_VEC4_SINT8; }
 
-	template<>DataTypes DtGet<Int32>()	{ return DT_SINT32; }
-	template<>DataTypes DtGet<V2i>()	{ return DT_VEC2_SINT32; }
-	template<>DataTypes DtGet<V3i>()	{ return DT_VEC3_SINT32; }
-	template<>DataTypes DtGet<V4i>()	{ return DT_VEC4_SINT32; }
+	template<>DataTypes DtGet<UInt8>() { return DT_SINT8; }
+	template<>DataTypes DtGet<V2u8>() { return DT_VEC2_UINT8; }
+	template<>DataTypes DtGet<V3u8>() { return DT_VEC3_UINT8; }
+	template<>DataTypes DtGet<V4u8>() { return DT_VEC4_UINT8; }
 
-	template<>DataTypes DtGet<UInt32>()	{ return DT_UINT32; }
-	template<>DataTypes DtGet<V2u>()	{ return DT_VEC2_UINT32; }
-	template<>DataTypes DtGet<V3u>()	{ return DT_VEC3_UINT32; }
-	template<>DataTypes DtGet<V4u>()	{ return DT_VEC4_UINT32; }
+	template<>DataTypes DtGet<Int16>() { return DT_SINT16; }
+	template<>DataTypes DtGet<V2i16>() { return DT_VEC2_SINT16; }
+	template<>DataTypes DtGet<V3i16>() { return DT_VEC3_SINT16; }
+	template<>DataTypes DtGet<V4i16>() { return DT_VEC4_SINT16; }
 
-	template<>DataTypes DtGet<Float32>(){ return DT_FLOAT32; }
-	template<>DataTypes DtGet<V2f>()	{ return DT_VEC2_FLOAT32; }
-	template<>DataTypes DtGet<V3f>()	{ return DT_VEC3_FLOAT32; }
-	template<>DataTypes DtGet<V4f>()	{ return DT_VEC4_FLOAT32; }
-	template<>DataTypes DtGet<Mat2f>()	{ return DT_MAT2_FLOAT32; }
-	template<>DataTypes DtGet<Mat3f>()	{ return DT_MAT3_FLOAT32; }
-	template<>DataTypes DtGet<Mat4f>()	{ return DT_MAT4_FLOAT32; }
+	template<>DataTypes DtGet<UInt16>() { return DT_UINT16; }
+	template<>DataTypes DtGet<V2u16>() { return DT_VEC2_UINT16; }
+	template<>DataTypes DtGet<V3u16>() { return DT_VEC3_UINT16; }
+	template<>DataTypes DtGet<V4u16>() { return DT_VEC4_UINT16; }
+
+	template<>DataTypes DtGet<Int32>() { return DT_SINT32; }
+	template<>DataTypes DtGet<V2i>() { return DT_VEC2_SINT32; }
+	template<>DataTypes DtGet<V3i>() { return DT_VEC3_SINT32; }
+	template<>DataTypes DtGet<V4i>() { return DT_VEC4_SINT32; }
+
+	template<>DataTypes DtGet<UInt32>() { return DT_UINT32; }
+	template<>DataTypes DtGet<V2u>() { return DT_VEC2_UINT32; }
+	template<>DataTypes DtGet<V3u>() { return DT_VEC3_UINT32; }
+	template<>DataTypes DtGet<V4u>() { return DT_VEC4_UINT32; }
+
+	template<>DataTypes DtGet<Float32>() { return DT_FLOAT32; }
+	template<>DataTypes DtGet<V2f>() { return DT_VEC2_FLOAT32; }
+	template<>DataTypes DtGet<V3f>() { return DT_VEC3_FLOAT32; }
+	template<>DataTypes DtGet<V4f>() { return DT_VEC4_FLOAT32; }
+	template<>DataTypes DtGet<Mat2f>() { return DT_MAT2_FLOAT32; }
+	template<>DataTypes DtGet<Mat3f>() { return DT_MAT3_FLOAT32; }
+	template<>DataTypes DtGet<Mat4f>() { return DT_MAT4_FLOAT32; }
 
 	template<> const char* ConvertEnum<DataTypes, const char*>(DataTypes dType) {
 		switch (dType) {
@@ -116,7 +171,12 @@ namespace NWG
 		}
 		return "SHD_DEFAULT";
 	}
+}
 #if (NWG_GAPI & NWG_GAPI_OGL)
+#include <ogl/nwg_ogl_loader.h>
+// --functions
+namespace NWG
+{
 	template<> DataTypes ConvertEnum<const char*, DataTypes>(const char* strType) {
 		if (CStrIsEqual(strType, "bool")) { return DT_BOOL; }
 
@@ -305,117 +365,12 @@ namespace NWG
 	template<> UInt32 ConvertEnum<TextureWraps, UInt32>(TextureWraps texWrap) {
 		switch (texWrap) {
 		case TXW_REPEAT: return GL_REPEAT; break;
-		case TXW_CLAMP: return GL_CLAMP; break;
-		case TXW_BORDER: return GL_CLAMP; break;
+		case TXW_CLAMP: return GL_CLAMP_TO_BORDER; break;
+		case TXW_BORDER: return GL_CLAMP_TO_BORDER; break;
 		default: throw Exception("invalid texture wrap", ERC_INVALID_ENUM); break;
 		}
 		return TXW_DEFAULT;
 	}
-#endif
-#if (NWG_GAPI & NWG_GAPI_DX)
-	template<> DataTypes ConvertEnum<const char*, DataTypes>(const char* strType) {
-		if (CStrIsEqual(strType, "int")) { return DT_INT32; }
-		if (CStrIsEqual(strType, "int2")) { return DT_VEC2_SINT32; }
-		if (CStrIsEqual(strType, "int3")) { return DT_VEC3_SINT32; }
-		if (CStrIsEqual(strType, "int4")) { return DT_VEC4_SINT32; }
-		if (CStrIsEqual(strType, "float")) { return DT_FLOAT32; }
-		if (CStrIsEqual(strType, "float2")) { return DT_VEC_2FLOAT32; }
-		if (CStrIsEqual(strType, "float3")) { return DT_VEC3_FLOAT32; }
-		if (CStrIsEqual(strType, "float4")) { return DT_VEC4_FLOAT32; }
-		return DT_DEFAULT;
-	}
-	template<> DXGI_FORMAT ConvertEnum<DataTypes, DXGI_FORMAT>(DataTypes dType) {
-		switch (dType) {
-		case DT_BOOL: return DXGI_FORMAT_R8_UINT;
-		case DT_SINT8: return DXGI_FORMAT_R8_SINT;
-		case DT_VEC2_SINT8: return DXGI_FORMAT_R8_SINT;
-		case DT_VEC3_SINT8: case DT_VEC4_SINT8: return DXGI_FORMAT_R8G8B8A8_SINT;
-
-		case DT_UINT8: return DXGI_FORMAT_R8_UINT;
-		case DT_VEC2_UINT8: return DXGI_FORMAT_R8_UINT;
-		case DT_VEC3_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
-		case DT_VEC4_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
-
-		case DT_SINT16: return DXGI_FORMAT_R16_SINT;
-		case DT_VEC2_SINT16: return DXGI_FORMAT_R16_SINT;
-		case DT_VEC3_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
-		case DT_VEC4_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
-
-		case DT_UINT16: return DXGI_FORMAT_R16_UINT;
-		case DT_VEC2_UINT16: return DXGI_FORMAT_R16_UINT;
-		case DT_VEC3_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
-		case DT_VEC4_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
-
-		case DT_SINT32: return DXGI_FORMAT_R32_SINT;
-		case DT_VEC2_SINT32: return DXGI_FORMAT_R32_SINT;
-		case DT_VEC3_SINT32: return DXGI_FORMAT_R32G32B32_SINT;
-		case DT_VEC4_SINT32: return DXGI_FORMAT_R32G32B32A32_SINT;
-
-		case DT_UINT32: return DXGI_FORMAT_R32_UINT;
-		case DT_VEC2_UINT32: return DXGI_FORMAT_R32_UINT;
-		case DT_VEC3_UINT32: return DXGI_FORMAT_R32G32B32_UINT;
-		case DT_VEC4_UINT32: return DXGI_FORMAT_R32G32B32A32_UINT;
-
-		case DT_FLOAT32: return DXGI_FORMAT_R32_FLOAT;
-		case DT_VEC2_FLOAT32: return DXGI_FORMAT_R32G32_FLOAT;
-		case DT_VEC3_FLOAT32: return DXGI_FORMAT_R32G32B32_FLOAT;
-		case DT_VEC4_FLOAT32: return DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-		default: throw Exception("unsupported format", ERC_NO_SUPPORT); break;
-		}
-		return DXGI_FORMAT_R32_FLOAT;
-	}
-	template<> D3D11_PRIMITIVE_TOPOLOGY ConvertEnum<GfxPrimitives, D3D11_PRIMITIVE_TOPOLOGY>(GfxPrimitives gpType) {
-		switch (gpType) {
-		case GPT_POINTS: return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST; break;
-		case GPT_TRIANGLES: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
-		case GPT_TRIANGLE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; break;
-		case GPT_TRIANGLE_FAN: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ; break;
-		case GPT_LINES: return D3D11_PRIMITIVE_TOPOLOGY_LINELIST; break;
-		case GPT_LINE_LOOP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ; break;
-		case GPT_LINE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
-		default: throw Exception("unavailable primitive topology", ERC_INVALID_ENUM); break;
-		}
-		return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	}
-	template<> UInt32 ConvertEnum<TextureTypes, UInt32>(TextureTypes texType) {
-		switch (texType) {
-		case TXT_1D: return 0; break;
-		case TXT_2D: return 0; break;
-		case TXT_3D: return 0; break;
-		default: throw Exception("unsupported texture type", ERC_NO_SUPPORT); break;
-		}
-		return 0;
-	}
-	template<> DXGI_FORMAT ConvertEnum <PixelFormats, DXGI_FORMAT>(PixelFormats pxlFormat) {
-		switch (pxlFormat) {
-		case PXF_R32_SINT32: return DXGI_FORMAT_R32_SINT; break;
-		case PXF_R8G8B8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
-		case PXF_R8G8B8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
-		case PXF_R8G8B8A8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
-		case PXF_R8G8B8A8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
-		default: throw Exception("unsupported pixel format", ERC_NO_SUPPORT); break;
-		}
-		return DXGI_FORMAT_R8G8B8A8_UNORM;
-	}
-	template<> D3D11_FILTER ConvertEnum <TextureFilters, D3D11_FILTER>(TextureFilters texFilter) {
-		switch (texFilter) {
-		case TXF_LINEAR: return D3D11_FILTER_MIN_MAG_MIP_LINEAR; break;
-		case TXF_NEAREST: return D3D11_FILTER_MIN_MAG_MIP_POINT; break;
-		default: throw Exception("unsupported pixel filter", ERC_NO_SUPPORT); break;
-		}
-		return D3D11_FILTER_MIN_MAG_MIP_POINT;
-	}
-	template<> D3D11_TEXTURE_ADDRESS_MODE ConvertEnum<TextureWraps, D3D11_TEXTURE_ADDRESS_MODE>(TextureWraps texWrap) {
-		switch (texWrap) {
-		case TXW_REPEAT: return D3D11_TEXTURE_ADDRESS_WRAP; break;
-		case TXW_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
-		case TXW_BORDER: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
-		default: throw Exception("unsupported pixel filter", ERC_NO_SUPPORT); break;
-		}
-		return D3D11_TEXTURE_ADDRESS_WRAP;
-	}
-#endif
 	const char* DtGetStr(DataTypes dType) {
 		switch (dType) {
 		case DT_BOOL: return "boolean";;
@@ -539,68 +494,8 @@ namespace NWG
 }
 namespace NWG
 {
-	GfxContextInfo::GfxContextInfo(const char* sRenderer, const char* sVersion, const char* sShaderLanguage) :
-		strRenderer("default"), strVersion("default"), strShdLang("default")
-	{
-		strcpy_s(&strRenderer[0], 256, &sRenderer[0]);
-		strcpy_s(&strVersion[0], 256, &sVersion[0]);
-		strcpy_s(&strShdLang[0], 256, &sShaderLanguage[0]);
-	}
-	// --operators
-	OutStream& GfxContextInfo::operator<<(OutStream& rStream) const {
-		return rStream <<
-			"--==<graphics_context_info>==--" << std::endl <<
-			"graphics context: " << &strVersion[0] << std::endl <<
-			"renderer: " << &strRenderer[0] << std::endl <<
-			"version: " << &strVersion[0] << std::endl <<
-			"vendor: " << &strVendor[0] << std::endl <<
-			"shading language: " << &strShdLang[0] << std::endl <<
-			"--==</graphics_info>==--" << std::endl;
-	}
-	OutStream& operator<<(OutStream& rStream, const GfxContextInfo& rInfo) { return rInfo.operator<<(rStream); }
-}
-namespace NWG
-{
-	GfxBufInfo::GfxBufInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset,
-		Ptr ptrToData, DataTypes dataType) :
-		szData(sizeOfData), szStride(sizeOfStride), szOffset(sizeOfOffset),
-		pData(ptrToData), sdType(dataType) { }
-	GfxBufInfo::GfxBufInfo(Size sizeOfData, Size sizeOfStride, Size sizeOfOffset, Ptr ptrToData) :
-		szData(sizeOfData), szStride(static_cast<UInt32>(sizeOfStride)), szOffset(static_cast<UInt32>(sizeOfOffset)),
-		pData(ptrToData), sdType(DT_DEFAULT) { }
-	// --operators
-	OutStream& GfxBufInfo::operator<<(OutStream& rStream) const {
-		return rStream <<
-			"--==<graphics_data_info>==--" << std::endl <<
-			"--==</graphics_data_info>==--" << std::endl;
-	}
-	OutStream& operator<<(OutStream& rStream, const GfxBufInfo& rInfo) { return rInfo.operator<<(rStream); }
-}
-namespace NWG
-{
-	void GfxConfig::Reset() {
-		General.DrawMode.dMode = DM_FILL;
-		General.DrawMode.facePlane = FACE_DEFAULT;
-
-		General.nLineWidth = 0.5f;
-		General.nPixelSize = 0.5f;
-
-		Blending.bEnable = false;
-		Blending.FactorSrc = BC_SRC_ALPHA;
-		Blending.FactorDest = BC_ONE_MINUS_SRC_ALPHA;
-
-		DepthTest.bEnable = false;
-		DepthTest.Func = DTC_GREATER;
-	}
-}
-#if (NWG_GAPI & NWG_GAPI_OGL)
-#include <nwg_loader.h>
-// Functions
-namespace NWG
-{
 	// glGetError gets last message and clears errorLog
 	void OglClearErr() { while (glGetError() != GL_NO_ERROR); }
-
 	bool OglErrLog(const char* strLoc, const char* strFile, int nLine)
 	{
 		UInt32 nErrCode = 0u;
@@ -620,29 +515,29 @@ namespace NWG
 		return true;
 	}
 
-	Int32 OglErrLogShader(ShaderTypes shaderType, UInt32 shaderID)
+	int OglErrLogShader(ShaderTypes shaderType, UInt32 unId)
 	{
-		if (shaderID == 0) { return ERC_UNKNOWN_ID; }
+		if (unId == 0) { return ERC_UNKNOWN_ID; }
 		Int32 nSuccess = 0;
 		Int32 nLogSize = 0;
 		String strLog;
 		const char* strType = ConvertEnum<ShaderTypes, const char*>(shaderType);
 		if (shaderType != SHD_SHADER) {
-			glGetShaderiv(shaderID, GL_COMPILE_STATUS, &nSuccess);
+			glGetShaderiv(unId, GL_COMPILE_STATUS, &nSuccess);
 			if (nSuccess == false) {
-				glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &nLogSize);
+				glGetShaderiv(unId, GL_INFO_LOG_LENGTH, &nLogSize);
 				strLog.resize(nLogSize);
-				glGetShaderInfoLog(shaderID, nLogSize, NULL, &strLog[0]);
+				glGetShaderInfoLog(unId, nLogSize, NULL, &strLog[0]);
 				throw Exception(&strLog[0], ERC_COMPILLATION, __FILE__, __LINE__);
 				return ERC_COMPILLATION;
 			}
 		}
 		else {
-			glGetProgramiv(shaderID, GL_LINK_STATUS, &nSuccess);
+			glGetProgramiv(unId, GL_LINK_STATUS, &nSuccess);
 			if (nSuccess == false) {
-				glGetProgramiv(shaderID, GL_INFO_LOG_LENGTH, &nLogSize);
+				glGetProgramiv(unId, GL_INFO_LOG_LENGTH, &nLogSize);
 				strLog.resize(nLogSize);
-				glGetProgramInfoLog(shaderID, nLogSize, NULL, &strLog[0]);
+				glGetProgramInfoLog(unId, nLogSize, NULL, &strLog[0]);
 				throw Exception(&strLog[0], ERC_LINKAGE, __FILE__, __LINE__);
 				return ERC_LINKAGE;
 			}
@@ -652,6 +547,109 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
+#include <dx/nwg_dx_loader.h>
+template<> DataTypes ConvertEnum<const char*, DataTypes>(const char* strType) {
+	if (CStrIsEqual(strType, "int")) { return DT_SINT32; }
+	if (CStrIsEqual(strType, "int2")) { return DT_VEC2_SINT32; }
+	if (CStrIsEqual(strType, "int3")) { return DT_VEC3_SINT32; }
+	if (CStrIsEqual(strType, "int4")) { return DT_VEC4_SINT32; }
+	if (CStrIsEqual(strType, "float")) { return DT_FLOAT32; }
+	if (CStrIsEqual(strType, "float2")) { return DT_VEC2_FLOAT32; }
+	if (CStrIsEqual(strType, "float3")) { return DT_VEC3_FLOAT32; }
+	if (CStrIsEqual(strType, "float4")) { return DT_VEC4_FLOAT32; }
+	return DT_DEFAULT;
+	}
+template<> DXGI_FORMAT ConvertEnum<DataTypes, DXGI_FORMAT>(DataTypes dType) {
+	switch (dType) {
+	case DT_BOOL: return DXGI_FORMAT_R8_UINT;
+	case DT_SINT8: return DXGI_FORMAT_R8_SINT;
+	case DT_VEC2_SINT8: return DXGI_FORMAT_R8_SINT;
+	case DT_VEC3_SINT8: case DT_VEC4_SINT8: return DXGI_FORMAT_R8G8B8A8_SINT;
+
+	case DT_UINT8: return DXGI_FORMAT_R8_UINT;
+	case DT_VEC2_UINT8: return DXGI_FORMAT_R8_UINT;
+	case DT_VEC3_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
+	case DT_VEC4_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
+
+	case DT_SINT16: return DXGI_FORMAT_R16_SINT;
+	case DT_VEC2_SINT16: return DXGI_FORMAT_R16_SINT;
+	case DT_VEC3_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
+	case DT_VEC4_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
+
+	case DT_UINT16: return DXGI_FORMAT_R16_UINT;
+	case DT_VEC2_UINT16: return DXGI_FORMAT_R16_UINT;
+	case DT_VEC3_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
+	case DT_VEC4_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
+
+	case DT_SINT32: return DXGI_FORMAT_R32_SINT;
+	case DT_VEC2_SINT32: return DXGI_FORMAT_R32_SINT;
+	case DT_VEC3_SINT32: return DXGI_FORMAT_R32G32B32_SINT;
+	case DT_VEC4_SINT32: return DXGI_FORMAT_R32G32B32A32_SINT;
+
+	case DT_UINT32: return DXGI_FORMAT_R32_UINT;
+	case DT_VEC2_UINT32: return DXGI_FORMAT_R32_UINT;
+	case DT_VEC3_UINT32: return DXGI_FORMAT_R32G32B32_UINT;
+	case DT_VEC4_UINT32: return DXGI_FORMAT_R32G32B32A32_UINT;
+
+	case DT_FLOAT32: return DXGI_FORMAT_R32_FLOAT;
+	case DT_VEC2_FLOAT32: return DXGI_FORMAT_R32G32_FLOAT;
+	case DT_VEC3_FLOAT32: return DXGI_FORMAT_R32G32B32_FLOAT;
+	case DT_VEC4_FLOAT32: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+	default: throw Exception("unsupported format", ERC_NO_SUPPORT); break;
+	}
+	return DXGI_FORMAT_R32_FLOAT;
+}
+template<> D3D11_PRIMITIVE_TOPOLOGY ConvertEnum<GfxPrimitives, D3D11_PRIMITIVE_TOPOLOGY>(GfxPrimitives gpType) {
+	switch (gpType) {
+	case GPT_POINTS: return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST; break;
+	case GPT_TRIANGLES: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+	case GPT_TRIANGLE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; break;
+	case GPT_TRIANGLE_FAN: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ; break;
+	case GPT_LINES: return D3D11_PRIMITIVE_TOPOLOGY_LINELIST; break;
+	case GPT_LINE_LOOP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ; break;
+	case GPT_LINE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
+	default: throw Exception("unavailable primitive topology", ERC_INVALID_ENUM); break;
+	}
+	return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+}
+template<> UInt32 ConvertEnum<TextureTypes, UInt32>(TextureTypes texType) {
+	switch (texType) {
+	case TXT_1D: return 0; break;
+	case TXT_2D: return 0; break;
+	case TXT_3D: return 0; break;
+	default: throw Exception("unsupported texture type", ERC_NO_SUPPORT); break;
+	}
+	return 0;
+}
+template<> DXGI_FORMAT ConvertEnum <PixelFormats, DXGI_FORMAT>(PixelFormats pxlFormat) {
+	switch (pxlFormat) {
+	case PXF_R32_SINT32: return DXGI_FORMAT_R32_SINT; break;
+	case PXF_R8G8B8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
+	case PXF_R8G8B8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
+	case PXF_R8G8B8A8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
+	case PXF_R8G8B8A8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
+	default: throw Exception("unsupported pixel format", ERC_NO_SUPPORT); break;
+	}
+	return DXGI_FORMAT_R8G8B8A8_UNORM;
+}
+template<> D3D11_FILTER ConvertEnum <TextureFilters, D3D11_FILTER>(TextureFilters texFilter) {
+	switch (texFilter) {
+	case TXF_LINEAR: return D3D11_FILTER_MIN_MAG_MIP_LINEAR; break;
+	case TXF_NEAREST: return D3D11_FILTER_MIN_MAG_MIP_POINT; break;
+	default: throw Exception("unsupported pixel filter", ERC_NO_SUPPORT); break;
+	}
+	return D3D11_FILTER_MIN_MAG_MIP_POINT;
+}
+template<> D3D11_TEXTURE_ADDRESS_MODE ConvertEnum<TextureWraps, D3D11_TEXTURE_ADDRESS_MODE>(TextureWraps texWrap) {
+	switch (texWrap) {
+	case TXW_REPEAT: return D3D11_TEXTURE_ADDRESS_WRAP; break;
+	case TXW_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
+	case TXW_BORDER: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
+	default: throw Exception("unsupported pixel filter", ERC_NO_SUPPORT); break;
+	}
+	return D3D11_TEXTURE_ADDRESS_WRAP;
+}
 namespace NWG
 {
 	void DxClearErr() {

@@ -38,6 +38,7 @@ namespace NWG
 		ShaderBlock(const char* sName, UInt8 unBindPoint);
 	};
 }
+
 namespace NWG
 {
 	/// VertexLayout class
@@ -76,6 +77,7 @@ namespace NWG
 		DArray<ShaderBlock> m_Blocks;
 	};
 }
+
 namespace NWG
 {
 	/// InputLayout class

@@ -3,6 +3,7 @@
 #if (defined NWG_GAPI)
 #include <nwg_texture.h>
 #include <nwg_shader_prog.h>
+
 namespace NWG
 {
 	OutStream& GfxMaterialInfo::operator<<(OutStream& rStream) const {
@@ -15,6 +16,7 @@ namespace NWG
 	OutStream& operator<<(OutStream& rStream, const GfxMaterialInfo& rInfo) { return rInfo.operator<<(rStream); }
 	InStream& operator>>(InStream& rStream, GfxMaterialInfo& rInfo) { return rInfo.operator>>(rStream); }
 }
+
 namespace NWG
 {
 	GfxMaterial::GfxMaterial(GfxEngine& rGfx, const char* strName) :

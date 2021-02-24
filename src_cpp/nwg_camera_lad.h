@@ -1,9 +1,7 @@
-#ifndef GFX_CAMERA_LAD_H
-#define GFX_CAMERA_LAD_H
-
+#ifndef NWG_CAMERA_LAD_H
+#define NWG_CAMERA_LAD_H
 #include <nwg_core.hpp>
 #include <nwg_camera.h>
-
 namespace NWG
 {
 	/// GraphicsCameraLad Singleton class
@@ -49,4 +47,4 @@ namespace NWG
 	};
 }
 
-#endif	// GFX_CAMERA_LAD_H
+#endif	// NWG_CAMERA_LAD_H

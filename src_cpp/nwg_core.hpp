@@ -3,13 +3,13 @@
 
 // --==<configuration>==--
 #if defined NWG_BUILD_LIB
-		#define NWG_API
+#	define NWG_API
 #else
-	#if defined NWG_BUILD_DLL
-		#define NWG_API __declspec(dllexport)
-	#else
-		#define NWG_API __declspec(dllimport)
-	#endif
+#	if defined NWG_BUILD_DLL
+#		define NWG_API __declspec(dllexport)
+#	else
+#		define NWG_API __declspec(dllimport)
+#	endif
 #endif
 
 #define NWG_GAPI_OGL	1 << 1
@@ -99,7 +99,6 @@ namespace NWG
 		GCM_2D = 2, GCM_3D = 3,
 	};
 }
-
 namespace NWG
 {
 	class NWG_API GfxEngine;
@@ -122,9 +121,7 @@ namespace NWG
 
 	class NWG_API Texture;
 	class NWG_API GfxMaterial;
-}
-namespace NWG
-{
+
 	struct NWG_API GfxCamera;
 }
 #endif	// NWG_CORE_HPP

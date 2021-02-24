@@ -8,8 +8,8 @@
 #include <nwg_texture.h>
 #include <nwg_drawable.h>
 
-namespace NWG
-{
+
+namespace NWG {
 	static inline DArray<Float32> MakeVtxRect(const Mat4f& m4Tf = Mat4f(1.0f)) {
 		DArray<Float32 >vtxData = {
 	-0.5f,	-0.5f,	0.0f,			1.0f,	1.0f,	1.0f,	1.0f,		0.0f,	0.0f,		0.0f,
@@ -37,7 +37,7 @@ namespace NWG
 	}
 }
 
-namespace NWG
+
 {
 	/// TransformComponent class
 	class NWG_API TFormCmp : public TCmp<TFormCmp>

@@ -25,7 +25,7 @@ namespace NWG
 }
 namespace NWG
 {
-	/// Shader Class
+	/// ShaderProg Class
 	class NWG_API ShaderProg : public TEntity<ShaderProg>, public AGfxRes, public ADataRes
 	{
 	public:

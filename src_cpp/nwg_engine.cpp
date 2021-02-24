@@ -4,8 +4,8 @@
 #include <nwg_tools.h>
 #include <nwg_frame_buf.h>
 #include <nwg_drawable.h>
-#include <nwg_loader.h>
 #if (NWG_GAPI & NWG_GAPI_OGL)
+#include <ogl/nwg_ogl_loader.h>
 namespace NWG
 {
 	GfxEngine::GfxEngine(HWND pWindow) :
@@ -47,7 +47,7 @@ namespace NWG
 		m_pContext = wglCreateContext(m_pDevice);
 		wglMakeCurrent(m_pDevice, m_pContext);
 
-		if (!gladLoadGL()) { NWL_ERR("Failed to load graphics library!"); return; }
+		if (!OglInit()) { throw Exception("failed to load graphics library!"); return; }
 		strcpy(&m_gInfo.strRenderer[0], &((const char*)glGetString(GL_RENDERER))[0]);
 		strcpy(&m_gInfo.strVersion[0], &((const char*)glGetString(GL_VERSION))[0]);
 		strcpy(&m_gInfo.strVendor[0], &((const char*)glGetString(GL_VENDOR))[0]);
@@ -120,6 +120,9 @@ namespace NWG
 		m_gConfig.StencilTest.nRefValue = unRefValue;
 		glStencilFunc(ConvertEnum<StencilConfigs, UInt32>(scFunc), unRefValue, unBitMask);
 	}
+	void GfxEngine::SetVSync(Bit bSynchronize) {
+		m_gConfig.General.unSwapInterval = bSynchronize;
+	}
 	// --==</setters>==--
 
 	// --==<core_methods>==--
@@ -127,7 +130,9 @@ namespace NWG
 	{
 		SwapBuffers(m_pDevice);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClearColor(sinf(TimeSys::GetCurr(0.1)), sinf(TimeSys::GetCurr(1.0)), cosf(TimeSys::GetCurr(0.5)), 1.0f);
+		glClearColor(
+			m_gConfig.General.rgbaClear[0], m_gConfig.General.rgbaClear[1],
+			m_gConfig.General.rgbaClear[2], m_gConfig.General.rgbaClear[3]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	void GfxEngine::BeginDraw()
@@ -160,6 +165,7 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
+#include <dx/nwg_dx_loader.h>
 namespace NWG
 {
 	GfxEngine::GfxEngine(HWND pWindow) :
@@ -236,8 +242,8 @@ namespace NWG
 		m_pContext->RSSetViewports(1, &vp);
 	}
 	void GfxEngine::SetDrawMode(DrawModes dMode, FacePlanes facePlane) {
-		m_gConfig.General.PolyMode.dMode = dMode;
-		m_gConfig.General.PolyMode.facePlane = facePlane;
+		m_gConfig.General.DrawMode.dMode = dMode;
+		m_gConfig.General.DrawMode.facePlane = facePlane;
 	}
 	void GfxEngine::SetVariable(GfxVariables gfxVar, Float32 nValue) {
 		switch(gfxVar) {
@@ -258,15 +264,17 @@ namespace NWG
 		m_gConfig.StencilTest.nBitMask = unBitMask;
 		m_gConfig.StencilTest.nRefValue = unRefValue;
 	}
+	void GfxEngine::SetVSync(Bit bSynchronize) {
+		m_gConfig.General.unSwapInterval = bSynchronize;
+	}
 	// --==</setters>==--
 	// --==<core_methods>==--
 	void GfxEngine::Update()
 	{
-		HRESULT hresInfo;
+		HRESULT hRes;
 		const Float32 rgbaClear[] = { sinf(TimeSys::GetCurr(0.1)), sinf(TimeSys::GetCurr(0.5)), cosf(TimeSys::GetCurr(0.3)), 1.0f };
 		
-		hresInfo = m_pSwap->Present(m_gConfig.General.unSwapInterval, 0u);
-		if (hresInfo == DXGI_ERROR_DEVICE_REMOVED) { throw Exception("device has been removed", hresInfo, __FILE__, __LINE__); }
+		if ((hRes = m_pSwap->Present(m_gConfig.General.unSwapInterval, 0u)) < 0) { throw(Exception("something went wrong")); }
 		m_pContext->ClearRenderTargetView(m_pTarget, rgbaClear);
 	}
 	void GfxEngine::BeginDraw()
@@ -281,7 +289,7 @@ namespace NWG
 	void GfxEngine::OnDraw(Drawable& rDrb)
 	{
 		rDrb.Bind();
-		for (auto& itBuf : rDrb.GetVtxBufs()) { }
+		for (auto& itBuf : rDrb.GetResources()) { }
 	}
 	void GfxEngine::Create(RefKeeper<GfxEngine>& rEngine, HWND& rWindow)
 	{

@@ -1,6 +1,5 @@
 #include <nwg_pch.hpp>
 #include "nwg_camera.h"
-
 namespace NWG
 {
 	GfxCamera::GfxCamera() :
@@ -13,8 +12,7 @@ namespace NWG
 		m_gcMode(GCM_2D), m_gcType(GCT_ORTHO),
 		m_m4Proj(Mat4f{ 1.0f }), m_m4View(Mat4f{ 1.0f }) {}
 	// --getters
-	const Mat4f& GfxCamera::GetProjMatrix()
-	{
+	const Mat4f& GfxCamera::GetProjMatrix() {
 		if (m_gcType == GCT_ORTHO) {
 			m_m4Proj = glm::ortho(-nViewScale * nAspectRatio,
 				nViewScale * nAspectRatio, -nViewScale, nViewScale, nNearClip, nFarClip);
@@ -24,8 +22,7 @@ namespace NWG
 		}
 		return m_m4Proj;
 	}
-	const Mat4f& GfxCamera::GetViewMatrix()
-	{
+	const Mat4f& GfxCamera::GetViewMatrix() {
 		V3f xyzNextFront = V3f(0.0f, 0.0f, 0.0f);
 		float nPitch_rad = (xyzRtn.x) * 3.14f / 180.0f;
 		float nYaw_rad = (xyzRtn.y) * 3.14f / 180.0f;

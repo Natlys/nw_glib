@@ -1,0 +1,689 @@
+#include <nwg_pch.hpp>
+#include "nwg_ogl_loader.h"
+#pragma comment (lib, "opengl32.lib")
+
+namespace NWG
+{
+	static HMODULE s_libOgl = nullptr;
+	static OglVersion s_version{ 0 };
+}
+namespace NWG
+{
+	// --getters
+	void* OglGetProc(const char* strProc) {
+		void* pResource;
+		pResource = wglGetProcAddress(strProc);
+		if (pResource == nullptr) { pResource = GetProcAddress(s_libOgl, strProc); }
+		return pResource;
+	}
+	// --predicates
+	int OglIsSupported(int nMajor, int nMinor) {
+		if (nMajor < 3) { return GL_FALSE; }
+		if (s_version.nMajor == nMajor) { return s_version.nMinor >= nMinor; }
+		return s_version.nMajor >= nMajor;
+	}
+	// --==<core_methods>==--
+	void OglOpen() { s_libOgl = LoadLibraryA("opengl32.dll"); }
+	void OglClose() { FreeLibrary(s_libOgl); }
+
+	int OglInit() {
+		OglOpen();
+		OglLoadProcs();
+		OglClose();
+
+		if (OglGetIntegerv == nullptr) { return GL_FALSE; }
+		OglGetIntegerv(GL_MAJOR_VERSION, &s_version.nMajor);
+		OglGetIntegerv(GL_MINOR_VERSION, &s_version.nMinor);
+		if (s_version.nMajor < 3) { return GL_FALSE; }
+		return GL_TRUE;
+	}
+	// --==</core_methods>==--
+
+	void OglLoadProcs()
+	{
+#if (defined GL_VERSION_1_0)
+		OglCullFace = (PFNGLCULLFACEPROC)OglGetProc("glCullFace");
+		OglFrontFace = (PFNGLFRONTFACEPROC)OglGetProc("glFrontFace");
+		OglHint = (PFNGLHINTPROC)OglGetProc("glHint");
+		OglLineWidth = (PFNGLLINEWIDTHPROC)OglGetProc("glLineWidth");
+		OglPointSize = (PFNGLPOINTSIZEPROC)OglGetProc("glPointSize");
+		OglPolygonMode = (PFNGLPOLYGONMODEPROC)OglGetProc("glPolygonMode");
+		OglScissor = (PFNGLSCISSORPROC)OglGetProc("glScissor");
+		OglTexParameterf = (PFNGLTEXPARAMETERFPROC)OglGetProc("glTexParameterf");
+		OglTexParameterfv = (PFNGLTEXPARAMETERFVPROC)OglGetProc("glTexParameterfv");
+		OglTexParameteri = (PFNGLTEXPARAMETERIPROC)OglGetProc("glTexParameteri");
+		OglTexParameteriv = (PFNGLTEXPARAMETERIVPROC)OglGetProc("glTexParameteriv");
+		OglTexImage1D = (PFNGLTEXIMAGE1DPROC)OglGetProc("glTexImage1D");
+		OglTexImage2D = (PFNGLTEXIMAGE2DPROC)OglGetProc("glTexImage2D");
+		OglDrawBuffer = (PFNGLDRAWBUFFERPROC)OglGetProc("glDrawBuffer");
+		OglClear = (PFNGLCLEARPROC)OglGetProc("glClear");
+		OglClearColor = (PFNGLCLEARCOLORPROC)OglGetProc("glClearColor");
+		OglClearStencil = (PFNGLCLEARSTENCILPROC)OglGetProc("glClearStencil");
+		OglClearDepth = (PFNGLCLEARDEPTHPROC)OglGetProc("glClearDepth");
+		OglStencilMask = (PFNGLSTENCILMASKPROC)OglGetProc("glStencilMask");
+		OglColorMask = (PFNGLCOLORMASKPROC)OglGetProc("glColorMask");
+		OglDepthMask = (PFNGLDEPTHMASKPROC)OglGetProc("glDepthMask");
+		OglDisable = (PFNGLDISABLEPROC)OglGetProc("glDisable");
+		OglEnable = (PFNGLENABLEPROC)OglGetProc("glEnable");
+		OglFinish = (PFNGLFINISHPROC)OglGetProc("glFinish");
+		OglFlush = (PFNGLFLUSHPROC)OglGetProc("glFlush");
+		OglBlendFunc = (PFNGLBLENDFUNCPROC)OglGetProc("glBlendFunc");
+		OglLogicOp = (PFNGLLOGICOPPROC)OglGetProc("glLogicOp");
+		OglStencilFunc = (PFNGLSTENCILFUNCPROC)OglGetProc("glStencilFunc");
+		OglStencilOp = (PFNGLSTENCILOPPROC)OglGetProc("glStencilOp");
+		OglDepthFunc = (PFNGLDEPTHFUNCPROC)OglGetProc("glDepthFunc");
+		OglPixelStoref = (PFNGLPIXELSTOREFPROC)OglGetProc("glPixelStoref");
+		OglPixelStorei = (PFNGLPIXELSTOREIPROC)OglGetProc("glPixelStorei");
+		OglReadBuffer = (PFNGLREADBUFFERPROC)OglGetProc("glReadBuffer");
+		OglReadPixels = (PFNGLREADPIXELSPROC)OglGetProc("glReadPixels");
+		OglGetBooleanv = (PFNGLGETBOOLEANVPROC)OglGetProc("glGetBooleanv");
+		OglGetDoublev = (PFNGLGETDOUBLEVPROC)OglGetProc("glGetDoublev");
+		OglGetError = (PFNGLGETERRORPROC)OglGetProc("glGetError");
+		OglGetFloatv = (PFNGLGETFLOATVPROC)OglGetProc("glGetFloatv");
+		OglGetIntegerv = (PFNGLGETINTEGERVPROC)OglGetProc("glGetIntegerv");
+		OglGetString = (PFNGLGETSTRINGPROC)OglGetProc("glGetString");
+		OglGetTexImage = (PFNGLGETTEXIMAGEPROC)OglGetProc("glGetTexImage");
+		OglGetTexParameterfv = (PFNGLGETTEXPARAMETERFVPROC)OglGetProc("glGetTexParameterfv");
+		OglGetTexParameteriv = (PFNGLGETTEXPARAMETERIVPROC)OglGetProc("glGetTexParameteriv");
+		OglGetTexLevelParameterfv = (PFNGLGETTEXLEVELPARAMETERFVPROC)OglGetProc("glGetTexLevelParameterfv");
+		OglGetTexLevelParameteriv = (PFNGLGETTEXLEVELPARAMETERIVPROC)OglGetProc("glGetTexLevelParameteriv");
+		OglIsEnabled = (PFNGLISENABLEDPROC)OglGetProc("glIsEnabled");
+		OglDepthRange = (PFNGLDEPTHRANGEPROC)OglGetProc("glDepthRange");
+		OglViewport = (PFNGLVIEWPORTPROC)OglGetProc("glViewport");
+#endif	// GL_VERSION_1_0
+#if (defined GL_VERSION_1_1)
+		OglDrawArrays = (PFNGLDRAWARRAYSPROC)OglGetProc("glDrawArrays");
+		OglDrawElements = (PFNGLDRAWELEMENTSPROC)OglGetProc("glDrawElements");
+		OglGetPointerv = (PFNGLGETPOINTERVPROC)OglGetProc("glGetPointerv");
+		OglPolygonOffset = (PFNGLPOLYGONOFFSETPROC)OglGetProc("glPolygonOffset");
+		OglCopyTexImage1D = (PFNGLCOPYTEXIMAGE1DPROC)OglGetProc("glCopyTexImage1D");
+		OglCopyTexImage2D = (PFNGLCOPYTEXIMAGE2DPROC)OglGetProc("glCopyTexImage2D");
+		OglCopyTexSubImage1D = (PFNGLCOPYTEXSUBIMAGE1DPROC)OglGetProc("glCopyTexSubImage1D");
+		OglCopyTexSubImage2D = (PFNGLCOPYTEXSUBIMAGE2DPROC)OglGetProc("glCopyTexSubImage2D");
+		OglTexSubImage1D = (PFNGLTEXSUBIMAGE1DPROC)OglGetProc("glTexSubImage1D");
+		OglTexSubImage2D = (PFNGLTEXSUBIMAGE2DPROC)OglGetProc("glTexSubImage2D");
+		OglBindTexture = (PFNGLBINDTEXTUREPROC)OglGetProc("glBindTexture");
+		OglDeleteTextures = (PFNGLDELETETEXTURESPROC)OglGetProc("glDeleteTextures");
+		OglGenTextures = (PFNGLGENTEXTURESPROC)OglGetProc("glGenTextures");
+		OglIsTexture = (PFNGLISTEXTUREPROC)OglGetProc("glIsTexture");
+#endif	// GL_VERSION_1_1
+#if (defined GL_VERSION_1_2)
+		OglBlendColor = (PFNGLBLENDCOLORPROC)OglGetProc("glBlendColor");
+		OglBlendEquation = (PFNGLBLENDEQUATIONPROC)OglGetProc("glBlendEquation");
+		OglDrawRangeElements = (PFNGLDRAWRANGEELEMENTSPROC)OglGetProc("glDrawRangeElements");
+		OglTexImage3D = (PFNGLTEXIMAGE3DPROC)OglGetProc("glTexImage3D");
+		OglTexSubImage3D = (PFNGLTEXSUBIMAGE3DPROC)OglGetProc("glTexSubImage3D");
+		OglCopyTexSubImage3D = (PFNGLCOPYTEXSUBIMAGE3DPROC)OglGetProc("glCopyTexSubImage3D");
+#endif	// GL_VERSION_1_2
+#if (defined GL_VERSION_1_3)
+		OglActiveTexture = (PFNGLACTIVETEXTUREPROC)OglGetProc("glActiveTexture");
+		OglSampleCoverage = (PFNGLSAMPLECOVERAGEPROC)OglGetProc("glSampleCoverage");
+		OglCompressedTexImage3D = (PFNGLCOMPRESSEDTEXIMAGE3DPROC)OglGetProc("glCompressedTexImage3D");
+		OglCompressedTexImage2D = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)OglGetProc("glCompressedTexImage2D");
+		OglCompressedTexImage1D = (PFNGLCOMPRESSEDTEXIMAGE1DPROC)OglGetProc("glCompressedTexImage1D");
+		OglCompressedTexSubImage3D = (PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC)OglGetProc("glCompressedTexSubImage3D");
+		OglCompressedTexSubImage2D = (PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC)OglGetProc("glCompressedTexSubImage2D");
+		OglCompressedTexSubImage1D = (PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC)OglGetProc("glCompressedTexSubImage1D");
+		OglGetCompressedTexImage = (PFNGLGETCOMPRESSEDTEXIMAGEPROC)OglGetProc("glGetCompressedTexImage");
+#endif	// GL_VERSION_1_3
+#if (defined GL_VERSION_1_4)
+		OglBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)OglGetProc("glBlendFuncSeparate");
+		OglMultiDrawArrays = (PFNGLMULTIDRAWARRAYSPROC)OglGetProc("glMultiDrawArrays");
+		OglMultiDrawElements = (PFNGLMULTIDRAWELEMENTSPROC)OglGetProc("glMultiDrawElements");
+		OglPointParameterf = (PFNGLPOINTPARAMETERFPROC)OglGetProc("glPointParameterf");
+		OglPointParameterfv = (PFNGLPOINTPARAMETERFVPROC)OglGetProc("glPointParameterfv");
+		OglPointParameteri = (PFNGLPOINTPARAMETERIPROC)OglGetProc("glPointParameteri");
+		OglPointParameteriv = (PFNGLPOINTPARAMETERIVPROC)OglGetProc("glPointParameteriv");
+#endif	// GL_VERSION_1_4
+#if (defined GL_VERSION_1_5)
+		OglGenQueries = (PFNGLGENQUERIESPROC)OglGetProc("glGenQueries");
+		OglDeleteQueries = (PFNGLDELETEQUERIESPROC)OglGetProc("glDeleteQueries");
+		OglIsQuery = (PFNGLISQUERYPROC)OglGetProc("glIsQuery");
+		OglBeginQuery = (PFNGLBEGINQUERYPROC)OglGetProc("glBeginQuery");
+		OglEndQuery = (PFNGLENDQUERYPROC)OglGetProc("glEndQuery");
+		OglGetQueryiv = (PFNGLGETQUERYIVPROC)OglGetProc("glGetQueryiv");
+		OglGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC)OglGetProc("glGetQueryObjectiv");
+		OglGetQueryObjectuiv = (PFNGLGETQUERYOBJECTUIVPROC)OglGetProc("glGetQueryObjectuiv");
+		OglBindBuffer = (PFNGLBINDBUFFERPROC)OglGetProc("glBindBuffer");
+		OglDeleteBuffers = (PFNGLDELETEBUFFERSPROC)OglGetProc("glDeleteBuffers");
+		OglGenBuffers = (PFNGLGENBUFFERSPROC)OglGetProc("glGenBuffers");
+		OglIsBuffer = (PFNGLISBUFFERPROC)OglGetProc("glIsBuffer");
+		OglBufferData = (PFNGLBUFFERDATAPROC)OglGetProc("glBufferData");
+		OglBufferSubData = (PFNGLBUFFERSUBDATAPROC)OglGetProc("glBufferSubData");
+		OglGetBufferSubData = (PFNGLGETBUFFERSUBDATAPROC)OglGetProc("glGetBufferSubData");
+		OglMapBuffer = (PFNGLMAPBUFFERPROC)OglGetProc("glMapBuffer");
+		OglUnmapBuffer = (PFNGLUNMAPBUFFERPROC)OglGetProc("glUnmapBuffer");
+		OglGetBufferParameteriv = (PFNGLGETBUFFERPARAMETERIVPROC)OglGetProc("glGetBufferParameteriv");
+		OglGetBufferPointerv = (PFNGLGETBUFFERPOINTERVPROC)OglGetProc("glGetBufferPointerv");
+#endif	// GL_VERSION_1_5
+#if (defined GL_VERSION_2_0)
+		OglBlendEquationSeparate = (PFNGLBLENDEQUATIONSEPARATEPROC)OglGetProc("glBlendEquationSeparate");
+		OglDrawBuffers = (PFNGLDRAWBUFFERSPROC)OglGetProc("glDrawBuffers");
+		OglStencilOpSeparate = (PFNGLSTENCILOPSEPARATEPROC)OglGetProc("glStencilOpSeparate");
+		OglStencilFuncSeparate = (PFNGLSTENCILFUNCSEPARATEPROC)OglGetProc("glStencilFuncSeparate");
+		OglStencilMaskSeparate = (PFNGLSTENCILMASKSEPARATEPROC)OglGetProc("glStencilMaskSeparate");
+		OglAttachShader = (PFNGLATTACHSHADERPROC)OglGetProc("glAttachShader");
+		OglBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)OglGetProc("glBindAttribLocation");
+		OglCompileShader = (PFNGLCOMPILESHADERPROC)OglGetProc("glCompileShader");
+		OglCreateProgram = (PFNGLCREATEPROGRAMPROC)OglGetProc("glCreateProgram");
+		OglCreateShader = (PFNGLCREATESHADERPROC)OglGetProc("glCreateShader");
+		OglDeleteProgram = (PFNGLDELETEPROGRAMPROC)OglGetProc("glDeleteProgram");
+		OglDeleteShader = (PFNGLDELETESHADERPROC)OglGetProc("glDeleteShader");
+		OglDetachShader = (PFNGLDETACHSHADERPROC)OglGetProc("glDetachShader");
+		OglDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)OglGetProc("glDisableVertexAttribArray");
+		OglEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)OglGetProc("glEnableVertexAttribArray");
+		OglGetActiveAttrib = (PFNGLGETACTIVEATTRIBPROC)OglGetProc("glGetActiveAttrib");
+		OglGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)OglGetProc("glGetActiveUniform");
+		OglGetAttachedShaders = (PFNGLGETATTACHEDSHADERSPROC)OglGetProc("glGetAttachedShaders");
+		OglGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)OglGetProc("glGetAttribLocation");
+		OglGetProgramiv = (PFNGLGETPROGRAMIVPROC)OglGetProc("glGetProgramiv");
+		OglGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)OglGetProc("glGetProgramInfoLog");
+		OglGetShaderiv = (PFNGLGETSHADERIVPROC)OglGetProc("glGetShaderiv");
+		OglGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)OglGetProc("glGetShaderInfoLog");
+		OglGetShaderSource = (PFNGLGETSHADERSOURCEPROC)OglGetProc("glGetShaderSource");
+		OglGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)OglGetProc("glGetUniformLocation");
+		OglGetUniformfv = (PFNGLGETUNIFORMFVPROC)OglGetProc("glGetUniformfv");
+		OglGetUniformiv = (PFNGLGETUNIFORMIVPROC)OglGetProc("glGetUniformiv");
+		OglGetVertexAttribdv = (PFNGLGETVERTEXATTRIBDVPROC)OglGetProc("glGetVertexAttribdv");
+		OglGetVertexAttribfv = (PFNGLGETVERTEXATTRIBFVPROC)OglGetProc("glGetVertexAttribfv");
+		OglGetVertexAttribiv = (PFNGLGETVERTEXATTRIBIVPROC)OglGetProc("glGetVertexAttribiv");
+		OglGetVertexAttribPointerv = (PFNGLGETVERTEXATTRIBPOINTERVPROC)OglGetProc("glGetVertexAttribPointerv");
+		OglIsProgram = (PFNGLISPROGRAMPROC)OglGetProc("glIsProgram");
+		OglIsShader = (PFNGLISSHADERPROC)OglGetProc("glIsShader");
+		OglLinkProgram = (PFNGLLINKPROGRAMPROC)OglGetProc("glLinkProgram");
+		OglShaderSource = (PFNGLSHADERSOURCEPROC)OglGetProc("glShaderSource");
+		OglUseProgram = (PFNGLUSEPROGRAMPROC)OglGetProc("glUseProgram");
+		OglUniform1f = (PFNGLUNIFORM1FPROC)OglGetProc("glUniform1f");
+		OglUniform2f = (PFNGLUNIFORM2FPROC)OglGetProc("glUniform2f");
+		OglUniform3f = (PFNGLUNIFORM3FPROC)OglGetProc("glUniform3f");
+		OglUniform4f = (PFNGLUNIFORM4FPROC)OglGetProc("glUniform4f");
+		OglUniform1i = (PFNGLUNIFORM1IPROC)OglGetProc("glUniform1i");
+		OglUniform2i = (PFNGLUNIFORM2IPROC)OglGetProc("glUniform2i");
+		OglUniform3i = (PFNGLUNIFORM3IPROC)OglGetProc("glUniform3i");
+		OglUniform4i = (PFNGLUNIFORM4IPROC)OglGetProc("glUniform4i");
+		OglUniform1fv = (PFNGLUNIFORM1FVPROC)OglGetProc("glUniform1fv");
+		OglUniform2fv = (PFNGLUNIFORM2FVPROC)OglGetProc("glUniform2fv");
+		OglUniform3fv = (PFNGLUNIFORM3FVPROC)OglGetProc("glUniform3fv");
+		OglUniform4fv = (PFNGLUNIFORM4FVPROC)OglGetProc("glUniform4fv");
+		OglUniform1iv = (PFNGLUNIFORM1IVPROC)OglGetProc("glUniform1iv");
+		OglUniform2iv = (PFNGLUNIFORM2IVPROC)OglGetProc("glUniform2iv");
+		OglUniform3iv = (PFNGLUNIFORM3IVPROC)OglGetProc("glUniform3iv");
+		OglUniform4iv = (PFNGLUNIFORM4IVPROC)OglGetProc("glUniform4iv");
+		OglUniformMatrix2fv = (PFNGLUNIFORMMATRIX2FVPROC)OglGetProc("glUniformMatrix2fv");
+		OglUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)OglGetProc("glUniformMatrix3fv");
+		OglUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)OglGetProc("glUniformMatrix4fv");
+		OglValidateProgram = (PFNGLVALIDATEPROGRAMPROC)OglGetProc("glValidateProgram");
+		OglVertexAttrib1d = (PFNGLVERTEXATTRIB1DPROC)OglGetProc("glVertexAttrib1d");
+		OglVertexAttrib1dv = (PFNGLVERTEXATTRIB1DVPROC)OglGetProc("glVertexAttrib1dv");
+		OglVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)OglGetProc("glVertexAttrib1f");
+		OglVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)OglGetProc("glVertexAttrib1fv");
+		OglVertexAttrib1s = (PFNGLVERTEXATTRIB1SPROC)OglGetProc("glVertexAttrib1s");
+		OglVertexAttrib1sv = (PFNGLVERTEXATTRIB1SVPROC)OglGetProc("glVertexAttrib1sv");
+		OglVertexAttrib2d = (PFNGLVERTEXATTRIB2DPROC)OglGetProc("glVertexAttrib2d");
+		OglVertexAttrib2dv = (PFNGLVERTEXATTRIB2DVPROC)OglGetProc("glVertexAttrib2dv");
+		OglVertexAttrib2f = (PFNGLVERTEXATTRIB2FPROC)OglGetProc("glVertexAttrib2f");
+		OglVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)OglGetProc("glVertexAttrib2fv");
+		OglVertexAttrib2s = (PFNGLVERTEXATTRIB2SPROC)OglGetProc("glVertexAttrib2s");
+		OglVertexAttrib2sv = (PFNGLVERTEXATTRIB2SVPROC)OglGetProc("glVertexAttrib2sv");
+		OglVertexAttrib3d = (PFNGLVERTEXATTRIB3DPROC)OglGetProc("glVertexAttrib3d");
+		OglVertexAttrib3dv = (PFNGLVERTEXATTRIB3DVPROC)OglGetProc("glVertexAttrib3dv");
+		OglVertexAttrib3f = (PFNGLVERTEXATTRIB3FPROC)OglGetProc("glVertexAttrib3f");
+		OglVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)OglGetProc("glVertexAttrib3fv");
+		OglVertexAttrib3s = (PFNGLVERTEXATTRIB3SPROC)OglGetProc("glVertexAttrib3s");
+		OglVertexAttrib3sv = (PFNGLVERTEXATTRIB3SVPROC)OglGetProc("glVertexAttrib3sv");
+		OglVertexAttrib4Nbv = (PFNGLVERTEXATTRIB4NBVPROC)OglGetProc("glVertexAttrib4Nbv");
+		OglVertexAttrib4Niv = (PFNGLVERTEXATTRIB4NIVPROC)OglGetProc("glVertexAttrib4Niv");
+		OglVertexAttrib4Nsv = (PFNGLVERTEXATTRIB4NSVPROC)OglGetProc("glVertexAttrib4Nsv");
+		OglVertexAttrib4Nub = (PFNGLVERTEXATTRIB4NUBPROC)OglGetProc("glVertexAttrib4Nub");
+		OglVertexAttrib4Nubv = (PFNGLVERTEXATTRIB4NUBVPROC)OglGetProc("glVertexAttrib4Nubv");
+		OglVertexAttrib4Nuiv = (PFNGLVERTEXATTRIB4NUIVPROC)OglGetProc("glVertexAttrib4Nuiv");
+		OglVertexAttrib4Nusv = (PFNGLVERTEXATTRIB4NUSVPROC)OglGetProc("glVertexAttrib4Nusv");
+		OglVertexAttrib4bv = (PFNGLVERTEXATTRIB4BVPROC)OglGetProc("glVertexAttrib4bv");
+		OglVertexAttrib4d = (PFNGLVERTEXATTRIB4DPROC)OglGetProc("glVertexAttrib4d");
+		OglVertexAttrib4dv = (PFNGLVERTEXATTRIB4DVPROC)OglGetProc("glVertexAttrib4dv");
+		OglVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)OglGetProc("glVertexAttrib4f");
+		OglVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)OglGetProc("glVertexAttrib4fv");
+		OglVertexAttrib4iv = (PFNGLVERTEXATTRIB4IVPROC)OglGetProc("glVertexAttrib4iv");
+		OglVertexAttrib4s = (PFNGLVERTEXATTRIB4SPROC)OglGetProc("glVertexAttrib4s");
+		OglVertexAttrib4sv = (PFNGLVERTEXATTRIB4SVPROC)OglGetProc("glVertexAttrib4sv");
+		OglVertexAttrib4ubv = (PFNGLVERTEXATTRIB4UBVPROC)OglGetProc("glVertexAttrib4ubv");
+		OglVertexAttrib4uiv = (PFNGLVERTEXATTRIB4UIVPROC)OglGetProc("glVertexAttrib4uiv");
+		OglVertexAttrib4usv = (PFNGLVERTEXATTRIB4USVPROC)OglGetProc("glVertexAttrib4usv");
+		OglVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)OglGetProc("glVertexAttribPointer");
+#endif	// GL_VERSION_2_0
+#if (defined GL_VERSION_2_1)
+		OglUniformMatrix2x3fv = (PFNGLUNIFORMMATRIX2X3FVPROC)OglGetProc("glUniformMatrix2x3fv");
+		OglUniformMatrix3x2fv = (PFNGLUNIFORMMATRIX3X2FVPROC)OglGetProc("glUniformMatrix3x2fv");
+		OglUniformMatrix2x4fv = (PFNGLUNIFORMMATRIX2X4FVPROC)OglGetProc("glUniformMatrix2x4fv");
+		OglUniformMatrix4x2fv = (PFNGLUNIFORMMATRIX4X2FVPROC)OglGetProc("glUniformMatrix4x2fv");
+		OglUniformMatrix3x4fv = (PFNGLUNIFORMMATRIX3X4FVPROC)OglGetProc("glUniformMatrix3x4fv");
+		OglUniformMatrix4x3fv = (PFNGLUNIFORMMATRIX4X3FVPROC)OglGetProc("glUniformMatrix4x3fv");
+#endif	// GL_VERSION_2_1
+#if (defined GL_VERSION_3_0)
+		OglColorMaski = (PFNGLCOLORMASKIPROC)OglGetProc("glColorMaski");
+		OglGetBooleani_v = (PFNGLGETBOOLEANI_VPROC)OglGetProc("glGetBooleani_v");
+		OglGetIntegeri_v = (PFNGLGETINTEGERI_VPROC)OglGetProc("glGetIntegeri_v");
+		OglEnablei = (PFNGLENABLEIPROC)OglGetProc("glEnablei");
+		OglDisablei = (PFNGLDISABLEIPROC)OglGetProc("glDisablei");
+		OglIsEnabledi = (PFNGLISENABLEDIPROC)OglGetProc("glIsEnabledi");
+		OglBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC)OglGetProc("glBeginTransformFeedback");
+		OglEndTransformFeedback = (PFNGLENDTRANSFORMFEEDBACKPROC)OglGetProc("glEndTransformFeedback");
+		OglBindBufferRange = (PFNGLBINDBUFFERRANGEPROC)OglGetProc("glBindBufferRange");
+		OglBindBufferBase = (PFNGLBINDBUFFERBASEPROC)OglGetProc("glBindBufferBase");
+		OglTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)OglGetProc("glTransformFeedbackVaryings");
+		OglGetTransformFeedbackVarying = (PFNGLGETTRANSFORMFEEDBACKVARYINGPROC)OglGetProc("glGetTransformFeedbackVarying");
+		OglClampColor = (PFNGLCLAMPCOLORPROC)OglGetProc("glClampColor");
+		OglBeginConditionalRender = (PFNGLBEGINCONDITIONALRENDERPROC)OglGetProc("glBeginConditionalRender");
+		OglEndConditionalRender = (PFNGLENDCONDITIONALRENDERPROC)OglGetProc("glEndConditionalRender");
+		OglVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)OglGetProc("glVertexAttribIPointer");
+		OglGetVertexAttribIiv = (PFNGLGETVERTEXATTRIBIIVPROC)OglGetProc("glGetVertexAttribIiv");
+		OglGetVertexAttribIuiv = (PFNGLGETVERTEXATTRIBIUIVPROC)OglGetProc("glGetVertexAttribIuiv");
+		OglVertexAttribI1i = (PFNGLVERTEXATTRIBI1IPROC)OglGetProc("glVertexAttribI1i");
+		OglVertexAttribI2i = (PFNGLVERTEXATTRIBI2IPROC)OglGetProc("glVertexAttribI2i");
+		OglVertexAttribI3i = (PFNGLVERTEXATTRIBI3IPROC)OglGetProc("glVertexAttribI3i");
+		OglVertexAttribI4i = (PFNGLVERTEXATTRIBI4IPROC)OglGetProc("glVertexAttribI4i");
+		OglVertexAttribI1ui = (PFNGLVERTEXATTRIBI1UIPROC)OglGetProc("glVertexAttribI1ui");
+		OglVertexAttribI2ui = (PFNGLVERTEXATTRIBI2UIPROC)OglGetProc("glVertexAttribI2ui");
+		OglVertexAttribI3ui = (PFNGLVERTEXATTRIBI3UIPROC)OglGetProc("glVertexAttribI3ui");
+		OglVertexAttribI4ui = (PFNGLVERTEXATTRIBI4UIPROC)OglGetProc("glVertexAttribI4ui");
+		OglVertexAttribI1iv = (PFNGLVERTEXATTRIBI1IVPROC)OglGetProc("glVertexAttribI1iv");
+		OglVertexAttribI2iv = (PFNGLVERTEXATTRIBI2IVPROC)OglGetProc("glVertexAttribI2iv");
+		OglVertexAttribI3iv = (PFNGLVERTEXATTRIBI3IVPROC)OglGetProc("glVertexAttribI3iv");
+		OglVertexAttribI4iv = (PFNGLVERTEXATTRIBI4IVPROC)OglGetProc("glVertexAttribI4iv");
+		OglVertexAttribI1uiv = (PFNGLVERTEXATTRIBI1UIVPROC)OglGetProc("glVertexAttribI1uiv");
+		OglVertexAttribI2uiv = (PFNGLVERTEXATTRIBI2UIVPROC)OglGetProc("glVertexAttribI2uiv");
+		OglVertexAttribI3uiv = (PFNGLVERTEXATTRIBI3UIVPROC)OglGetProc("glVertexAttribI3uiv");
+		OglVertexAttribI4uiv = (PFNGLVERTEXATTRIBI4UIVPROC)OglGetProc("glVertexAttribI4uiv");
+		OglVertexAttribI4bv = (PFNGLVERTEXATTRIBI4BVPROC)OglGetProc("glVertexAttribI4bv");
+		OglVertexAttribI4sv = (PFNGLVERTEXATTRIBI4SVPROC)OglGetProc("glVertexAttribI4sv");
+		OglVertexAttribI4ubv = (PFNGLVERTEXATTRIBI4UBVPROC)OglGetProc("glVertexAttribI4ubv");
+		OglVertexAttribI4usv = (PFNGLVERTEXATTRIBI4USVPROC)OglGetProc("glVertexAttribI4usv");
+		OglGetUniformuiv = (PFNGLGETUNIFORMUIVPROC)OglGetProc("glGetUniformuiv");
+		OglBindFragDataLocation = (PFNGLBINDFRAGDATALOCATIONPROC)OglGetProc("glBindFragDataLocation");
+		OglGetFragDataLocation = (PFNGLGETFRAGDATALOCATIONPROC)OglGetProc("glGetFragDataLocation");
+		OglUniform1ui = (PFNGLUNIFORM1UIPROC)OglGetProc("glUniform1ui");
+		OglUniform2ui = (PFNGLUNIFORM2UIPROC)OglGetProc("glUniform2ui");
+		OglUniform3ui = (PFNGLUNIFORM3UIPROC)OglGetProc("glUniform3ui");
+		OglUniform4ui = (PFNGLUNIFORM4UIPROC)OglGetProc("glUniform4ui");
+		OglUniform1uiv = (PFNGLUNIFORM1UIVPROC)OglGetProc("glUniform1uiv");
+		OglUniform2uiv = (PFNGLUNIFORM2UIVPROC)OglGetProc("glUniform2uiv");
+		OglUniform3uiv = (PFNGLUNIFORM3UIVPROC)OglGetProc("glUniform3uiv");
+		OglUniform4uiv = (PFNGLUNIFORM4UIVPROC)OglGetProc("glUniform4uiv");
+		OglTexParameterIiv = (PFNGLTEXPARAMETERIIVPROC)OglGetProc("glTexParameterIiv");
+		OglTexParameterIuiv = (PFNGLTEXPARAMETERIUIVPROC)OglGetProc("glTexParameterIuiv");
+		OglGetTexParameterIiv = (PFNGLGETTEXPARAMETERIIVPROC)OglGetProc("glGetTexParameterIiv");
+		OglGetTexParameterIuiv = (PFNGLGETTEXPARAMETERIUIVPROC)OglGetProc("glGetTexParameterIuiv");
+		OglClearBufferiv = (PFNGLCLEARBUFFERIVPROC)OglGetProc("glClearBufferiv");
+		OglClearBufferuiv = (PFNGLCLEARBUFFERUIVPROC)OglGetProc("glClearBufferuiv");
+		OglClearBufferfv = (PFNGLCLEARBUFFERFVPROC)OglGetProc("glClearBufferfv");
+		OglClearBufferfi = (PFNGLCLEARBUFFERFIPROC)OglGetProc("glClearBufferfi");
+		OglGetStringi = (PFNGLGETSTRINGIPROC)OglGetProc("glGetStringi");
+#endif	// GL_VERSION_3_0
+#if (defined GL_VERSION_3_1)
+		OglDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)OglGetProc("glDrawArraysInstanced");
+		OglDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)OglGetProc("glDrawElementsInstanced");
+		OglTexBuffer = (PFNGLTEXBUFFERPROC)OglGetProc("glTexBuffer");
+		OglPrimitiveRestartIndex = (PFNGLPRIMITIVERESTARTINDEXPROC)OglGetProc("glPrimitiveRestartIndex");
+#endif	// GL_VERSION_3_1
+#if (defined GL_VERSION_3_2)
+#endif	// GL_VERSION_3_2
+#if (defined GL_VERSION_3_3)
+		OglGetInteger64i_v = (PFNGLGETINTEGER64I_VPROC)OglGetProc("glGetInteger64i_v");
+		OglGetBufferParameteri64v = (PFNGLGETBUFFERPARAMETERI64VPROC)OglGetProc("glGetBufferParameteri64v");
+		OglFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)OglGetProc("glFramebufferTexture");
+#endif	// GL_VERSION_3_3
+		OglVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)OglGetProc("glVertexAttribDivisor");
+#if (defined GL_VERSION_4_0)
+		OglMinSampleShading = (PFNGLMINSAMPLESHADINGPROC)OglGetProc("glMinSampleShading");
+		OglBlendEquationi = (PFNGLBLENDEQUATIONIPROC)OglGetProc("glBlendEquationi");
+		OglBlendEquationSeparatei = (PFNGLBLENDEQUATIONSEPARATEIPROC)OglGetProc("glBlendEquationSeparatei");
+		OglBlendFunci = (PFNGLBLENDFUNCIPROC)OglGetProc("glBlendFunci");
+		OglBlendFuncSeparatei = (PFNGLBLENDFUNCSEPARATEIPROC)OglGetProc("glBlendFuncSeparatei");
+#endif	// GL_VERSION_4_0
+#if (defined GL_VERSION_4_1)
+#endif	// GL_VERSION_4_1
+#if (defined GL_VERSION_4_2)
+#endif	// GL_VERSION_4_2
+#if (defined GL_VERSION_4_3)
+#endif	// GL_VERSION_4_3
+#if (defined GL_VERSION_4_4)
+#endif	// GL_VERSION_4_4
+#if (defined GL_VERSION_4_5)
+#endif	// GL_VERSION_4_5
+#if (defined GL_VERSION_4_6)
+#endif	// GL_VERSION_4_6
+#if (defined NWG_OGL_ARB_H)
+		OglIsRenderbuffer = (PFNGLISRENDERBUFFERPROC)OglGetProc("glIsRenderbuffer");
+		OglBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)OglGetProc("glBindRenderbuffer");
+		OglDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)OglGetProc("glDeleteRenderbuffers");
+		OglGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)OglGetProc("glGenRenderbuffers");
+		OglRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)OglGetProc("glRenderbufferStorage");
+		OglGetRenderbufferParameteriv = (PFNGLGETRENDERBUFFERPARAMETERIVPROC)OglGetProc("glGetRenderbufferParameteriv");
+		OglIsFramebuffer = (PFNGLISFRAMEBUFFERPROC)OglGetProc("glIsFramebuffer");
+		OglBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)OglGetProc("glBindFramebuffer");
+		OglDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)OglGetProc("glDeleteFramebuffers");
+		OglGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)OglGetProc("glGenFramebuffers");
+		OglCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)OglGetProc("glCheckFramebufferStatus");
+		OglFramebufferTexture1D = (PFNGLFRAMEBUFFERTEXTURE1DPROC)OglGetProc("glFramebufferTexture1D");
+		OglFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)OglGetProc("glFramebufferTexture2D");
+		OglFramebufferTexture3D = (PFNGLFRAMEBUFFERTEXTURE3DPROC)OglGetProc("glFramebufferTexture3D");
+		OglFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)OglGetProc("glFramebufferRenderbuffer");
+		OglGetFramebufferAttachmentParameteriv = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)OglGetProc("glGetFramebufferAttachmentParameteriv");
+		OglGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)OglGetProc("glGenerateMipmap");
+		OglBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)OglGetProc("glBlitFramebuffer");
+		OglRenderbufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)OglGetProc("glRenderbufferStorageMultisample");
+		OglFramebufferTextureLayer = (PFNGLFRAMEBUFFERTEXTURELAYERPROC)OglGetProc("glFramebufferTextureLayer");
+		OglMapBufferRange = (PFNGLMAPBUFFERRANGEPROC)OglGetProc("glMapBufferRange");
+		OglFlushMappedBufferRange = (PFNGLFLUSHMAPPEDBUFFERRANGEPROC)OglGetProc("glFlushMappedBufferRange");
+		OglBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)OglGetProc("glBindVertexArray");
+		OglDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)OglGetProc("glDeleteVertexArrays");
+		OglGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)OglGetProc("glGenVertexArrays");
+		OglIsVertexArray = (PFNGLISVERTEXARRAYPROC)OglGetProc("glIsVertexArray");
+		OglGetUniformIndices = (PFNGLGETUNIFORMINDICESPROC)OglGetProc("glGetUniformIndices");
+		OglGetActiveUniformsiv = (PFNGLGETACTIVEUNIFORMSIVPROC)OglGetProc("glGetActiveUniformsiv");
+		OglGetActiveUniformName = (PFNGLGETACTIVEUNIFORMNAMEPROC)OglGetProc("glGetActiveUniformName");
+		OglGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)OglGetProc("glGetUniformBlockIndex");
+		OglGetActiveUniformBlockiv = (PFNGLGETACTIVEUNIFORMBLOCKIVPROC)OglGetProc("glGetActiveUniformBlockiv");
+		OglGetActiveUniformBlockName = (PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC)OglGetProc("glGetActiveUniformBlockName");
+		OglUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)OglGetProc("glUniformBlockBinding");
+		OglCopyBufferSubData = (PFNGLCOPYBUFFERSUBDATAPROC)OglGetProc("glCopyBufferSubData");
+		OglDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)OglGetProc("glDrawElementsBaseVertex");
+		OglDrawRangeElementsBaseVertex = (PFNGLDRAWRANGEELEMENTSBASEVERTEXPROC)OglGetProc("glDrawRangeElementsBaseVertex");
+		OglDrawElementsInstancedBaseVertex = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC)OglGetProc("glDrawElementsInstancedBaseVertex");
+		OglMultiDrawElementsBaseVertex = (PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC)OglGetProc("glMultiDrawElementsBaseVertex");
+		OglProvokingVertex = (PFNGLPROVOKINGVERTEXPROC)OglGetProc("glProvokingVertex");
+		OglFenceSync = (PFNGLFENCESYNCPROC)OglGetProc("glFenceSync");
+		OglIsSync = (PFNGLISSYNCPROC)OglGetProc("glIsSync");
+		OglDeleteSync = (PFNGLDELETESYNCPROC)OglGetProc("glDeleteSync");
+		OglClientWaitSync = (PFNGLCLIENTWAITSYNCPROC)OglGetProc("glClientWaitSync");
+		OglWaitSync = (PFNGLWAITSYNCPROC)OglGetProc("glWaitSync");
+		OglGetInteger64v = (PFNGLGETINTEGER64VPROC)OglGetProc("glGetInteger64v");
+		OglGetSynciv = (PFNGLGETSYNCIVPROC)OglGetProc("glGetSynciv");
+		OglTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)OglGetProc("glTexImage2DMultisample");
+		OglTexImage3DMultisample = (PFNGLTEXIMAGE3DMULTISAMPLEPROC)OglGetProc("glTexImage3DMultisample");
+		OglGetMultisamplefv = (PFNGLGETMULTISAMPLEFVPROC)OglGetProc("glGetMultisamplefv");
+		OglSampleMaski = (PFNGLSAMPLEMASKIPROC)OglGetProc("glSampleMaski");
+		OglBlendEquationiARB = (PFNGLBLENDEQUATIONIARBPROC)OglGetProc("glBlendEquationiARB");
+		OglBlendEquationSeparateiARB = (PFNGLBLENDEQUATIONSEPARATEIARBPROC)OglGetProc("glBlendEquationSeparateiARB");
+		OglBlendFunciARB = (PFNGLBLENDFUNCIARBPROC)OglGetProc("glBlendFunciARB");
+		OglBlendFuncSeparateiARB = (PFNGLBLENDFUNCSEPARATEIARBPROC)OglGetProc("glBlendFuncSeparateiARB");
+		OglMinSampleShadingARB = (PFNGLMINSAMPLESHADINGARBPROC)OglGetProc("glMinSampleShadingARB");
+		OglNamedStringARB = (PFNGLNAMEDSTRINGARBPROC)OglGetProc("glNamedStringARB");
+		OglDeleteNamedStringARB = (PFNGLDELETENAMEDSTRINGARBPROC)OglGetProc("glDeleteNamedStringARB");
+		OglCompileShaderIncludeARB = (PFNGLCOMPILESHADERINCLUDEARBPROC)OglGetProc("glCompileShaderIncludeARB");
+		OglIsNamedStringARB = (PFNGLISNAMEDSTRINGARBPROC)OglGetProc("glIsNamedStringARB");
+		OglGetNamedStringARB = (PFNGLGETNAMEDSTRINGARBPROC)OglGetProc("glGetNamedStringARB");
+		OglGetNamedStringivARB = (PFNGLGETNAMEDSTRINGIVARBPROC)OglGetProc("glGetNamedStringivARB");
+		OglBindFragDataLocationIndexed = (PFNGLBINDFRAGDATALOCATIONINDEXEDPROC)OglGetProc("glBindFragDataLocationIndexed");
+		OglGetFragDataIndex = (PFNGLGETFRAGDATAINDEXPROC)OglGetProc("glGetFragDataIndex");
+		OglGenSamplers = (PFNGLGENSAMPLERSPROC)OglGetProc("glGenSamplers");
+		OglDeleteSamplers = (PFNGLDELETESAMPLERSPROC)OglGetProc("glDeleteSamplers");
+		OglIsSampler = (PFNGLISSAMPLERPROC)OglGetProc("glIsSampler");
+		OglBindSampler = (PFNGLBINDSAMPLERPROC)OglGetProc("glBindSampler");
+		OglSamplerParameteri = (PFNGLSAMPLERPARAMETERIPROC)OglGetProc("glSamplerParameteri");
+		OglSamplerParameteriv = (PFNGLSAMPLERPARAMETERIVPROC)OglGetProc("glSamplerParameteriv");
+		OglSamplerParameterf = (PFNGLSAMPLERPARAMETERFPROC)OglGetProc("glSamplerParameterf");
+		OglSamplerParameterfv = (PFNGLSAMPLERPARAMETERFVPROC)OglGetProc("glSamplerParameterfv");
+		OglSamplerParameterIiv = (PFNGLSAMPLERPARAMETERIIVPROC)OglGetProc("glSamplerParameterIiv");
+		OglSamplerParameterIuiv = (PFNGLSAMPLERPARAMETERIUIVPROC)OglGetProc("glSamplerParameterIuiv");
+		OglGetSamplerParameteriv = (PFNGLGETSAMPLERPARAMETERIVPROC)OglGetProc("glGetSamplerParameteriv");
+		OglGetSamplerParameterIiv = (PFNGLGETSAMPLERPARAMETERIIVPROC)OglGetProc("glGetSamplerParameterIiv");
+		OglGetSamplerParameterfv = (PFNGLGETSAMPLERPARAMETERFVPROC)OglGetProc("glGetSamplerParameterfv");
+		OglGetSamplerParameterIuiv = (PFNGLGETSAMPLERPARAMETERIUIVPROC)OglGetProc("glGetSamplerParameterIuiv");
+		OglQueryCounter = (PFNGLQUERYCOUNTERPROC)OglGetProc("glQueryCounter");
+		OglGetQueryObjecti64v = (PFNGLGETQUERYOBJECTI64VPROC)OglGetProc("glGetQueryObjecti64v");
+		OglGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC)OglGetProc("glGetQueryObjectui64v");
+		OglVertexP2ui = (PFNGLVERTEXP2UIPROC)OglGetProc("glVertexP2ui");
+		OglVertexP2uiv = (PFNGLVERTEXP2UIVPROC)OglGetProc("glVertexP2uiv");
+		OglVertexP3ui = (PFNGLVERTEXP3UIPROC)OglGetProc("glVertexP3ui");
+		OglVertexP3uiv = (PFNGLVERTEXP3UIVPROC)OglGetProc("glVertexP3uiv");
+		OglVertexP4ui = (PFNGLVERTEXP4UIPROC)OglGetProc("glVertexP4ui");
+		OglVertexP4uiv = (PFNGLVERTEXP4UIVPROC)OglGetProc("glVertexP4uiv");
+		OglTexCoordP1ui = (PFNGLTEXCOORDP1UIPROC)OglGetProc("glTexCoordP1ui");
+		OglTexCoordP1uiv = (PFNGLTEXCOORDP1UIVPROC)OglGetProc("glTexCoordP1uiv");
+		OglTexCoordP2ui = (PFNGLTEXCOORDP2UIPROC)OglGetProc("glTexCoordP2ui");
+		OglTexCoordP2uiv = (PFNGLTEXCOORDP2UIVPROC)OglGetProc("glTexCoordP2uiv");
+		OglTexCoordP3ui = (PFNGLTEXCOORDP3UIPROC)OglGetProc("glTexCoordP3ui");
+		OglTexCoordP3uiv = (PFNGLTEXCOORDP3UIVPROC)OglGetProc("glTexCoordP3uiv");
+		OglTexCoordP4ui = (PFNGLTEXCOORDP4UIPROC)OglGetProc("glTexCoordP4ui");
+		OglTexCoordP4uiv = (PFNGLTEXCOORDP4UIVPROC)OglGetProc("glTexCoordP4uiv");
+		OglMultiTexCoordP1ui = (PFNGLMULTITEXCOORDP1UIPROC)OglGetProc("glMultiTexCoordP1ui");
+		OglMultiTexCoordP1uiv = (PFNGLMULTITEXCOORDP1UIVPROC)OglGetProc("glMultiTexCoordP1uiv");
+		OglMultiTexCoordP2ui = (PFNGLMULTITEXCOORDP2UIPROC)OglGetProc("glMultiTexCoordP2ui");
+		OglMultiTexCoordP2uiv = (PFNGLMULTITEXCOORDP2UIVPROC)OglGetProc("glMultiTexCoordP2uiv");
+		OglMultiTexCoordP3ui = (PFNGLMULTITEXCOORDP3UIPROC)OglGetProc("glMultiTexCoordP3ui");
+		OglMultiTexCoordP3uiv = (PFNGLMULTITEXCOORDP3UIVPROC)OglGetProc("glMultiTexCoordP3uiv");
+		OglMultiTexCoordP4ui = (PFNGLMULTITEXCOORDP4UIPROC)OglGetProc("glMultiTexCoordP4ui");
+		OglMultiTexCoordP4uiv = (PFNGLMULTITEXCOORDP4UIVPROC)OglGetProc("glMultiTexCoordP4uiv");
+		OglNormalP3ui = (PFNGLNORMALP3UIPROC)OglGetProc("glNormalP3ui");
+		OglNormalP3uiv = (PFNGLNORMALP3UIVPROC)OglGetProc("glNormalP3uiv");
+		OglColorP3ui = (PFNGLCOLORP3UIPROC)OglGetProc("glColorP3ui");
+		OglColorP3uiv = (PFNGLCOLORP3UIVPROC)OglGetProc("glColorP3uiv");
+		OglColorP4ui = (PFNGLCOLORP4UIPROC)OglGetProc("glColorP4ui");
+		OglColorP4uiv = (PFNGLCOLORP4UIVPROC)OglGetProc("glColorP4uiv");
+		OglSecondaryColorP3ui = (PFNGLSECONDARYCOLORP3UIPROC)OglGetProc("glSecondaryColorP3ui");
+		OglSecondaryColorP3uiv = (PFNGLSECONDARYCOLORP3UIVPROC)OglGetProc("glSecondaryColorP3uiv");
+		OglVertexAttribP1ui = (PFNGLVERTEXATTRIBP1UIPROC)OglGetProc("glVertexAttribP1ui");
+		OglVertexAttribP1uiv = (PFNGLVERTEXATTRIBP1UIVPROC)OglGetProc("glVertexAttribP1uiv");
+		OglVertexAttribP2ui = (PFNGLVERTEXATTRIBP2UIPROC)OglGetProc("glVertexAttribP2ui");
+		OglVertexAttribP2uiv = (PFNGLVERTEXATTRIBP2UIVPROC)OglGetProc("glVertexAttribP2uiv");
+		OglVertexAttribP3ui = (PFNGLVERTEXATTRIBP3UIPROC)OglGetProc("glVertexAttribP3ui");
+		OglVertexAttribP3uiv = (PFNGLVERTEXATTRIBP3UIVPROC)OglGetProc("glVertexAttribP3uiv");
+		OglVertexAttribP4ui = (PFNGLVERTEXATTRIBP4UIPROC)OglGetProc("glVertexAttribP4ui");
+		OglVertexAttribP4uiv = (PFNGLVERTEXATTRIBP4UIVPROC)OglGetProc("glVertexAttribP4uiv");
+		OglDrawArraysIndirect = (PFNGLDRAWARRAYSINDIRECTPROC)OglGetProc("glDrawArraysIndirect");
+		OglDrawElementsIndirect = (PFNGLDRAWELEMENTSINDIRECTPROC)OglGetProc("glDrawElementsIndirect");
+		OglUniform1d = (PFNGLUNIFORM1DPROC)OglGetProc("glUniform1d");
+		OglUniform2d = (PFNGLUNIFORM2DPROC)OglGetProc("glUniform2d");
+		OglUniform3d = (PFNGLUNIFORM3DPROC)OglGetProc("glUniform3d");
+		OglUniform4d = (PFNGLUNIFORM4DPROC)OglGetProc("glUniform4d");
+		OglUniform1dv = (PFNGLUNIFORM1DVPROC)OglGetProc("glUniform1dv");
+		OglUniform2dv = (PFNGLUNIFORM2DVPROC)OglGetProc("glUniform2dv");
+		OglUniform3dv = (PFNGLUNIFORM3DVPROC)OglGetProc("glUniform3dv");
+		OglUniform4dv = (PFNGLUNIFORM4DVPROC)OglGetProc("glUniform4dv");
+		OglUniformMatrix2dv = (PFNGLUNIFORMMATRIX2DVPROC)OglGetProc("glUniformMatrix2dv");
+		OglUniformMatrix3dv = (PFNGLUNIFORMMATRIX3DVPROC)OglGetProc("glUniformMatrix3dv");
+		OglUniformMatrix4dv = (PFNGLUNIFORMMATRIX4DVPROC)OglGetProc("glUniformMatrix4dv");
+		OglUniformMatrix2x3dv = (PFNGLUNIFORMMATRIX2X3DVPROC)OglGetProc("glUniformMatrix2x3dv");
+		OglUniformMatrix2x4dv = (PFNGLUNIFORMMATRIX2X4DVPROC)OglGetProc("glUniformMatrix2x4dv");
+		OglUniformMatrix3x2dv = (PFNGLUNIFORMMATRIX3X2DVPROC)OglGetProc("glUniformMatrix3x2dv");
+		OglUniformMatrix3x4dv = (PFNGLUNIFORMMATRIX3X4DVPROC)OglGetProc("glUniformMatrix3x4dv");
+		OglUniformMatrix4x2dv = (PFNGLUNIFORMMATRIX4X2DVPROC)OglGetProc("glUniformMatrix4x2dv");
+		OglUniformMatrix4x3dv = (PFNGLUNIFORMMATRIX4X3DVPROC)OglGetProc("glUniformMatrix4x3dv");
+		OglGetUniformdv = (PFNGLGETUNIFORMDVPROC)OglGetProc("glGetUniformdv");
+		OglGetSubroutineUniformLocation = (PFNGLGETSUBROUTINEUNIFORMLOCATIONPROC)OglGetProc("glGetSubroutineUniformLocation");
+		OglGetSubroutineIndex = (PFNGLGETSUBROUTINEINDEXPROC)OglGetProc("glGetSubroutineIndex");
+		OglGetActiveSubroutineUniformiv = (PFNGLGETACTIVESUBROUTINEUNIFORMIVPROC)OglGetProc("glGetActiveSubroutineUniformiv");
+		OglGetActiveSubroutineUniformName = (PFNGLGETACTIVESUBROUTINEUNIFORMNAMEPROC)OglGetProc("glGetActiveSubroutineUniformName");
+		OglGetActiveSubroutineName = (PFNGLGETACTIVESUBROUTINENAMEPROC)OglGetProc("glGetActiveSubroutineName");
+		OglUniformSubroutinesuiv = (PFNGLUNIFORMSUBROUTINESUIVPROC)OglGetProc("glUniformSubroutinesuiv");
+		OglGetUniformSubroutineuiv = (PFNGLGETUNIFORMSUBROUTINEUIVPROC)OglGetProc("glGetUniformSubroutineuiv");
+		OglGetProgramStageiv = (PFNGLGETPROGRAMSTAGEIVPROC)OglGetProc("glGetProgramStageiv");
+		OglPatchParameteri = (PFNGLPATCHPARAMETERIPROC)OglGetProc("glPatchParameteri");
+		OglPatchParameterfv = (PFNGLPATCHPARAMETERFVPROC)OglGetProc("glPatchParameterfv");
+		OglBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC)OglGetProc("glBindTransformFeedback");
+		OglDeleteTransformFeedbacks = (PFNGLDELETETRANSFORMFEEDBACKSPROC)OglGetProc("glDeleteTransformFeedbacks");
+		OglGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)OglGetProc("glGenTransformFeedbacks");
+		OglIsTransformFeedback = (PFNGLISTRANSFORMFEEDBACKPROC)OglGetProc("glIsTransformFeedback");
+		OglPauseTransformFeedback = (PFNGLPAUSETRANSFORMFEEDBACKPROC)OglGetProc("glPauseTransformFeedback");
+		OglResumeTransformFeedback = (PFNGLRESUMETRANSFORMFEEDBACKPROC)OglGetProc("glResumeTransformFeedback");
+		OglDrawTransformFeedback = (PFNGLDRAWTRANSFORMFEEDBACKPROC)OglGetProc("glDrawTransformFeedback");
+		OglDrawTransformFeedbackStream = (PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC)OglGetProc("glDrawTransformFeedbackStream");
+		OglBeginQueryIndexed = (PFNGLBEGINQUERYINDEXEDPROC)OglGetProc("glBeginQueryIndexed");
+		OglEndQueryIndexed = (PFNGLENDQUERYINDEXEDPROC)OglGetProc("glEndQueryIndexed");
+		OglGetQueryIndexediv = (PFNGLGETQUERYINDEXEDIVPROC)OglGetProc("glGetQueryIndexediv");
+		OglReleaseShaderCompiler = (PFNGLRELEASESHADERCOMPILERPROC)OglGetProc("glReleaseShaderCompiler");
+		OglShaderBinary = (PFNGLSHADERBINARYPROC)OglGetProc("glShaderBinary");
+		OglGetShaderPrecisionFormat = (PFNGLGETSHADERPRECISIONFORMATPROC)OglGetProc("glGetShaderPrecisionFormat");
+		OglDepthRangef = (PFNGLDEPTHRANGEFPROC)OglGetProc("glDepthRangef");
+		OglClearDepthf = (PFNGLCLEARDEPTHFPROC)OglGetProc("glClearDepthf");
+		OglGetProgramBinary = (PFNGLGETPROGRAMBINARYPROC)OglGetProc("glGetProgramBinary");
+		OglProgramBinary = (PFNGLPROGRAMBINARYPROC)OglGetProc("glProgramBinary");
+		OglProgramParameteri = (PFNGLPROGRAMPARAMETERIPROC)OglGetProc("glProgramParameteri");
+		OglUseProgramStages = (PFNGLUSEPROGRAMSTAGESPROC)OglGetProc("glUseProgramStages");
+		OglActiveShaderProgram = (PFNGLACTIVESHADERPROGRAMPROC)OglGetProc("glActiveShaderProgram");
+		OglCreateShaderProgramv = (PFNGLCREATESHADERPROGRAMVPROC)OglGetProc("glCreateShaderProgramv");
+		OglBindProgramPipeline = (PFNGLBINDPROGRAMPIPELINEPROC)OglGetProc("glBindProgramPipeline");
+		OglDeleteProgramPipelines = (PFNGLDELETEPROGRAMPIPELINESPROC)OglGetProc("glDeleteProgramPipelines");
+		OglGenProgramPipelines = (PFNGLGENPROGRAMPIPELINESPROC)OglGetProc("glGenProgramPipelines");
+		OglIsProgramPipeline = (PFNGLISPROGRAMPIPELINEPROC)OglGetProc("glIsProgramPipeline");
+		OglGetProgramPipelineiv = (PFNGLGETPROGRAMPIPELINEIVPROC)OglGetProc("glGetProgramPipelineiv");
+		OglProgramUniform1i = (PFNGLPROGRAMUNIFORM1IPROC)OglGetProc("glProgramUniform1i");
+		OglProgramUniform1iv = (PFNGLPROGRAMUNIFORM1IVPROC)OglGetProc("glProgramUniform1iv");
+		OglProgramUniform1f = (PFNGLPROGRAMUNIFORM1FPROC)OglGetProc("glProgramUniform1f");
+		OglProgramUniform1fv = (PFNGLPROGRAMUNIFORM1FVPROC)OglGetProc("glProgramUniform1fv");
+		OglProgramUniform1d = (PFNGLPROGRAMUNIFORM1DPROC)OglGetProc("glProgramUniform1d");
+		OglProgramUniform1dv = (PFNGLPROGRAMUNIFORM1DVPROC)OglGetProc("glProgramUniform1dv");
+		OglProgramUniform1ui = (PFNGLPROGRAMUNIFORM1UIPROC)OglGetProc("glProgramUniform1ui");
+		OglProgramUniform1uiv = (PFNGLPROGRAMUNIFORM1UIVPROC)OglGetProc("glProgramUniform1uiv");
+		OglProgramUniform2i = (PFNGLPROGRAMUNIFORM2IPROC)OglGetProc("glProgramUniform2i");
+		OglProgramUniform2iv = (PFNGLPROGRAMUNIFORM2IVPROC)OglGetProc("glProgramUniform2iv");
+		OglProgramUniform2f = (PFNGLPROGRAMUNIFORM2FPROC)OglGetProc("glProgramUniform2f");
+		OglProgramUniform2fv = (PFNGLPROGRAMUNIFORM2FVPROC)OglGetProc("glProgramUniform2fv");
+		OglProgramUniform2d = (PFNGLPROGRAMUNIFORM2DPROC)OglGetProc("glProgramUniform2d");
+		OglProgramUniform2dv = (PFNGLPROGRAMUNIFORM2DVPROC)OglGetProc("glProgramUniform2dv");
+		OglProgramUniform2ui = (PFNGLPROGRAMUNIFORM2UIPROC)OglGetProc("glProgramUniform2ui");
+		OglProgramUniform2uiv = (PFNGLPROGRAMUNIFORM2UIVPROC)OglGetProc("glProgramUniform2uiv");
+		OglProgramUniform3i = (PFNGLPROGRAMUNIFORM3IPROC)OglGetProc("glProgramUniform3i");
+		OglProgramUniform3iv = (PFNGLPROGRAMUNIFORM3IVPROC)OglGetProc("glProgramUniform3iv");
+		OglProgramUniform3f = (PFNGLPROGRAMUNIFORM3FPROC)OglGetProc("glProgramUniform3f");
+		OglProgramUniform3fv = (PFNGLPROGRAMUNIFORM3FVPROC)OglGetProc("glProgramUniform3fv");
+		OglProgramUniform3d = (PFNGLPROGRAMUNIFORM3DPROC)OglGetProc("glProgramUniform3d");
+		OglProgramUniform3dv = (PFNGLPROGRAMUNIFORM3DVPROC)OglGetProc("glProgramUniform3dv");
+		OglProgramUniform3ui = (PFNGLPROGRAMUNIFORM3UIPROC)OglGetProc("glProgramUniform3ui");
+		OglProgramUniform3uiv = (PFNGLPROGRAMUNIFORM3UIVPROC)OglGetProc("glProgramUniform3uiv");
+		OglProgramUniform4i = (PFNGLPROGRAMUNIFORM4IPROC)OglGetProc("glProgramUniform4i");
+		OglProgramUniform4iv = (PFNGLPROGRAMUNIFORM4IVPROC)OglGetProc("glProgramUniform4iv");
+		OglProgramUniform4f = (PFNGLPROGRAMUNIFORM4FPROC)OglGetProc("glProgramUniform4f");
+		OglProgramUniform4fv = (PFNGLPROGRAMUNIFORM4FVPROC)OglGetProc("glProgramUniform4fv");
+		OglProgramUniform4d = (PFNGLPROGRAMUNIFORM4DPROC)OglGetProc("glProgramUniform4d");
+		OglProgramUniform4dv = (PFNGLPROGRAMUNIFORM4DVPROC)OglGetProc("glProgramUniform4dv");
+		OglProgramUniform4ui = (PFNGLPROGRAMUNIFORM4UIPROC)OglGetProc("glProgramUniform4ui");
+		OglProgramUniform4uiv = (PFNGLPROGRAMUNIFORM4UIVPROC)OglGetProc("glProgramUniform4uiv");
+		OglProgramUniformMatrix2fv = (PFNGLPROGRAMUNIFORMMATRIX2FVPROC)OglGetProc("glProgramUniformMatrix2fv");
+		OglProgramUniformMatrix3fv = (PFNGLPROGRAMUNIFORMMATRIX3FVPROC)OglGetProc("glProgramUniformMatrix3fv");
+		OglProgramUniformMatrix4fv = (PFNGLPROGRAMUNIFORMMATRIX4FVPROC)OglGetProc("glProgramUniformMatrix4fv");
+		OglProgramUniformMatrix2dv = (PFNGLPROGRAMUNIFORMMATRIX2DVPROC)OglGetProc("glProgramUniformMatrix2dv");
+		OglProgramUniformMatrix3dv = (PFNGLPROGRAMUNIFORMMATRIX3DVPROC)OglGetProc("glProgramUniformMatrix3dv");
+		OglProgramUniformMatrix4dv = (PFNGLPROGRAMUNIFORMMATRIX4DVPROC)OglGetProc("glProgramUniformMatrix4dv");
+		OglProgramUniformMatrix2x3fv = (PFNGLPROGRAMUNIFORMMATRIX2X3FVPROC)OglGetProc("glProgramUniformMatrix2x3fv");
+		OglProgramUniformMatrix3x2fv = (PFNGLPROGRAMUNIFORMMATRIX3X2FVPROC)OglGetProc("glProgramUniformMatrix3x2fv");
+		OglProgramUniformMatrix2x4fv = (PFNGLPROGRAMUNIFORMMATRIX2X4FVPROC)OglGetProc("glProgramUniformMatrix2x4fv");
+		OglProgramUniformMatrix4x2fv = (PFNGLPROGRAMUNIFORMMATRIX4X2FVPROC)OglGetProc("glProgramUniformMatrix4x2fv");
+		OglProgramUniformMatrix3x4fv = (PFNGLPROGRAMUNIFORMMATRIX3X4FVPROC)OglGetProc("glProgramUniformMatrix3x4fv");
+		OglProgramUniformMatrix4x3fv = (PFNGLPROGRAMUNIFORMMATRIX4X3FVPROC)OglGetProc("glProgramUniformMatrix4x3fv");
+		OglProgramUniformMatrix2x3dv = (PFNGLPROGRAMUNIFORMMATRIX2X3DVPROC)OglGetProc("glProgramUniformMatrix2x3dv");
+		OglProgramUniformMatrix3x2dv = (PFNGLPROGRAMUNIFORMMATRIX3X2DVPROC)OglGetProc("glProgramUniformMatrix3x2dv");
+		OglProgramUniformMatrix2x4dv = (PFNGLPROGRAMUNIFORMMATRIX2X4DVPROC)OglGetProc("glProgramUniformMatrix2x4dv");
+		OglProgramUniformMatrix4x2dv = (PFNGLPROGRAMUNIFORMMATRIX4X2DVPROC)OglGetProc("glProgramUniformMatrix4x2dv");
+		OglProgramUniformMatrix3x4dv = (PFNGLPROGRAMUNIFORMMATRIX3X4DVPROC)OglGetProc("glProgramUniformMatrix3x4dv");
+		OglProgramUniformMatrix4x3dv = (PFNGLPROGRAMUNIFORMMATRIX4X3DVPROC)OglGetProc("glProgramUniformMatrix4x3dv");
+		OglValidateProgramPipeline = (PFNGLVALIDATEPROGRAMPIPELINEPROC)OglGetProc("glValidateProgramPipeline");
+		OglGetProgramPipelineInfoLog = (PFNGLGETPROGRAMPIPELINEINFOLOGPROC)OglGetProc("glGetProgramPipelineInfoLog");
+		OglVertexAttribL1d = (PFNGLVERTEXATTRIBL1DPROC)OglGetProc("glVertexAttribL1d");
+		OglVertexAttribL2d = (PFNGLVERTEXATTRIBL2DPROC)OglGetProc("glVertexAttribL2d");
+		OglVertexAttribL3d = (PFNGLVERTEXATTRIBL3DPROC)OglGetProc("glVertexAttribL3d");
+		OglVertexAttribL4d = (PFNGLVERTEXATTRIBL4DPROC)OglGetProc("glVertexAttribL4d");
+		OglVertexAttribL1dv = (PFNGLVERTEXATTRIBL1DVPROC)OglGetProc("glVertexAttribL1dv");
+		OglVertexAttribL2dv = (PFNGLVERTEXATTRIBL2DVPROC)OglGetProc("glVertexAttribL2dv");
+		OglVertexAttribL3dv = (PFNGLVERTEXATTRIBL3DVPROC)OglGetProc("glVertexAttribL3dv");
+		OglVertexAttribL4dv = (PFNGLVERTEXATTRIBL4DVPROC)OglGetProc("glVertexAttribL4dv");
+		OglVertexAttribLPointer = (PFNGLVERTEXATTRIBLPOINTERPROC)OglGetProc("glVertexAttribLPointer");
+		OglGetVertexAttribLdv = (PFNGLGETVERTEXATTRIBLDVPROC)OglGetProc("glGetVertexAttribLdv");
+		OglViewportArrayv = (PFNGLVIEWPORTARRAYVPROC)OglGetProc("glViewportArrayv");
+		OglViewportIndexedf = (PFNGLVIEWPORTINDEXEDFPROC)OglGetProc("glViewportIndexedf");
+		OglViewportIndexedfv = (PFNGLVIEWPORTINDEXEDFVPROC)OglGetProc("glViewportIndexedfv");
+		OglScissorArrayv = (PFNGLSCISSORARRAYVPROC)OglGetProc("glScissorArrayv");
+		OglScissorIndexed = (PFNGLSCISSORINDEXEDPROC)OglGetProc("glScissorIndexed");
+		OglScissorIndexedv = (PFNGLSCISSORINDEXEDVPROC)OglGetProc("glScissorIndexedv");
+		OglDepthRangeArrayv = (PFNGLDEPTHRANGEARRAYVPROC)OglGetProc("glDepthRangeArrayv");
+		OglDepthRangeIndexed = (PFNGLDEPTHRANGEINDEXEDPROC)OglGetProc("glDepthRangeIndexed");
+		OglGetFloati_v = (PFNGLGETFLOATI_VPROC)OglGetProc("glGetFloati_v");
+		OglGetDoublei_v = (PFNGLGETDOUBLEI_VPROC)OglGetProc("glGetDoublei_v");
+		OglCreateSyncFromCLeventARB = (PFNGLCREATESYNCFROMCLEVENTARBPROC)OglGetProc("glCreateSyncFromCLeventARB");
+		OglDebugMessageControlARB = (PFNGLDEBUGMESSAGECONTROLARBPROC)OglGetProc("glDebugMessageControlARB");
+		OglDebugMessageInsertARB = (PFNGLDEBUGMESSAGEINSERTARBPROC)OglGetProc("glDebugMessageInsertARB");
+		OglDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)OglGetProc("glDebugMessageCallbackARB");
+		OglGetDebugMessageLogARB = (PFNGLGETDEBUGMESSAGELOGARBPROC)OglGetProc("glGetDebugMessageLogARB");
+		OglGetGraphicsResetStatusARB = (PFNGLGETGRAPHICSRESETSTATUSARBPROC)OglGetProc("glGetGraphicsResetStatusARB");
+		OglGetnTexImageARB = (PFNGLGETNTEXIMAGEARBPROC)OglGetProc("glGetnTexImageARB");
+		OglReadnPixelsARB = (PFNGLREADNPIXELSARBPROC)OglGetProc("glReadnPixelsARB");
+		OglGetnCompressedTexImageARB = (PFNGLGETNCOMPRESSEDTEXIMAGEARBPROC)OglGetProc("glGetnCompressedTexImageARB");
+		OglGetnUniformfvARB = (PFNGLGETNUNIFORMFVARBPROC)OglGetProc("glGetnUniformfvARB");
+		OglGetnUniformivARB = (PFNGLGETNUNIFORMIVARBPROC)OglGetProc("glGetnUniformivARB");
+		OglGetnUniformuivARB = (PFNGLGETNUNIFORMUIVARBPROC)OglGetProc("glGetnUniformuivARB");
+		OglGetnUniformdvARB = (PFNGLGETNUNIFORMDVARBPROC)OglGetProc("glGetnUniformdvARB");
+		OglDrawArraysInstancedBaseInstance = (PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC)OglGetProc("glDrawArraysInstancedBaseInstance");
+		OglDrawElementsInstancedBaseInstance = (PFNGLDRAWELEMENTSINSTANCEDBASEINSTANCEPROC)OglGetProc("glDrawElementsInstancedBaseInstance");
+		OglDrawElementsInstancedBaseVertexBaseInstance = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC)OglGetProc("glDrawElementsInstancedBaseVertexBaseInstance");
+		OglDrawTransformFeedbackInstanced = (PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDPROC)OglGetProc("glDrawTransformFeedbackInstanced");
+		OglDrawTransformFeedbackStreamInstanced = (PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC)OglGetProc("glDrawTransformFeedbackStreamInstanced");
+		OglGetInternalformativ = (PFNGLGETINTERNALFORMATIVPROC)OglGetProc("glGetInternalformativ");
+		OglGetActiveAtomicCounterBufferiv = (PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC)OglGetProc("glGetActiveAtomicCounterBufferiv");
+		OglBindImageTexture = (PFNGLBINDIMAGETEXTUREPROC)OglGetProc("glBindImageTexture");
+		OglMemoryBarrier = (PFNGLMEMORYBARRIERPROC)OglGetProc("glMemoryBarrier");
+		OglTexStorage1D = (PFNGLTEXSTORAGE1DPROC)OglGetProc("glTexStorage1D");
+		OglTexStorage2D = (PFNGLTEXSTORAGE2DPROC)OglGetProc("glTexStorage2D");
+		OglTexStorage3D = (PFNGLTEXSTORAGE3DPROC)OglGetProc("glTexStorage3D");
+		OglTextureStorage1DEXT = (PFNGLTEXTURESTORAGE1DEXTPROC)OglGetProc("glTextureStorage1DEXT");
+		OglTextureStorage2DEXT = (PFNGLTEXTURESTORAGE2DEXTPROC)OglGetProc("glTextureStorage2DEXT");
+		OglTextureStorage3DEXT = (PFNGLTEXTURESTORAGE3DEXTPROC)OglGetProc("glTextureStorage3DEXT");
+		OglDebugMessageControl = (PFNGLDEBUGMESSAGECONTROLPROC)OglGetProc("glDebugMessageControl");
+		OglDebugMessageInsert = (PFNGLDEBUGMESSAGEINSERTPROC)OglGetProc("glDebugMessageInsert");
+		OglDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)OglGetProc("glDebugMessageCallback");
+		OglGetDebugMessageLog = (PFNGLGETDEBUGMESSAGELOGPROC)OglGetProc("glGetDebugMessageLog");
+		OglPushDebugGroup = (PFNGLPUSHDEBUGGROUPPROC)OglGetProc("glPushDebugGroup");
+		OglPopDebugGroup = (PFNGLPOPDEBUGGROUPPROC)OglGetProc("glPopDebugGroup");
+		OglObjectLabel = (PFNGLOBJECTLABELPROC)OglGetProc("glObjectLabel");
+		OglGetObjectLabel = (PFNGLGETOBJECTLABELPROC)OglGetProc("glGetObjectLabel");
+		OglObjectPtrLabel = (PFNGLOBJECTPTRLABELPROC)OglGetProc("glObjectPtrLabel");
+		OglGetObjectPtrLabel = (PFNGLGETOBJECTPTRLABELPROC)OglGetProc("glGetObjectPtrLabel");
+		OglClearBufferData = (PFNGLCLEARBUFFERDATAPROC)OglGetProc("glClearBufferData");
+		OglClearBufferSubData = (PFNGLCLEARBUFFERSUBDATAPROC)OglGetProc("glClearBufferSubData");
+		OglClearNamedBufferDataEXT = (PFNGLCLEARNAMEDBUFFERDATAEXTPROC)OglGetProc("glClearNamedBufferDataEXT");
+		OglClearNamedBufferSubDataEXT = (PFNGLCLEARNAMEDBUFFERSUBDATAEXTPROC)OglGetProc("glClearNamedBufferSubDataEXT");
+		OglDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)OglGetProc("glDispatchCompute");
+		OglDispatchComputeIndirect = (PFNGLDISPATCHCOMPUTEINDIRECTPROC)OglGetProc("glDispatchComputeIndirect");
+		OglCopyImageSubData = (PFNGLCOPYIMAGESUBDATAPROC)OglGetProc("glCopyImageSubData");
+		OglTextureView = (PFNGLTEXTUREVIEWPROC)OglGetProc("glTextureView");
+		OglBindVertexBuffer = (PFNGLBINDVERTEXBUFFERPROC)OglGetProc("glBindVertexBuffer");
+		OglVertexAttribFormat = (PFNGLVERTEXATTRIBFORMATPROC)OglGetProc("glVertexAttribFormat");
+		OglVertexAttribIFormat = (PFNGLVERTEXATTRIBIFORMATPROC)OglGetProc("glVertexAttribIFormat");
+		OglVertexAttribLFormat = (PFNGLVERTEXATTRIBLFORMATPROC)OglGetProc("glVertexAttribLFormat");
+		OglVertexAttribBinding = (PFNGLVERTEXATTRIBBINDINGPROC)OglGetProc("glVertexAttribBinding");
+		OglVertexBindingDivisor = (PFNGLVERTEXBINDINGDIVISORPROC)OglGetProc("glVertexBindingDivisor");
+		OglVertexArrayBindVertexBufferEXT = (PFNGLVERTEXARRAYBINDVERTEXBUFFEREXTPROC)OglGetProc("glVertexArrayBindVertexBufferEXT");
+		OglVertexArrayVertexAttribFormatEXT = (PFNGLVERTEXARRAYVERTEXATTRIBFORMATEXTPROC)OglGetProc("glVertexArrayVertexAttribFormatEXT");
+		OglVertexArrayVertexAttribIFormatEXT = (PFNGLVERTEXARRAYVERTEXATTRIBIFORMATEXTPROC)OglGetProc("glVertexArrayVertexAttribIFormatEXT");
+		OglVertexArrayVertexAttribLFormatEXT = (PFNGLVERTEXARRAYVERTEXATTRIBLFORMATEXTPROC)OglGetProc("glVertexArrayVertexAttribLFormatEXT");
+		OglVertexArrayVertexAttribBindingEXT = (PFNGLVERTEXARRAYVERTEXATTRIBBINDINGEXTPROC)OglGetProc("glVertexArrayVertexAttribBindingEXT");
+		OglVertexArrayVertexBindingDivisorEXT = (PFNGLVERTEXARRAYVERTEXBINDINGDIVISOREXTPROC)OglGetProc("glVertexArrayVertexBindingDivisorEXT");
+		OglFramebufferParameteri = (PFNGLFRAMEBUFFERPARAMETERIPROC)OglGetProc("glFramebufferParameteri");
+		OglGetFramebufferParameteriv = (PFNGLGETFRAMEBUFFERPARAMETERIVPROC)OglGetProc("glGetFramebufferParameteriv");
+		OglNamedFramebufferParameteriEXT = (PFNGLNAMEDFRAMEBUFFERPARAMETERIEXTPROC)OglGetProc("glNamedFramebufferParameteriEXT");
+		OglGetNamedFramebufferParameterivEXT = (PFNGLGETNAMEDFRAMEBUFFERPARAMETERIVEXTPROC)OglGetProc("glGetNamedFramebufferParameterivEXT");
+		OglGetInternalformati64v = (PFNGLGETINTERNALFORMATI64VPROC)OglGetProc("glGetInternalformati64v");
+		OglInvalidateTexSubImage = (PFNGLINVALIDATETEXSUBIMAGEPROC)OglGetProc("glInvalidateTexSubImage");
+		OglInvalidateTexImage = (PFNGLINVALIDATETEXIMAGEPROC)OglGetProc("glInvalidateTexImage");
+		OglInvalidateBufferSubData = (PFNGLINVALIDATEBUFFERSUBDATAPROC)OglGetProc("glInvalidateBufferSubData");
+		OglInvalidateBufferData = (PFNGLINVALIDATEBUFFERDATAPROC)OglGetProc("glInvalidateBufferData");
+		OglInvalidateFramebuffer = (PFNGLINVALIDATEFRAMEBUFFERPROC)OglGetProc("glInvalidateFramebuffer");
+		OglInvalidateSubFramebuffer = (PFNGLINVALIDATESUBFRAMEBUFFERPROC)OglGetProc("glInvalidateSubFramebuffer");
+		OglMultiDrawArraysIndirect = (PFNGLMULTIDRAWARRAYSINDIRECTPROC)OglGetProc("glMultiDrawArraysIndirect");
+		OglMultiDrawElementsIndirect = (PFNGLMULTIDRAWELEMENTSINDIRECTPROC)OglGetProc("glMultiDrawElementsIndirect");
+		OglGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)OglGetProc("glGetProgramInterfaceiv");
+		OglGetProgramResourceIndex = (PFNGLGETPROGRAMRESOURCEINDEXPROC)OglGetProc("glGetProgramResourceIndex");
+		OglGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)OglGetProc("glGetProgramResourceName");
+		OglGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)OglGetProc("glGetProgramResourceiv");
+		OglGetProgramResourceLocation = (PFNGLGETPROGRAMRESOURCELOCATIONPROC)OglGetProc("glGetProgramResourceLocation");
+		OglGetProgramResourceLocationIndex = (PFNGLGETPROGRAMRESOURCELOCATIONINDEXPROC)OglGetProc("glGetProgramResourceLocationIndex");
+		OglShaderStorageBlockBinding = (PFNGLSHADERSTORAGEBLOCKBINDINGPROC)OglGetProc("glShaderStorageBlockBinding");
+		OglTexBufferRange = (PFNGLTEXBUFFERRANGEPROC)OglGetProc("glTexBufferRange");
+		OglTextureBufferRangeEXT = (PFNGLTEXTUREBUFFERRANGEEXTPROC)OglGetProc("glTextureBufferRangeEXT");
+		OglTexStorage2DMultisample = (PFNGLTEXSTORAGE2DMULTISAMPLEPROC)OglGetProc("glTexStorage2DMultisample");
+		OglTexStorage3DMultisample = (PFNGLTEXSTORAGE3DMULTISAMPLEPROC)OglGetProc("glTexStorage3DMultisample");
+		OglTextureStorage2DMultisampleEXT = (PFNGLTEXTURESTORAGE2DMULTISAMPLEEXTPROC)OglGetProc("glTextureStorage2DMultisampleEXT");
+		OglTextureStorage3DMultisampleEXT = (PFNGLTEXTURESTORAGE3DMULTISAMPLEEXTPROC)OglGetProc("glTextureStorage3DMultisampleEXT");
+#endif	// NWG_OGL_ARBNWG_OGL_ARB_H
+	}
+}

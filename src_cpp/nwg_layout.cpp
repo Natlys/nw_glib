@@ -2,21 +2,20 @@
 #include <nwg_layout.h>
 #if(defined NWG_GAPI)
 #include <nwg_engine.h>
-#include <nwg_loader.h>
 #include <nwg_shader.h>
 #include <nwg_vtx_buf.h>
 #include <nwg_idx_buf.h>
 #pragma warning(disable : 4267)
-namespace NWG
-{
+
+namespace NWG {
 	ShaderBlock::ShaderBlock(const char* sName, UInt8 unBindPoint) :
 		strName(""),
 		unBindPoint(unBindPoint), szAll(0), szOffset(0) {
 		strcpy(strName, sName);
 	}
 }
-namespace NWG
-{
+
+namespace NWG {
 	// --setters
 	void VertexLayout::SetElements(const DArray<BufElem>& rBufElems) { m_Elems = rBufElems; }
 	void VertexLayout::AddElement(const BufElem& rBufElem, Int8 nElems) {
@@ -37,8 +36,8 @@ namespace NWG
 		}
 	}
 }
-namespace NWG
-{
+
+namespace NWG {
 	ShaderLayout::ShaderLayout() : m_szData(0) {}
 	// --setters
 	void ShaderLayout::SetBlocks(const DArray<ShaderBlock>& rBlocks) { m_Blocks = rBlocks; Remake(); }
@@ -58,8 +57,8 @@ namespace NWG
 	}
 }
 #if(NWG_GAPI & NWG_GAPI_OGL)
-namespace NWG
-{
+#include <ogl/nwg_ogl_loader.h>
+namespace NWG {
 	InputLayout::InputLayout(GfxEngine& rGfx) :
 		TEntity(), AGfxRes(rGfx),
 		m_pShader(nullptr) { }
@@ -72,7 +71,7 @@ namespace NWG
 	{
 		if (m_pShader == nullptr) { return false; }
 		if (m_unRId != 0) { glDeleteVertexArrays(1, &m_unRId); m_unRId = 0; }
-		glCreateVertexArrays(1, &m_unRId);
+		glGenVertexArrays(1, &m_unRId);
 		glBindVertexArray(m_unRId);
 		
 		auto& rElems = m_pShader->GetVtxLayout().GetElems();
@@ -89,8 +88,8 @@ namespace NWG
 
 #endif
 #if(NWG_GAPI & NWG_GAPI_DX)
-namespace NWG
-{
+#include <dx/nwg_dx_loader.h>
+namespace NWG {
 	InputLayout::InputLayout(GfxEngine& rGfx) :
 		TEntity(), AGfxRes(rGfx),
 		m_pShader(nullptr), m_pNative(nullptr) { }
@@ -101,7 +100,7 @@ namespace NWG
 	void InputLayout::Bind() { m_pGfx->GetContext()->IASetInputLayout(m_pNative); }
 	bool InputLayout::Remake() {
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
-		if (m_pShader == nullptr) { return; }
+		if (m_pShader == nullptr) { return false; }
 		
 		auto& rLayout = m_pShader->GetVtxLayout();
 		DArray<D3D11_INPUT_ELEMENT_DESC> dxElems(rLayout.GetElems().size());
@@ -120,6 +119,7 @@ namespace NWG
 			m_pShader->GetBlob()->GetBufferPointer(), m_pShader->GetBlob()->GetBufferSize(), &m_pNative);
 		if (m_pNative == nullptr) { throw Exception("input layout is null!"); }
 		m_pGfx->GetContext()->IASetInputLayout(m_pNative);
+		return true;
 	}
 }
 

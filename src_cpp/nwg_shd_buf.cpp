@@ -2,10 +2,9 @@
 #include "nwg_shd_buf.h"
 #if (defined NWG_GAPI)
 #include <nwg_engine.h>
-#include <nwg_loader.h>
 #if (NWG_GAPI & NWG_GAPI_OGL)
-namespace NWG
-{
+#include <ogl/nwg_ogl_loader.h>
+namespace NWG {
 	ShaderBuf::ShaderBuf(GfxEngine& rGfx) :
 		TEntity(), AGfxRes(rGfx),
 		m_gdInfo(GfxBufInfo()) { }
@@ -32,8 +31,8 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
-namespace NWG
-{
+#include <dx/nwg_dx_loader.h>
+namespace NWG {
 	ShaderBuf::ShaderBuf(GfxEngine& rGfx) :
 		TEntity(), AGfxRes(rGfx),
 		m_gdInfo(GfxBufInfo()), m_pNative(nullptr) { }
@@ -45,7 +44,7 @@ namespace NWG
 		memcpy(msubRes.pData, pData, szData);
 		m_pGfx->GetContext()->Unmap(m_pNative, 0u);
 	}
-	void ShaderBuf::SetLayout(const ShaderLayout& rBufLayout) {
+	void ShaderBuf::SetLayout(ShaderLayout& rBufLayout) {
 		for (auto& rBlock : rBufLayout.GetBlocks()) { Bind(rBlock.unBindPoint, rBlock.szAll, rBlock.szOffset); }
 	}
 	// --core_methods

@@ -69,6 +69,7 @@ namespace NWG
 			Float32 nPixelSize = 0.5f;
 			UInt32 unSwapInterval = 1u;
 			V4i rectViewport = { 0, 0, 800, 600 };
+			V4f rgbaClear = { 0.3f, 0.5f, 0.7f, 1.0f };
 		} General;
 		struct {
 			Bit bEnable = false;

@@ -7,8 +7,8 @@
 #include <nwg_vtx_buf.h>
 #include <nwg_idx_buf.h>
 #include <nwg_material.h>
-namespace NWG
-{
+
+namespace NWG {
 	/// Abstract Drawable class
 	class NWG_API Drawable : public TEntity<Drawable>, public AGfxRes
 	{
@@ -35,8 +35,8 @@ namespace NWG
 		RefKeeper<AGfxRes> aRes; aRes.SetRef<RType>(rRes); AddResource(aRes);
 	}
 }
-namespace NWG
-{
+
+namespace NWG {
 	/// VtxDrawable class
 	class NWG_API VtxDrawable : public Drawable
 	{
