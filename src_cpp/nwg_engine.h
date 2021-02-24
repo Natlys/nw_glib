@@ -3,8 +3,8 @@
 #include <nwg_core.hpp>
 #if (defined NWG_GAPI)
 #include <nwg_tools.h>
-namespace NWG
-{
+
+namespace NWG {
 	/// GraphicsEngine class
 	class NWG_API GfxEngine
 	{
@@ -34,6 +34,7 @@ namespace NWG
 		void SetBlendFunc(BlendConfigs bcFactorSrc, BlendConfigs bcFactorDest);
 		void SetDepthFunc(DepthConfigs dcFunc);
 		void SetStencilFunc(StencilConfigs scFunc, UInt32 unRefValue, UInt8 unBitMask);
+		void SetVSync(Bit bSynchronize);
 		// --core_methods
 		void Update();
 		void BeginDraw();

@@ -2,8 +2,8 @@
 #include "nwg_frame_buf.h"
 #if (defined NWG_GAPI)
 #include <nwg_texture.h>
-#include <nwg_loader.h>
 #if (NWG_GAPI & NWG_GAPI_OGL)
+#include <ogl/nwg_ogl_loader.h>
 namespace NWG
 {
 	FrameBuf::FrameBuf(GfxEngine& rGfx, const char* strName, const FrameBufInfo& rInfo) :
@@ -25,7 +25,7 @@ namespace NWG
 		if (m_unRId != 0) { glDeleteFramebuffers(1, &m_unRId); m_unRId = 0; }
 		if (m_Info.GetHeight() < 1 || m_Info.GetWidth() < 1) { return; }
 
-		glCreateFramebuffers(1, &m_unRId);
+		glGenFramebuffers(1, &m_unRId);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_unRId);
 
 		m_Info.bHasStencil = m_Info.bHasDepth = false;
@@ -35,33 +35,31 @@ namespace NWG
 		for (UInt32 txi = 0; txi < m_Attachments.size(); txi++) {
 			if (m_Attachments[txi] == nullptr) { NWL_ERR("Null attachment!"); DetachTexture(txi); }
 			auto& rTex = *m_Attachments[txi];
-			ImageInfo imgInfo = rTex.GetImage().GetInfo();
+			TextureInfo texInfo = rTex.GetInfo();
 			if (m_Info.bResizable) {
-				imgInfo.nWidth = GetWidth();
-				imgInfo.nHeight = GetHeight();
+				texInfo.nWidth = GetWidth();
+				texInfo.nHeight = GetHeight();
 			}
-			Image rImg = rTex.GetImage();
-			rTex.SetImage(rImg);
-			rTex.Remake();
+			rTex.Remake(texInfo);
 			rTex.Bind();
 			UInt32 unAttachType = 0;
-			if (rImg.GetFormat()== PXF_R32_SINT32 || rImg.GetFormat()== PXF_R32_UINT32 ||
-				rImg.GetFormat()== PXF_R8G8B8_SINT32 || rImg.GetFormat()== PXF_R8G8B8_UINT32 ||
-				rImg.GetFormat()== PXF_R8G8B8A8_SINT32 || rImg.GetFormat()== PXF_R8G8B8A8_UINT32)
+			if (texInfo.pxlFormat== PXF_R32_SINT32 || texInfo.pxlFormat == PXF_R32_UINT32 ||
+				texInfo.pxlFormat== PXF_R8G8B8_SINT32 || texInfo.pxlFormat == PXF_R8G8B8_UINT32 ||
+				texInfo.pxlFormat== PXF_R8G8B8A8_SINT32 || texInfo.pxlFormat== PXF_R8G8B8A8_UINT32)
 			{
 				unAttachType = GL_COLOR_ATTACHMENT0 + m_Info.unColorCount;
 				ColorIds[m_Info.unColorCount] = rTex.GetRenderId();
 				m_Info.unColorCount++;
 			}
-			else if (rImg.GetFormat()== PXF_D32_SINT32 || rImg.GetFormat()== PXF_D32_UINT32) {
+			else if (texInfo.pxlFormat== PXF_D32_SINT32 || texInfo.pxlFormat== PXF_D32_UINT32) {
 				m_Info.bHasDepth = true;
 				unAttachType = GL_DEPTH_ATTACHMENT;
 			}
-			else if (rImg.GetFormat()== PXF_S8_SINT8 || rImg.GetFormat()== PXF_S8_UINT8) {
+			else if (texInfo.pxlFormat== PXF_S8_SINT8 || texInfo.pxlFormat== PXF_S8_UINT8) {
 				m_Info.bHasStencil = true;
 				unAttachType = GL_STENCIL_ATTACHMENT;
 			}
-			else if (rImg.GetFormat()== PXF_D24S8_SINT32 || rImg.GetFormat()== PXF_D24S8_UINT32) {
+			else if (texInfo.pxlFormat== PXF_D24S8_SINT32 || texInfo.pxlFormat== PXF_D24S8_UINT32) {
 				m_Info.bHasDepth = m_Info.bHasStencil = true;
 				unAttachType = GL_DEPTH_STENCIL_ATTACHMENT;
 			}
@@ -84,16 +82,20 @@ namespace NWG
 
 	void FrameBuf::ReadPixels(Ptr pData, UInt32 unAttachIdx, Int32 nX, Int32 nY, Int32 nW, Int32 nH)
 	{
-		const Image& rImg = GetAttachment()->GetImage();
+		const TextureInfo& texInfo = GetAttachment()->GetInfo();
+		const ImageInfo& imgInfo = GetAttachment()->GetImage().GetInfo();
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + unAttachIdx);
 		// --error is guaranteed, internal and usual formats are different
-		glReadPixels(nX, nY, nW, nH, ConvertEnum<PixelFormats, UInt32>(rImg.GetFormat()), ConvertEnum<PixelFormats, UInt32>(rImg.GetFormat()), pData);
+		glReadPixels(nX, nY, nW, nH, ConvertEnum<PixelFormats, UInt32>(imgInfo.pxlFormat),
+			ConvertEnum<PixelFormats, UInt32>(texInfo.pxlFormat), pData);
 	}
 	void FrameBuf::WritePixels(Ptr pData, UInt32 unAttachIdx, Int32 nX, Int32 nY, Int32 nW, Int32 nH)
 	{
-		const Image& rImg = GetAttachment()->GetImage();
-		glRasterPos2i(nX, nY);
-		glDrawPixels(nW, nH, ConvertEnum<PixelFormats, UInt32>(rImg.GetFormat()), ConvertEnum<PixelFormats, UInt32>(rImg.GetFormat()), pData);
+		const TextureInfo& texInfo = GetAttachment()->GetInfo();
+		const ImageInfo& imgInfo = GetAttachment()->GetImage().GetInfo();
+		//glRasterPos2i(nX, nY);
+		//glDrawPixels(nW, nH, ConvertEnum<PixelFormats, UInt32>(imgInfo.pxlFormat),
+		//	ConvertEnum<PixelFormats, UInt32>(texInfo.pxlFormat), pData);
 	}
 	// --==</core_methods>==--
 	// --==<data_methods>==--
@@ -103,6 +105,7 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
+#include <dx/nwg_dx_loader.h>
 namespace NWG
 {
 	FrameBuf::FrameBuf(GfxEngine& rGfx, const char* strName, const FrameBufInfo& rInfo) :
@@ -113,7 +116,7 @@ namespace NWG
 	// --setters
 	void FrameBuf::SetViewport(V4i rectViewport) { m_Info.rectViewport = rectViewport; }
 	void FrameBuf::SetClearColor(V4f rgbaClear) { m_rgbaClear = rgbaClear; }
-	void FrameBuf::AttachTexture(Texture& rTex) { m_Attachments.push_back(RefKeeper<Texture>{ *EntSys::GetEnt<Texture>(rTex.GetRenderId()) }); }
+	void FrameBuf::AttachTexture(Texture& rTex) { m_Attachments.push_back(RefKeeper<Texture>{ *EntSys::GetEnt<Texture>(rTex.GetEntId()) }); }
 	void FrameBuf::DetachTexture(UInt32 unIdx) { m_Attachments.erase(m_Attachments.begin() + unIdx); }
 	// --==<core_methods>==--
 	void FrameBuf::Bind() {
@@ -121,7 +124,7 @@ namespace NWG
 	void FrameBuf::Remake()
 	{
 	}
-	void FrameBuf::Clear(UInt32 bitMask) {
+	void FrameBuf::Clear() {
 	}
 
 	void FrameBuf::ReadPixels(Ptr pData, UInt32 unAttachIdx, Int32 nX, Int32 nY, Int32 nW, Int32 nH)

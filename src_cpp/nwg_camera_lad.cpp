@@ -1,8 +1,8 @@
 #include <nwg_pch.hpp>
 #include "nwg_camera_lad.h"
 
-namespace NWG
-{
+
+namespace NWG {
 	GfxCameraLad::GfxCameraLad() :
 		nZoomSpeed(1000.0f),
 		nMoveSpeed(2.0f),

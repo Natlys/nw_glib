@@ -4,8 +4,6 @@
 #include <nwg_engine.h>
 #include <nwg_shader_prog.h>
 #include <nwg_shd_buf.h>
-#include <nwg_loader.h>
-#if (NWG_GAPI & NWG_GAPI_OGL)
 namespace NWG
 {
 	OutStream& ShaderInfo::operator<<(OutStream& rStream) const {
@@ -34,6 +32,8 @@ namespace NWG
 	OutStream& operator<<(OutStream& rStream, const ShaderInfo& rInfo) { return rInfo.operator<<(rStream); }
 	InStream& operator>>(InStream& rStream, ShaderInfo& rInfo) { return rInfo.operator>>(rStream); }
 }
+#if (NWG_GAPI & NWG_GAPI_OGL)
+#include <ogl/nwg_ogl_loader.h>
 namespace NWG
 {
 	Shader::Shader(GfxEngine& rGfx, const char* strName, ShaderTypes sdType) :
@@ -85,6 +85,7 @@ namespace NWG
 	}
 	// --==</data_methods>==--
 }
+
 namespace NWG
 {
 	VertexShader::VertexShader(GfxEngine& rGfx, const char* strName) :
@@ -156,6 +157,7 @@ namespace NWG
 		return m_inLayout.Remake();
 	}
 }
+
 namespace NWG
 {
 	PixelShader::PixelShader(GfxEngine& rGfx, const char* strName) :
@@ -178,15 +180,16 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
+#include <dx/nwg_dx_loader.h>
 namespace NWG
 {
-	Shader::Shader(GfxEngine& rGfx, const char* strName, ShaderTypes sdType) :
+	Shader::Shader(GfxEngine& rGfx, const char* strName, ShaderTypes sType) :
 		TEntity(), AGfxRes(rGfx), ACodeRes(strName),
-		m_sdType(sdType), m_pProg(nullptr), m_shdLayout(ShaderLayout()),
+		m_sType(sType), m_pProg(nullptr), m_shdLayout(ShaderLayout()),
 		m_pBlob(nullptr) {}
 	Shader::~Shader() { if (m_pBlob != nullptr) { m_pBlob->Release(); m_pBlob = nullptr; } }
 	// --setters
-	void Shader::SetProgram(ShaderProgram* pProg) { m_pProg = pProg; }
+	void Shader::SetProg(ShaderProg* pProg) { m_pProg = pProg; }
 	// --data_methods
 	bool Shader::SaveF(const char* strFPath)
 	{
@@ -197,10 +200,11 @@ namespace NWG
 		return true;
 	}
 }
+
 namespace NWG
 {
 	VertexShader::VertexShader(GfxEngine& rGfx, const char* strName) :
-		Shader(rGfx, strName, ST_VERTEX),
+		Shader(rGfx, strName, SHD_VERTEX),
 		m_inLayout(InputLayout(rGfx)),
 		m_pNative(nullptr) { }
 	VertexShader::~VertexShader() { if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; } }
@@ -213,12 +217,24 @@ namespace NWG
 	bool VertexShader::Compile()
 	{
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
+		if (m_pBlob != nullptr) { m_pBlob->Release(); m_pBlob = nullptr; }
 		
-		WChar wstrFPath[256]{ 0 };
-		mbstowcs(&wstrFPath[0], &m_strCode[0], 256);
-		
-		D3DReadFileToBlob(&wstrFPath[0], &m_pBlob);
+		HRESULT hRes = 0;
+		if ((hRes = D3DCompile(
+			&m_strCode[0],		// source code
+			m_strCode.length(),	// source code length
+			NULL,				// source name
+			NULL,				// defines
+			NULL,				// includes
+			"main",				// entry point name
+			"vs_4_0",			// target
+			0u,					// flags1
+			0u,					// flags2
+			&m_pBlob,			// where to store the code
+			NULL				// blob for error messages
+		)) < 0u) { return false; }
 		if (m_pBlob == nullptr) { return false; }
+
 		m_pGfx->GetDevice()->CreateVertexShader(m_pBlob->GetBufferPointer(), m_pBlob->GetBufferSize(), NULL, &m_pNative);
 		
 		m_pGfx->GetContext()->VSSetShader(m_pNative, NULL, NULL);
@@ -231,10 +247,11 @@ namespace NWG
 		return true;
 	}
 }
+
 namespace NWG
 {
 	PixelShader::PixelShader(GfxEngine& rGfx, const char* strName) :
-		Shader(rGfx, strName, ST_PIXEL),
+		Shader(rGfx, strName, SHD_PIXEL),
 		m_pNative(nullptr) { }
 	PixelShader::~PixelShader() { if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; } }
 	// --core_methods
@@ -242,12 +259,26 @@ namespace NWG
 	bool PixelShader::Compile()
 	{
 		if (m_pNative != nullptr) { m_pNative->Release(); m_pNative = nullptr; }
-		
-		WChar wstrFPath[256]{ 0 };
-		mbstowcs(&wstrFPath[0], &m_strCode[0], 256);
-		
-		D3DReadFileToBlob(&wstrFPath[0], &m_pBlob);
+		if (m_pBlob != nullptr) { m_pBlob->Release(); m_pBlob = nullptr; }
+
+		HRESULT hRes = 0;
+		if ((hRes = D3DCompile(
+			&m_strCode[0],		// source code
+			m_strCode.length(),	// source code length
+			NULL,				// source name
+			NULL,				// defines
+			NULL,				// includes
+			"main",				// entry point name
+			"ps_4_0",			// target
+			0u,					// flags1
+			0u,					// flags2
+			&m_pBlob,			// where to store the code
+			NULL				// blob for error messages
+		)) < 0u) {
+			return false;
+		}
 		if (m_pBlob == nullptr) { return false; }
+
 		m_pGfx->GetContext()->PSSetShader(m_pNative, NULL, NULL);
 		m_pGfx->GetDevice()->CreatePixelShader(m_pBlob->GetBufferPointer(), m_pBlob->GetBufferSize(), NULL, &m_pNative);
 		

@@ -2,11 +2,8 @@
 #include "nwg_shader_prog.h"
 #if (defined NWG_GAPI)
 #include <nwg_engine.h>
-#include <nwg_loader.h>
 #include <nwg_shader.h>
-#if (NWG_GAPI & NWG_GAPI_OGL)
-namespace NWG
-{
+namespace NWG {
 	OutStream& ShaderProgInfo::operator<<(OutStream& rStream) const {
 		return rStream <<
 			"--==<shader_program_info>==--" << std::endl <<
@@ -35,8 +32,9 @@ namespace NWG
 	OutStream& operator<<(OutStream& rStream, const ShaderProgInfo& rInfo) { return rInfo.operator<<(rStream); }
 	InStream& operator>>(InStream& rStream, ShaderProgInfo& rInfo) { return rInfo.operator>>(rStream); }
 }
-namespace NWG
-{
+#if (NWG_GAPI & NWG_GAPI_OGL)
+#include <ogl/nwg_ogl_loader.h>
+namespace NWG {
 	ShaderProg::ShaderProg(GfxEngine& rGfx, const char* strName) :
 		TEntity(), AGfxRes(rGfx), ADataRes(strName) { }
 	ShaderProg::~ShaderProg() { if (m_unRId != 0) { glDeleteProgram(m_unRId); m_unRId = 0; } }
@@ -130,22 +128,21 @@ namespace NWG
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
-namespace NWG
-{
+#include <dx/nwg_dx_loader.h>
+namespace NWG {
 	ShaderProg::ShaderProg(GfxEngine& rGfx, const char* strName) :
 		TEntity(), AGfxRes(rGfx), ADataRes(strName),
 		m_shdLayout(ShaderLayout()) {  }
-	ShaderProg::~ShaderProg() { Remake(); }
+	ShaderProg::~ShaderProg() { }
 	// --==<core_methods>==--
 	void ShaderProg::Bind() {
 		for (auto& itShader : m_Shaders) {
 			itShader->Bind();
 		}
 	}
-	void ShaderProg::Remake()
+	bool ShaderProg::Remake(const ShaderProgInfo& rInfo)
 	{
-		m_shdLayout.Remake();
-		m_Shaders.clear();
+		return false;
 	}
 	// --==</core_methods>==--
 	// --==<data_methods>==--

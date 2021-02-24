@@ -1,8 +1,6 @@
-#ifndef NWG_GCAMERA_H
-#define NWG_GCAMERA_H
-
+#ifndef NWG_CAMERA_H
+#define NWG_CAMERA_H
 #include <nwg_core.hpp>
-
 namespace NWG
 {
 	/// GraphicsCamera struct
@@ -44,4 +42,4 @@ namespace NWG
 		GfxCameraModes m_gcMode;
 	};
 }
-#endif // NWG_GCAMERA_H
+#endif // NWG_CAMERA_H

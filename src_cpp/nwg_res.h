@@ -7,7 +7,6 @@ namespace NWG
 	/// Abstract GraphicsResource class
 	class NWG_API AGfxRes : public AMemUser
 	{
-		friend class GfxEngine;
 	protected:
 		AGfxRes(GfxEngine& rGfx);
 	public:

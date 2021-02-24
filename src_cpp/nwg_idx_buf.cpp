@@ -2,8 +2,8 @@
 #include "nwg_idx_buf.h"
 #if (defined NWG_GAPI)
 #include <nwg_engine.h>
-#include <nwg_loader.h>
 #if (NWG_GAPI & NWG_GAPI_OGL)
+#include <ogl/nwg_ogl_loader.h>
 namespace NWG
 {
 	IndexBuf::IndexBuf(GfxEngine& rGfx) :
@@ -27,6 +27,7 @@ namespace NWG
 
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
+#include <dx/nwg_dx_loader.h>
 namespace NWG
 {
 	IndexBuf::IndexBuf(GfxEngine& rGfx) :
