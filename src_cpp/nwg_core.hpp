@@ -15,99 +15,28 @@
 #define NWG_GAPI_OGL	1 << 1
 #define NWG_GAPI_DX		1 << 2
 #define NWG_GAPI		NWG_GAPI_OGL
+
+#if (NWG_GAPI & NWG_GAPI_OGL)
+using GfxDevice = HDC;
+using GfxContext = HGLRC;
+using GfxLib = HMODULE;
+#endif	// NWG_GAPI
+#if (NWG_GAPI & NWG_GAPI_DX)
+using GfxDevice = ID3D11Device*;
+using GfxContext = ID3D11DeviceContext*;
+using GfxLib = HMODULE;
+#endif	// NWG_GAPI
 // --==</configurations>==--
-
 #include <nwg_pch.hpp>
-
-namespace NWG
-{
-	enum GfxApiTypes : UInt32 {
-		GAPI_DEFAULT = NWG_GAPI,
-		GAPI_OPENGL = NWG_GAPI_OGL,
-		GAPI_DIRECTX = NWG_GAPI_DX,
-	};
-	enum GfxBufferTypes : UInt32 {
-		GBT_DEFAULT = 0,
-		GBT_VERTEX = 1, GBT_INDEX = 2, GBT_SHADER = 3,
-	};
-	enum FrameBufTypes : UInt32 {
-		FBT_DEFAULT = 0,
-		FBT_IN = 1, FBT_OUT = 2, FBT_IN_OUT = 3,
-	};
-	enum ShaderTypes : UInt32 {
-		SHD_DEFAULT = 0,
-		SHD_VERTEX = 1, SHD_PIXEL = 2, SHD_GEOMETRY = 3,
-		SHD_SHADER = 4,
-	};
-	enum FrameBufAttachments : UInt32 {
-		FB_DEFAULT = 0,
-		FB_COLOR = 1, FB_DEPTH = 2, FB_STENCIL = 3,
-		FB_DEPTH_STENCIL,
-	};
-}
-namespace NWG
-{
-	enum GfxPrimitives : UInt32 {
-		GPT_DEFAULT = 0,
-		GPT_POINTS = 1,
-		GPT_LINES, GPT_LINE_LOOP, GPT_LINE_STRIP,
-		GPT_TRIANGLES, GPT_TRIANGLE_STRIP, GPT_TRIANGLE_FAN,
-	};
-	enum DrawModes : UInt32 {
-		DM_DEFAULT = 0,
-		DM_LINE = 1, DM_FILL = 2
-	};
-	enum GfxVariables : UInt32 {
-		GV_DEFAULT = 0,
-		GV_LINE_WIDTH = 1, GV_POINT_SIZE = 2,
-	};
-	enum ProcessingModes : UInt32 {
-		PM_DEFAULT = 0,
-		PM_DEPTH_TEST = 1, PM_STENCIL_TEST = 2,
-		PM_BLEND, PM_MULTISAMPLE,
-		PM_CULL_FACE,
-	};
-	enum BlendConfigs : UInt32 {
-		BC_SRC_DEFAULT = 0, BC_DEST_DEFAULT = 0,
-		BC_SRC_ALPHA, BC_SRC_COLOR,
-		BC_ONE_MINUS_SRC_ALPHA,
-		BC_ONE_MINUS_SRC_COLOR,
-		BC_DST_ALPHA, BC_DST_COLOR,
-		BC_ONE_MUNUS_DST_ALPHA,
-		BC_ONE_MINUS_DST_COLOR,
-	};
-	enum CullFaceConfigs : UInt32 {
-		CFC_DEFAULT = 0
-	};
-	enum DepthConfigs : UInt32 {
-		DTC_DEFAULT = 0,
-		DTC_EQUAL = 1, DTC_LESS = 2, DTC_LEQUAL = 3,
-		DTC_GREATER, DTC_GEQUAL,
-		DTC_NEVER, DTC_ALWAYS,
-	};
-	enum StencilConfigs : UInt32 {
-		STC_DEFAULT = 0,
-		STC_INCR = 0, STC_DECR = 1,
-		STC_KEEP, STC_ZERO, STC_REPLACE, STC_INVERT,
-	};
-	enum GfxCameraTypes : UInt32 {
-		GCT_DEFAULT = 0,
-		GCT_ORTHO = 1, GCT_PERSPECT = 2,
-	};
-	enum GfxCameraModes : UInt32 {
-		GCM_DEFAULT = 0,
-		GCM_2D = 2, GCM_3D = 3,
-	};
-}
 namespace NWG
 {
 	class NWG_API GfxEngine;
 	class NWG_API FrameBuf;
 
-	class NWG_API Drawable;
-	class NWG_API VtxDrawable;
-	class NWG_API IdxDrawable;
-	class NWG_API MeshDrawable;
+	class NWG_API AGfxRes;
+	class NWG_API ADrawCmp;
+	class NWG_API DrawVtxCmp;
+	class NWG_API DrawIdxCmp;
 
 	class NWG_API VertexBuf;
 	class NWG_API IndexBuf;

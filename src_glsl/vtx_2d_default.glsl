@@ -6,13 +6,13 @@ layout(location=1)in vec2 atb_texCrd;
 layout(std140)uniform unf_tform{mat4 unf_matProj;mat4 unf_matView;};
 
 out VS_INFO {
-	vec2 vtxCrd;
+	vec4 vtxCrd;
 	vec2 texCrd;
-} vso;
+}vso;
 
 void main()
 {
 	gl_Position = vec4(atb_vtxCrd.x, atb_vtxCrd.y, 0.0f, 1.0f);
-	vso.vtxCrd = atb_vtxCrd;
+	vso.vtxCrd = gl_Position;
 	vso.texCrd = atb_texCrd;
 }
