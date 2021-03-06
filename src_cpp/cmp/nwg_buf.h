@@ -6,7 +6,7 @@
 #include <core/nwg_switch.h>
 namespace NWG
 {
-	class NWG_API a_gfx_buf : public t_gfx_cmp<a_gfx_buf>
+	class NWG_API a_gfx_buf : public a_gfx_cmp
 	{
 	public:
 		a_gfx_buf(gfx_engine& graphics);
@@ -14,7 +14,10 @@ namespace NWG
 		// --getters
 		inline size get_data_size() const	{ return m_data_size; }
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		inline GLuint get_ogl_id() const { return m_ogl_id; }
+		virtual inline ptr get_native() override { return &m_native; }
+#endif
+#if (NWG_GAPI & NWG_GAPI_DX)
+		virtual inline ptr get_native() override { return m_native; }
 #endif
 		// --setters
 		virtual void set_data(size data_size, const ptr data_ptr, size offset_size = 0) = 0;
@@ -24,7 +27,7 @@ namespace NWG
 		size m_data_size = 0;
 		ptr m_data_ptr = nullptr;
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		GLuint m_ogl_id;
+		GLuint m_native;
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
 		ID3D11Buffer* m_native;

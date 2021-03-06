@@ -18,7 +18,7 @@ namespace NWG
 		texture_wraps wrap_t = TXW_BORDER;
 		texture_wraps wrap_r = TXW_BORDER;
 		texture_filters filter = TXFL_NEAREST;
-		v4f32 border_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		v4f border_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	public:
 		// --operators
 		texture_info& operator=(const image_bmp_info& info);
@@ -32,7 +32,7 @@ namespace NWG
 {
 	/// a_texture class
 	/// description:
-	class NWG_API a_texture : public t_gfx_cmp<a_texture>, public a_data_res
+	class NWG_API a_texture : public a_gfx_cmp, public a_data_res
 	{
 	public:
 		a_texture(gfx_engine& graphics, cstring name, texture_types txr_types);
@@ -42,7 +42,10 @@ namespace NWG
 		inline texture_types get_txr_type() const	{ return m_info.txr_type; }
 		inline const texture_info& get_info() const	{ return m_info; }
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		inline GLuint get_ogl_id() const { return m_ogl_id; }
+		virtual inline ptr get_native() override { return &m_native; }
+#endif
+#if (NWG_GAPI & NWG_GAPI_DX)
+		virtual inline ptr get_native() override { return m_native; }
 #endif
 		// --setters
 		void set_txr_slot(ui8 texture_slot);
@@ -57,7 +60,7 @@ namespace NWG
 		texture_info m_info;
 		ui8 m_slot;
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		GLuint m_ogl_id;
+		GLuint m_native;
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
 		ID3D11ShaderResourceView* m_res;
@@ -67,7 +70,7 @@ namespace NWG
 }
 namespace NWG
 {
-	class NWG_API texture2d : public a_texture
+	class NWG_API texture2d : public a_texture, public t_cmp<texture2d>
 	{
 	public:
 		texture2d(gfx_engine& graphics, cstring name);

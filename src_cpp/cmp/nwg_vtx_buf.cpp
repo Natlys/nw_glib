@@ -7,9 +7,13 @@
 namespace NWG
 {
 	vtx_buf::vtx_buf(gfx_engine& graphics) :
-		a_gfx_buf(graphics),
-		m_stride_size(0) { }
-	vtx_buf::~vtx_buf() { }
+		a_gfx_buf(graphics), t_cmp(),
+		m_stride_size(0)
+	{
+	}
+	vtx_buf::~vtx_buf()
+	{
+	}
 	// --setters
 	void vtx_buf::set_data(size data_size, const ptr data_ptr, size offset_size)
 	{
@@ -18,17 +22,17 @@ namespace NWG
 	// --core_methods
 	void vtx_buf::on_draw()
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_ogl_id);
+		glBindBuffer(GL_ARRAY_BUFFER, m_native);
 	}
 	bit vtx_buf::remake(size data_size, const ptr data_ptr, size stride_size)
 	{
 		m_data_size = data_size;
 		m_data_ptr = data_ptr;
 		m_stride_size = stride_size;
-		if (m_ogl_id != 0) { glDeleteBuffers(1, &m_ogl_id); m_ogl_id = 0; }
+		if (m_native != 0) { glDeleteBuffers(1, &m_native); m_native = 0; }
 		if (data_size == 0 || stride_size == 0) { return false; }
-		glGenBuffers(1, &m_ogl_id);
-		glBindBuffer(GL_ARRAY_BUFFER, m_ogl_id);
+		glGenBuffers(1, &m_native);
+		glBindBuffer(GL_ARRAY_BUFFER, m_native);
 		glBufferData(GL_ARRAY_BUFFER, data_size, data_ptr, data_ptr == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 		return true;
 	}
@@ -39,7 +43,10 @@ namespace NWG
 namespace NWG
 {
 	vtx_buf::vtx_buf(gfx_engine& graphics) :
-		a_gfx_buf(graphics) { }
+		a_gfx_buf(graphics), t_cmp()
+		m_stride_size(0)
+	{
+	}
 	vtx_buf::~vtx_buf() { }
 	// --setters
 	void vtx_buf::SetSubData(Size szData, const Ptr pData, Size szOffset) {

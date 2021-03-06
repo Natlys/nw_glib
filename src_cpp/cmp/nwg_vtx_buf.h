@@ -6,7 +6,7 @@
 namespace NWG
 {
 	/// vtx_buf class
-	class NWG_API vtx_buf : public a_gfx_buf
+	class NWG_API vtx_buf : public a_gfx_buf, public t_cmp<vtx_buf>
 	{
 	public:
 		vtx_buf(gfx_engine& graphics);
@@ -18,7 +18,7 @@ namespace NWG
 		virtual void set_data(size data_size, const ptr data_ptr, size offset_size = 0) override;
 		// --core_methods
 		virtual void on_draw() override;
-		bit remake(size data_size, const ptr data_ptr = nullptr, size stride_size = sizeof(v2f32));
+		bit remake(size data_size, const ptr data_ptr = nullptr, size stride_size = sizeof(v2f));
 		template<typename vtype>
 		bit remake(si32 data_count, vtype* data_ptr = nullptr);
 	private:

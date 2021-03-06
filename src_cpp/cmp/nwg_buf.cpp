@@ -6,10 +6,12 @@
 namespace NWG
 {
 	a_gfx_buf::a_gfx_buf(gfx_engine& graphics) :
-		t_gfx_cmp(graphics),
+		a_gfx_cmp(graphics),
 		m_data_size(0), m_data_ptr(nullptr),
-		m_ogl_id(0) { }
-	a_gfx_buf::~a_gfx_buf() { if (m_ogl_id != 0) { glDeleteBuffers(1, &m_ogl_id); m_ogl_id = 0; } }
+		m_native(0)
+	{
+	}
+	a_gfx_buf::~a_gfx_buf() { if (m_native != 0) { glDeleteBuffers(1, &m_native); m_native = 0; } }
 }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
@@ -17,9 +19,11 @@ namespace NWG
 namespace NWG
 {
 	a_gfx_buf::a_gfx_buf(gfx_engine& graphics) :
-		t_gfx_cmp(graphics),
+		a_gfx_cmp(graphics),
 		m_info(gfx_buf_info()),
-		m_native(nullptr) { }
+		m_native(nullptr)
+	{
+	}
 	a_gfx_buf::~a_gfx_buf() { if (m_native != nullptr) { m_native->Release(); m_native = nullptr; } }
 }
 #endif

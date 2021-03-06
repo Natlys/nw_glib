@@ -11,7 +11,7 @@ namespace NWG
 	/// description:
 	/// --default input assembler tool for vertex shaders;
 	/// --equivalent to the vertex array in opengl;
-	class NWG_API input_layout : public t_gfx_cmp<input_layout>
+	class NWG_API input_layout : public a_gfx_cmp, public t_cmp<input_layout>
 	{
 		using elems = darray<shd_elem>;
 	public:
@@ -22,7 +22,10 @@ namespace NWG
 		inline elems& get_elems()			{ return m_elems; }
 		inline shd_elem& get_elem(ui8 idx)	{ return m_elems[idx % m_elems.size()]; }
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		inline GLuint get_ogl_id() const { return m_ogl_id; }
+		virtual inline ptr get_native() override { return &m_native; }
+#endif
+#if (NWG_GAPI & NWG_GAPI_DX)
+		virtual inline ptr get_native() override { return m_native; }
 #endif
 		// --setters
 		void set_shader(vtx_shader* shader);
@@ -36,7 +39,7 @@ namespace NWG
 		elems m_elems;
 		darray<size> m_strides;
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		GLuint m_ogl_id;
+		GLuint m_native;
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
 		ID3D11InputLayout* m_native;

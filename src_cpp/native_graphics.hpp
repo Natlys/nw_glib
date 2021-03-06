@@ -4,11 +4,11 @@
 #include <nwg_core.hpp>
 
 #include <core/nwg_engine.h>
-#include <core/nwg_cmp.h>
-#include <core/nwg_cmp.h>
 #include <core/nwg_camera.h>
 #include <core/nwg_camera_lad.h>
 
+#include <core/nwg_cmp.h>
+#include <core/nwg_drawable.h>
 #include <cmp/nwg_frame_buf.h>
 #include <cmp/nwg_vtx_buf.h>
 #include <cmp/nwg_idx_buf.h>

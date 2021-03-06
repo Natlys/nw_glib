@@ -6,7 +6,7 @@
 namespace NWG
 {
 	/// idx_buf class
-	class NWG_API idx_buf : public a_gfx_buf
+	class NWG_API idx_buf : public a_gfx_buf, public t_cmp<idx_buf>
 	{
 	public:
 		idx_buf(gfx_engine& graphics);

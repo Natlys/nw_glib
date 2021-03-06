@@ -25,10 +25,10 @@ namespace NWG
 	struct NWG_API gfx_camera
 	{
 	public:
-		v3f32
+		v3f
 			coord = { 0.0f, 0.0f, 0.0f },
 			rotation = { 0.0f, 90.0f, 0.0f };
-		v3f32
+		v3f
 			right_dir = { 1.0f, 0.0f, 0.0f },
 			upper_dir = { 0.0f, 1.0f, 0.0f },
 			front_dir = { 0.0f, 0.0f, 1.0f },
@@ -39,8 +39,8 @@ namespace NWG
 	public:
 		gfx_camera();
 		// --getters
-		const m4f32& get_proj_mat()const		{ return m_proj; }
-		const m4f32& get_view_mat() const		{ return m_view; }
+		const m4f& get_proj_mat()const		{ return m_proj; }
+		const m4f& get_view_mat() const		{ return m_view; }
 		inline const gfx_cameraTypes& get_type() const	{ return m_type; }
 		inline const gfx_cameraModes& get_mode() const	{ return m_mode; }
 		// --setters
@@ -49,7 +49,7 @@ namespace NWG
 		// --core_methods
 		void update();
 	protected:
-		m4f32 m_view, m_proj;
+		m4f m_view, m_proj;
 		gfx_cameraTypes m_type;
 		gfx_cameraModes m_mode;
 	};

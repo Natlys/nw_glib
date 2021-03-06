@@ -11,7 +11,7 @@ namespace NWG
 		near_clip(0.1f), far_clip(100.0f),
 		aspect_ratio(1.3f),
 		m_mode(GCM_2D), m_type(GCT_ORTHO),
-		m_proj(m4f32(1.0f)), m_view(m4f32(1.0f)) {}
+		m_proj(m4f(1.0f)), m_view(m4f(1.0f)) {}
 	// --getters
 	void gfx_camera::set_mode(gfx_cameraModes camera_mode) {
 		m_mode = camera_mode;
@@ -44,7 +44,7 @@ namespace NWG
 				aspect_ratio, near_clip, far_clip);
 		}
 
-		v3f32 next_front_dir = v3f32(0.0f, 0.0f, 0.0f);
+		v3f next_front_dir = v3f(0.0f, 0.0f, 0.0f);
 		f32 pitch_rad = deg_to_rad(rotation.x);
 		f32 yaw_rad = deg_to_rad(rotation.y);
 		f32 roll_rad = deg_to_rad(rotation.z);
@@ -64,11 +64,11 @@ namespace NWG
 		right_dir = glm::normalize(glm::cross(front_dir, world_up_dir));
 		upper_dir = glm::normalize(glm::cross(right_dir, front_dir));
 
-		m4f32 transformation =
-			mat_translate(m4f32(1.0f), coord) *
-			mat_rotate(m4f32(1.0f), pitch_rad, v3f32(1.0f, 0.0f, 0.0f)) *
-			mat_rotate(m4f32(1.0f), yaw_rad, v3f32(0.0f, 1.0f, 0.0f)) *
-			mat_rotate(m4f32(1.0f), roll_rad, v3f32(0.0f, 0.0f, 1.0f));
+		m4f transformation =
+			mat_translate(m4f(1.0f), coord) *
+			mat_rotate(m4f(1.0f), pitch_rad, v3f(1.0f, 0.0f, 0.0f)) *
+			mat_rotate(m4f(1.0f), yaw_rad, v3f(0.0f, 1.0f, 0.0f)) *
+			mat_rotate(m4f(1.0f), roll_rad, v3f(0.0f, 0.0f, 1.0f));
 		m_view = mat_inverse(transformation);
 	}
 }

@@ -25,7 +25,7 @@ namespace NWG
 }
 namespace NWG
 {
-	class NWG_API shader : public t_gfx_cmp<shader>, public a_data_res
+	class NWG_API shader : public a_gfx_cmp, public a_data_res
 	{
 		using textures = darray<mem_ref<a_texture>>;
 		using buffers = darray<mem_ref<shd_buf>>;
@@ -39,10 +39,10 @@ namespace NWG
 		inline mem_ref<a_texture>& get_texture(ui8 idx) { return m_txrs[idx % m_txrs.size()]; }
 		inline mem_ref<shd_buf>& get_buffer(ui8 idx) { return m_bufs[idx % m_bufs.size()]; }
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		inline GLuint get_ogl_id() const { return m_ogl_id; }
+		virtual inline ptr get_native() override { return &m_native; }
 #endif
 #if (NWG_GAPI & NWG_GAPI_DX)
-		inline ID3DBlob* get_blob()		{ return m_blob; }
+		virtual inline ptr get_native() override { return m_blob; }
 #endif
 		// --setters
 		void set_source_code(cstring source_code);
@@ -58,7 +58,7 @@ namespace NWG
 		textures m_txrs;
 		buffers m_bufs;
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		GLuint m_ogl_id;
+		GLuint m_native;
 #endif
 #if(NWG_GAPI & NWG_GAPI_DX)
 		ID3DBlob* m_blob;
@@ -67,7 +67,7 @@ namespace NWG
 }
 namespace NWG
 {
-	class NWG_API vtx_shader : public shader
+	class NWG_API vtx_shader : public shader, public t_cmp<vtx_shader>
 	{
 	public:
 		vtx_shader(gfx_engine& graphics, cstring name);
@@ -87,7 +87,7 @@ namespace NWG
 }
 namespace NWG
 {
-	class NWG_API pxl_shader : public shader
+	class NWG_API pxl_shader : public shader, public t_cmp<pxl_shader>
 	{
 	public:
 		pxl_shader(gfx_engine& graphics, cstring name);
@@ -105,7 +105,7 @@ namespace NWG
 }
 namespace NWG
 {
-	class NWG_API gmt_shader : public shader
+	class NWG_API gmt_shader : public shader, public t_cmp<gmt_shader>
 	{
 	public:
 		gmt_shader(gfx_engine& graphics, cstring name);

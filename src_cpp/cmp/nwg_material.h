@@ -23,7 +23,7 @@ namespace NWG
 namespace NWG
 {
 	/// gfx_material class
-	class NWG_API gfx_material : public t_gfx_cmp<gfx_material>, public a_data_res
+	class NWG_API gfx_material : public a_gfx_cmp, public t_cmp<gfx_material>, public a_data_res
 	{
 	public:
 		using shaders = darray<mem_ref<shader>>;
@@ -34,7 +34,10 @@ namespace NWG
 		inline const gfx_material_info& get_info() const	{ return m_info; }
 		inline mem_ref<shader>& get_shader(shader_types shd_type);
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		inline GLuint get_ogl_id() const { return m_ogl_id; }
+		virtual inline ptr get_native() override { return &m_native; }
+#endif
+#if (NWG_GAPI & NWG_GAPI_DX)
+		virtual inline ptr get_native() override { return m_native; }
 #endif
 		// --setters
 		template<typename vtype> void set_value(si32 idx, const vtype& data, ui32 count = 1);
@@ -48,7 +51,7 @@ namespace NWG
 		gfx_material_info m_info;
 		shaders m_shds;
 #if (NWG_GAPI & NWG_GAPI_OGL)
-		GLuint m_ogl_id;
+		GLuint m_native;
 #endif
 	};
 	inline mem_ref<shader>& gfx_material::get_shader(shader_types shd_type) {

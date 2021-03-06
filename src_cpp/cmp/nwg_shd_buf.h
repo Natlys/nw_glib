@@ -9,7 +9,7 @@ namespace NWG
 	struct NWG_API shd_elem
 	{
 	public:
-		char8 name[128] = "default";
+		schar name[128] = "default";
 		data_types type = DT_DEFAULT;
 		si32 count = 0;
 		si32 idx = 0;
@@ -21,7 +21,7 @@ namespace NWG
 	{
 	public:
 		darray<shd_elem> elems;
-		char8 name[128] = "default";
+		schar name[128] = "default";
 		ui8 bind_point = 0u;
 		size offset_size = 0ul;
 		size data_size = 0ul;
@@ -34,7 +34,7 @@ namespace NWG
 	/// shader_buffer class
 	/// description:
 	/// --it is used by shaders as opengl uniform buffer, or as directx constant buffer;
-	class NWG_API shd_buf : public a_gfx_buf
+	class NWG_API shd_buf : public a_gfx_buf, public t_cmp<shd_buf>
 	{
 		using blocks = darray<shd_block>;
 	public:

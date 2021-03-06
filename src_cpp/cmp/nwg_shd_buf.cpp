@@ -21,7 +21,9 @@ namespace NWG
 namespace NWG
 {
 	shd_buf::shd_buf(gfx_engine& graphics) :
-		a_gfx_buf(graphics) { }
+		a_gfx_buf(graphics), t_cmp()
+	{
+	}
 	shd_buf::~shd_buf() { }
 	// --setters
 	void shd_buf::set_data(size data_size, const ptr data_ptr, size offset_size) {
@@ -36,27 +38,27 @@ namespace NWG
 	// --core_methods
 	void shd_buf::on_draw()
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, m_ogl_id);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_native);
 		for (auto& iblock : m_blocks) { bind(iblock.bind_point, iblock.data_size, iblock.offset_size); }
 	}
 	void shd_buf::bind(ui32 where_to_bind)
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, m_ogl_id);
-		glBindBufferBase(GL_UNIFORM_BUFFER, where_to_bind, m_ogl_id);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_native);
+		glBindBufferBase(GL_UNIFORM_BUFFER, where_to_bind, m_native);
 	}
 	void shd_buf::bind(ui32 where_to_bind, size data_size, size offset_size)
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, m_ogl_id);
-		glBindBufferRange(GL_UNIFORM_BUFFER, where_to_bind, m_ogl_id, offset_size, data_size);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_native);
+		glBindBufferRange(GL_UNIFORM_BUFFER, where_to_bind, m_native, offset_size, data_size);
 	}
 	bit shd_buf::remake(size data_size, const ptr data_ptr)
 	{
 		m_data_size = data_size;
 		m_data_ptr = data_ptr;
-		if (m_ogl_id != 0) { glDeleteBuffers(1, &m_ogl_id); m_ogl_id = 0; }
+		if (m_native != 0) { glDeleteBuffers(1, &m_native); m_native = 0; }
 		if (data_size == 0) { return false; }
-		glGenBuffers(1, &m_ogl_id);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_ogl_id);
+		glGenBuffers(1, &m_native);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_native);
 		glBufferData(GL_UNIFORM_BUFFER, data_size, data_ptr, data_ptr == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 		
 		for (ui8 bi = 0; bi < m_blocks.size(); bi++) {
@@ -79,7 +81,10 @@ namespace NWG
 #include <lib/nwg_dx_loader.h>
 namespace NWG
 {
-	shd_buf::shd_buf(gfx_engine& graphics) : a_gfx_buf(graphics) { }
+	shd_buf::shd_buf(gfx_engine& graphics) :
+		a_gfx_buf(graphics), t_cmp()
+	{
+	}
 	shd_buf::~shd_buf() { }
 	// --setters
 	void shd_buf::SetSubData(Size szData, const Ptr pData, Size szOffset) {

@@ -27,9 +27,9 @@ namespace NWG
 namespace NWG
 {
 	a_texture::a_texture(gfx_engine& graphics, cstring name, texture_types txr_type) :
-		t_gfx_cmp(graphics), a_data_res(name),
+		a_gfx_cmp(graphics), a_data_res(name),
 		m_info(texture_info()), m_slot(0),
-		m_ogl_id(0) { if (m_ogl_id != 0) { glDeleteTextures(1, &m_ogl_id); m_ogl_id = 0; } }
+		m_native(0) { if (m_native != 0) { glDeleteTextures(1, &m_native); m_native = 0; } }
 	a_texture::~a_texture() { }
 	// --setters
 	void a_texture::set_txr_slot(ui8 texture_slot) { m_slot = texture_slot; }
@@ -37,21 +37,23 @@ namespace NWG
 namespace NWG
 {
 	texture2d::texture2d(gfx_engine& graphics, cstring name) :
-		a_texture(graphics, name, TXT_2D) { }
+		a_texture(graphics, name, TXT_2D), t_cmp()
+	{
+	}
 	texture2d::~texture2d() { }
 	// --==<core_methods>==--
 	void texture2d::on_draw()
 	{
 		glActiveTexture(GL_TEXTURE0 + m_slot);
-		glBindTexture(GL_TEXTURE_2D, m_ogl_id);
+		glBindTexture(GL_TEXTURE_2D, m_native);
 	}
 	bit texture2d::remake(const texture_info& info)
 	{
-		if (m_ogl_id != 0) { glDeleteTextures(1, &m_ogl_id); m_ogl_id = 0; }
+		if (m_native != 0) { glDeleteTextures(1, &m_native); m_native = 0; }
 		if (m_info.nof_samples == 0) { return false; }
 		if (m_info.size_x <= 0 || m_info.size_y <= 0 || m_info.nof_channels <= 0) { return false; }
-		glGenTextures(1, &m_ogl_id);
-		glBindTexture(GL_TEXTURE_2D, m_ogl_id);
+		glGenTextures(1, &m_native);
+		glBindTexture(GL_TEXTURE_2D, m_native);
 
 		if (m_info.nof_samples == 1) {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convert_enum<texture_filters, GLenum>(m_info.filter));
@@ -72,7 +74,7 @@ namespace NWG
 		return true;
 	}
 	void texture2d::clear(ptr value) {
-		glClearTexImage(m_ogl_id, 0,
+		glClearTexImage(m_native, 0,
 			convert_enum<pixel_formats, GLenum>(m_info.pxl_format),
 			convert_enum<pixel_formats, GLenum>(m_info.pxl_format), value);
 	}
@@ -104,7 +106,9 @@ namespace NWG
 	a_texture::a_texture(gfx_engine& graphics, const char* name, texture_types txr_type) :
 		a_gfx_cmp(graphics), a_data_res(name),
 		m_info(texture_info()), m_unSlot(0),
-		m_pRes(nullptr), m_pSampler(nullptr) { }
+		m_pRes(nullptr), m_pSampler(nullptr)
+	{
+	}
 	a_texture::~a_texture() {
 		if (m_pRes != nullptr) { m_pRes->Release(); m_pRes = nullptr; }
 		if (m_pSampler != nullptr) { m_pSampler->Release(); m_pSampler = nullptr; }

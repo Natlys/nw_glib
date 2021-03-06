@@ -25,8 +25,8 @@ namespace NWG
 	{
 		gfx_primitives prim_type = GPT_DEFAULT;
 		si32 swap_interval = 1u;
-		v4si32 viewport = { 0, 0, 800, 600 };
-		v4f32 clear_color = { 0.3f, 0.5f, 0.7f, 1.0f };
+		v4si viewport = { 0, 0, 800, 600 };
+		v4f clear_color = { 0.3f, 0.5f, 0.7f, 1.0f };
 	};
 }
 

@@ -101,40 +101,11 @@ namespace NWG
 	void gfx_engine::end_draw()
 	{
 	}
-	void gfx_engine::on_draw_vtx(ui32 ent_id)
-	{
-		auto& cmps = get_cmps(ent_id);
-		size data_size = 0;
-		ui32 data_count = 0;
-		for (auto& icmp : cmps) {
-			if (icmp.second->check_type_id<a_gfx_buf>()) {
-				vtx_buf* buf = icmp.second.get_ref<vtx_buf>();
-				data_size += buf->get_data_size();
-				data_count += buf->get_data_count();
-			}
-			icmp.second->on_draw();
-		}
-		glDrawArrays(convert_enum<gfx_primitives, GLenum>(m_config.prim_type), data_count, data_size);
-	}
-	void gfx_engine::on_draw_idx(ui32 ent_id)
-	{
-		auto& cmps = get_cmps(ent_id);
-		GLuint count = 0;
-		GLenum type = DT_DEFAULT;
-		for (auto& icmp : cmps) {
-			if (icmp.second->check_type_id<a_gfx_buf>()) {
-				idx_buf* buf = icmp.second.get_ref<idx_buf>();
-				count += buf->get_data_count();
-				type = convert_enum<data_types, GLenum>(buf->get_data_type());
-			}
-			icmp.second->on_draw();
-		}
-		glDrawElements(convert_enum<gfx_primitives, GLenum>(m_config.prim_type), count, type, nullptr);
-	}
 
-	void gfx_engine::rmv_cmp(ui32 ent_id, ui32 type_id)
+	void gfx_engine::del_cmp(ui32 type_id, ui32 cmp_id)
 	{
-		m_reg[ent_id].erase(type_id);
+		if (!has_cmp(type_id, cmp_id)) { return; }
+		m_reg[type_id].erase(cmp_id);
 	}
 	// --==</core_methods>==--
 }

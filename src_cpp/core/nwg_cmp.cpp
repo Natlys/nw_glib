@@ -5,7 +5,7 @@
 namespace NWG
 {
 	a_gfx_cmp::a_gfx_cmp(gfx_engine& graphics) :
-		a_cmp(), m_gfx(&graphics) { }
+		m_gfx(&graphics) { }
 	a_gfx_cmp::~a_gfx_cmp() { }
 	// --setters
 	// --core_methods

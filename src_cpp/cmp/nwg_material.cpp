@@ -15,7 +15,7 @@ namespace NWG
 			"--==</shader_program_info>==--" << std::endl;
 	}
 	in_stream& gfx_material_info::operator>>(in_stream& stm) {
-		char8 str_buf[256];
+		schar str_buf[256];
 		si32 unGfxApi = 0;
 		
 		stm.getline(str_buf, 256, ':');
@@ -44,24 +44,25 @@ namespace NWG
 #include <lib/nwg_ogl_v2.h>
 #include <lib/nwg_ogl_v3.h>
 #include <lib/nwg_ogl_arb.h>
-namespace NWG {
+namespace NWG
+{
 	gfx_material::gfx_material(gfx_engine& graphics, cstring name) :
-		t_gfx_cmp(graphics), a_data_res(name),
-		m_ogl_id(0) { }
-	gfx_material::~gfx_material() { if (m_ogl_id != 0) { glDeleteProgram(m_ogl_id); m_ogl_id = 0; } }
+		a_gfx_cmp(graphics), t_cmp(), a_data_res(name),
+		m_native(0) { }
+	gfx_material::~gfx_material() { if (m_native != 0) { glDeleteProgram(m_native); m_native = 0; } }
 	// --setters
 	template<> void gfx_material::set_value<si32>(si32 idx, const si32& data, ui32 count) { glUniform1i(idx, data); }
 	template<> void gfx_material::set_value<ui32>(si32 idx, const ui32& data, ui32 count) { glUniform1ui(idx, data); }
-	template<> void gfx_material::set_value<m4f32>(si32 idx, const m4f32& data, ui32 count) { glUniform4fv(idx, 1, &data[0][0]); }
+	template<> void gfx_material::set_value<m4f>(si32 idx, const m4f& data, ui32 count) { glUniform4fv(idx, 1, &data[0][0]); }
 	// --==<core_methods>==--
 	void gfx_material::on_draw() {
-		glUseProgram(m_ogl_id);
+		glUseProgram(m_native);
 		for (auto& ishd : m_shds) { ishd->on_draw(); }
 	}
 	bool gfx_material::remake(const gfx_material_info& info)
 	{
-		if (m_ogl_id != 0) { glDeleteShader(m_ogl_id); m_ogl_id = 0; }
-		m_ogl_id = glCreateProgram();
+		if (m_native != 0) { glDeleteShader(m_native); m_native = 0; }
+		m_native = glCreateProgram();
 		m_shds.clear();
 
 		if (info.gapi_type != GAPI_OPENGL) { throw error("wrong shader info!"); }
@@ -71,31 +72,28 @@ namespace NWG {
 		shd_info.gapi_type = GAPI_OPENGL;
 		if (info.source_vtx != "default") {
 			m_shds.push_back(mem_ref<shader>());
-			m_gfx->new_cmp<vtx_shader>("shd_vtx");
-			m_shds.back().set_ref(m_gfx->get_cmp<shader>(1));
+			m_gfx->new_cmp<shader, vtx_shader>(m_shds.back(), "shd_vtx");
 			if (!data_sys::load_file(&info.source_vtx[0], shd_info)) { return false; }
 			if (!m_shds.back()->remake(shd_info)) { throw error("shader was not loaded"); }
-			glAttachShader(m_ogl_id, m_shds.back()->get_ogl_id());
+			glAttachShader(m_native, *static_cast<GLuint*>(m_shds.back()->get_native()));
 		}
 		if (info.source_vtx != "default") {
 			m_shds.push_back(mem_ref<shader>());
-			m_gfx->new_cmp<pxl_shader>("shd_pxl");
-			m_shds.back().set_ref(m_gfx->get_cmp<shader>(2));
+			m_gfx->new_cmp<shader, pxl_shader>(m_shds.back(), "shd_pxl");
 			if (!data_sys::load_file(&info.source_pxl[0], shd_info)) { return false; }
 			if (!m_shds.back()->remake(shd_info)) { throw error("shader was not loaded"); }
-			glAttachShader(m_ogl_id, m_shds.back()->get_ogl_id());
+			glAttachShader(m_native, *static_cast<GLuint*>(m_shds.back()->get_native()));
 		}
 		if (info.source_gmt != "default" && false) {
 			m_shds.push_back(mem_ref<shader>());
-			m_gfx->new_cmp<gmt_shader>("shd_gmt");
-			m_shds.back().set_ref(m_gfx->get_cmp<shader>(3));
+			m_gfx->new_cmp<shader, gmt_shader>(m_shds.back(), "shd_gmt");
 			if (!data_sys::load_file(&info.source_gmt[0], shd_info)) { return false; }
 			if (!m_shds.back()->remake(shd_info)) { throw error("shader was not loaded"); }
-			glAttachShader(m_ogl_id, m_shds.back()->get_ogl_id());
+			glAttachShader(m_native, *static_cast<GLuint*>(m_shds.back()->get_native()));
 		}
 
-		glLinkProgram(m_ogl_id);
-		return (ogl_get_err_log(SHD_PROG, m_ogl_id));
+		glLinkProgram(m_native);
+		return (ogl_get_err_log(SHD_PROG, m_native));
 	}
 	// --==</core_methods>==--
 	// --==<data_methods>==--

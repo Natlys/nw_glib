@@ -10,10 +10,12 @@
 namespace NWG
 {
 	input_layout::input_layout(gfx_engine& graphics) :
-		t_gfx_cmp(graphics),
+		a_gfx_cmp(graphics), t_cmp(),
 		m_shader(nullptr),
-		m_ogl_id(0) { }
-	input_layout::~input_layout() { if (m_ogl_id != 0) { glDeleteVertexArrays(1, &m_ogl_id); m_ogl_id = 0; } }
+		m_native(0)
+	{
+	}
+	input_layout::~input_layout() { if (m_native != 0) { glDeleteVertexArrays(1, &m_native); m_native = 0; } }
 	// --setters
 	void input_layout::set_shader(vtx_shader* shader) { m_shader = shader; }
 	void input_layout::add_elem(const shd_elem& element, si8 count) {
@@ -26,15 +28,18 @@ namespace NWG
 		m_elems.erase(m_elems.begin() + idx % m_elems.size());
 	}
 	// --core_methods
-	void input_layout::on_draw() { glBindVertexArray(m_ogl_id); }
+	void input_layout::on_draw()
+	{
+		glBindVertexArray(m_native);
+	}
 	bool input_layout::remake(vtx_shader& shader)
 	{
 		set_shader(&shader);
 		if (m_shader == nullptr) { return false; }
-		if (m_ogl_id != 0) { glDeleteVertexArrays(1, &m_ogl_id); m_ogl_id = 0; }
+		if (m_native != 0) { glDeleteVertexArrays(1, &m_native); m_native = 0; }
 		if (m_elems.size() == 0) { return false; }
-		glGenVertexArrays(1, &m_ogl_id);
-		glBindVertexArray(m_ogl_id);
+		glGenVertexArrays(1, &m_native);
+		glBindVertexArray(m_native);
 		
 		m_strides.clear();
 		m_strides.push_back(0);
@@ -58,7 +63,7 @@ namespace NWG
 #include <lib/nwg_dx_loader.h>
 namespace NWG {
 	input_layout::input_layout(gfx_engine& graphics) :
-		a_gfx_cmp(graphics),
+		a_gfx_cmp(graphics), t_cmp(),
 		m_shader(nullptr), m_native(nullptr) { }
 	input_layout::~input_layout() { if (m_native != nullptr) { m_native->Release(); m_native = nullptr; } }
 	// --setters

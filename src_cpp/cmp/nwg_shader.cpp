@@ -19,7 +19,7 @@ namespace NWG
 			"--==</shader_info>==--" << std::endl;
 	}
 	in_stream& shader_info::operator>>(in_stream& stm) {
-		char8 str_buf[256];
+		schar str_buf[256];
 		si32 unGApi = 0;
 		si32 unShdType = 0;
 		
@@ -49,12 +49,12 @@ namespace NWG
 namespace NWG
 {
 	shader::shader(gfx_engine& graphics, cstring name, shader_types shd_type) :
-		t_gfx_cmp(graphics), a_data_res(name),
+		a_gfx_cmp(graphics), a_data_res(name),
 		m_info{ GAPI_DEFAULT, shd_type, name, "" },
-		m_ogl_id(0)
+		m_native(0)
 	{
 	}
-	shader::~shader() { if (m_ogl_id != 0) { glDeleteShader(m_ogl_id); m_ogl_id = 0; } }
+	shader::~shader() { if (m_native != 0) { glDeleteShader(m_native); m_native = 0; } }
 	// --setters
 	void shader::set_source_code(cstring soruce_code) { m_info.source_code = soruce_code; }
 	// --==<core_methods>==--
@@ -92,14 +92,14 @@ namespace NWG
 namespace NWG
 {
 	vtx_shader::vtx_shader(gfx_engine& graphics, cstring name) :
-		shader(graphics, name, SHD_VERTEX),
+		shader(graphics, name, SHD_VERTEX), t_cmp(),
 		m_layout(graphics) { }
 	vtx_shader::~vtx_shader() { }
 	// --core_methods
 	void vtx_shader::on_draw() {
 		for (ui8 bi = 0; bi < m_bufs.size(); bi++) {
 			m_bufs[bi]->on_draw();
-			glUniformBlockBinding(m_ogl_id, bi, bi);
+			glUniformBlockBinding(m_native, bi, bi);
 		}
 		for (ui8 bi = 0; bi < m_txrs.size(); bi++) {
 			m_txrs[bi]->set_txr_slot(bi);
@@ -110,18 +110,18 @@ namespace NWG
 	}
 	bit vtx_shader::compile()
 	{
-		if (m_ogl_id != 0) { glDeleteShader(m_ogl_id); m_ogl_id = 0; }
-		m_ogl_id = glCreateShader(GL_VERTEX_SHADER);
+		if (m_native != 0) { glDeleteShader(m_native); m_native = 0; }
+		m_native = glCreateShader(GL_VERTEX_SHADER);
 		m_txrs.clear();
 		m_bufs.clear();
 		m_layout.get_elems().clear();
 
 		if (!code_proc()) { return false; }
 		cstring shader_source = &get_source_code()[0];
-		glShaderSource(m_ogl_id, 1, &shader_source, nullptr);
-		glCompileShader(m_ogl_id);
+		glShaderSource(m_native, 1, &shader_source, nullptr);
+		glCompileShader(m_native);
 
-		return ogl_get_err_log(get_shd_type(), m_ogl_id);
+		return ogl_get_err_log(get_shd_type(), m_native);
 	}
 	bit vtx_shader::code_proc() {
 		if (m_info.source_code.empty() || m_info.source_code == "default") { return false; }
@@ -146,8 +146,7 @@ namespace NWG
 				}
 				else if ((ncurr = str_buf.find("uniform ")) != -1) {
 					m_bufs.push_back(mem_ref<shd_buf>());
-					m_gfx->new_cmp<shd_buf>();
-					m_bufs.back().set_ref(m_gfx->get_cmp<a_gfx_buf>(3));
+					m_gfx->new_cmp<shd_buf>(m_bufs.back());
 					auto& buf = *m_bufs.back();
 
 					stm_code.seekg(-static_cast<si32>(str_buf.length()) + ncurr, std::ios_base::cur);
@@ -182,14 +181,16 @@ namespace NWG
 namespace NWG
 {
 	pxl_shader::pxl_shader(gfx_engine& graphics, cstring name) :
-		shader(graphics, name, SHD_PIXEL) { }
+		shader(graphics, name, SHD_PIXEL), t_cmp()
+	{
+	}
 	pxl_shader::~pxl_shader() { }
 	// --core_methods
 	void pxl_shader::on_draw()
 	{
 		for (ui8 bi = 0; bi < m_bufs.size(); bi++) {
 			m_bufs[bi]->on_draw();
-			glUniformBlockBinding(m_ogl_id, bi, bi);
+			glUniformBlockBinding(m_native, bi, bi);
 		}
 		for (ui8 bi = 0; bi < m_txrs.size(); bi++) {
 			m_txrs[bi]->set_txr_slot(bi);
@@ -199,17 +200,17 @@ namespace NWG
 	}
 	bit pxl_shader::compile()
 	{
-		if (m_ogl_id != 0) { glDeleteShader(m_ogl_id); m_ogl_id = 0; }
-		m_ogl_id = glCreateShader(GL_FRAGMENT_SHADER);
+		if (m_native != 0) { glDeleteShader(m_native); m_native = 0; }
+		m_native = glCreateShader(GL_FRAGMENT_SHADER);
 		m_txrs.clear();
 		m_bufs.clear();
 
 		if (!code_proc()) { return false; }
 		cstring shader_source = &get_source_code()[0];
-		glShaderSource(m_ogl_id, 1, &shader_source, nullptr);
-		glCompileShader(m_ogl_id);
+		glShaderSource(m_native, 1, &shader_source, nullptr);
+		glCompileShader(m_native);
 
-		return ogl_get_err_log(get_shd_type(), m_ogl_id);
+		return ogl_get_err_log(get_shd_type(), m_native);
 	}
 	bit pxl_shader::code_proc() {
 		if (m_info.source_code.empty() || m_info.source_code == "default") { return false; }
@@ -227,8 +228,7 @@ namespace NWG
 				if ((ncurr = str_buf.find("in ")) != -1) { }
 				else if ((ncurr = str_buf.find("uniform ")) != -1) {
 					m_bufs.push_back(mem_ref<shd_buf>());
-					m_gfx->new_cmp<shd_buf>();
-					m_bufs.back().set_ref(m_gfx->get_cmp<a_gfx_buf>(2));
+					m_gfx->new_cmp<shd_buf>(m_bufs.back());
 					auto& buf = *m_bufs.back();
 
 					stm_code.seekg(-static_cast<si32>(str_buf.length()) + ncurr, std::ios_base::cur);
@@ -269,13 +269,15 @@ namespace NWG
 namespace NWG
 {
 	gmt_shader::gmt_shader(gfx_engine& graphics, cstring name) :
-		shader(graphics, name, SHD_GEOMETRY) { }
+		shader(graphics, name, SHD_GEOMETRY), t_cmp()
+	{
+	}
 	gmt_shader::~gmt_shader() { }
 	// --core_methods
 	void gmt_shader::on_draw() {
 		for (ui8 bi = 0; bi < m_bufs.size(); bi++) {
 			m_bufs[bi]->on_draw();
-			glUniformBlockBinding(m_ogl_id, bi, bi);
+			glUniformBlockBinding(m_native, bi, bi);
 		}
 		for (ui8 bi = 0; bi < m_txrs.size(); bi++) {
 			m_txrs[bi]->set_txr_slot(bi);
@@ -285,17 +287,17 @@ namespace NWG
 	}
 	bit gmt_shader::compile()
 	{
-		if (m_ogl_id != 0) { glDeleteShader(m_ogl_id); m_ogl_id = 0; }
-		m_ogl_id = glCreateShader(GL_FRAGMENT_SHADER);
+		if (m_native != 0) { glDeleteShader(m_native); m_native = 0; }
+		m_native = glCreateShader(GL_FRAGMENT_SHADER);
 		m_txrs.clear();
 		m_bufs.clear();
 
 		if (!code_proc()) { return false; }
 		cstring shader_source = &get_source_code()[0];
-		glShaderSource(m_ogl_id, 1, &shader_source, nullptr);
-		glCompileShader(m_ogl_id);
+		glShaderSource(m_native, 1, &shader_source, nullptr);
+		glCompileShader(m_native);
 
-		return ogl_get_err_log(get_shd_type(), m_ogl_id);
+		return ogl_get_err_log(get_shd_type(), m_native);
 	}
 	bit gmt_shader::code_proc() {
 		return true;
@@ -416,16 +418,16 @@ namespace NWG
 	void gmt_shader::Bind() { for (auto& itBuf : m_Bufs) { itBuf->Bind(); } }
 	bool gmt_shader::Compile()
 	{
-		if (m_ogl_id != 0) { glDeleteShader(m_ogl_id); m_ogl_id = 0; }
-		m_ogl_id = glCreateShader(GL_FRAGMENT_SHADER);
+		if (m_native != 0) { glDeleteShader(m_native); m_native = 0; }
+		m_native = glCreateShader(GL_FRAGMENT_SHADER);
 
 		if (!CodeProc()) { return false; }
 		cstring strSource = &m_strCode[0];
-		glShaderSource(m_ogl_id, 1, &strSource, nullptr);
-		glCompileShader(m_ogl_id);
-		glAttachShader(m_pProg == nullptr ? 0 : m_pProg->get_ogl_id(), m_ogl_id);
+		glShaderSource(m_native, 1, &strSource, nullptr);
+		glCompileShader(m_native);
+		glAttachShader(m_pProg == nullptr ? 0 : m_pProg->get_ogl_id(), m_native);
 
-		return ogl_get_err_log(m_sType, m_ogl_id);
+		return ogl_get_err_log(m_sType, m_native);
 	}
 	bool gmt_shader::CodeProc() {
 		return true;
