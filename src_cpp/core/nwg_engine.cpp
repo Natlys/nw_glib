@@ -45,8 +45,8 @@ namespace NW
 		// get the best availabple pixel format for device context;
 		si32 pxl_format = ::ChoosePixelFormat(m_device, &pxf_desc);
 		if (pxl_format == 0) { NW_ERR("Failed to get a pixel format"); return; }
-		// Pixel format can be set to some window only once
-		if (!::SetPixelFormat(m_device, pxl_format, &pxf_desc)) { NW_ERR("Failed to set a pixel format"); return; }
+		// pixel format can be set to some window only once
+		if (!::SetPixelFormat(m_device, pxl_format, &pxf_desc)) { throw error("failed to set pixel format"); return; }
 		::DescribePixelFormat(m_device, pxl_format, pxf_desc.nSize, &pxf_desc);
 		// create opengl context and associate that with the device context;
 		// it will be attached to the current thread and dc;
@@ -72,11 +72,12 @@ namespace NW
 		std::cout << m_info;
 		// also add "GL_MAX_COMBINED_IMAGE_UNITS"
 
-		set_primitive(GPT_TRIANGLES);
-		set_viewport(0, 0, 800, 600);
 
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
+		
+		set_primitive(GPT_TRIANGLES);
+		set_viewport(0, 0, 800, 600);
 	}
 	gfx_engine::~gfx_engine()
 	{
@@ -103,7 +104,7 @@ namespace NW
 	// --==<core_methods>==--
 	void gfx_engine::update()
 	{
-		::SwapBuffers(m_device);
+		SwapBuffers(m_device);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClearColor(
 			m_config.clear_color[0], m_config.clear_color[1],
@@ -229,7 +230,11 @@ namespace NW
 		HRESULT hRes;
 		const Float32 rgbaClear[] = { sinf(TimeSys::GetCurr(0.1)), sinf(TimeSys::GetCurr(0.5)), cosf(TimeSys::GetCurr(0.3)), 1.0f };
 		
+<<<<<<< HEAD
 		if ((hRes = m_pSwap->Prscent(m_config.General.unSwapInterval, 0u)) < 0) { throw(error("something went wrong")); }
+=======
+		if ((hRes = m_pSwap->Present(m_config.General.unSwapInterval, 0u)) < 0) { throw(error("something went wrong")); }
+>>>>>>> 430af4e607072ef3493e27858bfaef3d92e36416
 		m_context->ClearRenderTargetView(m_pTarget, rgbaClear);
 	}
 	void gfx_engine::BeginDraw()

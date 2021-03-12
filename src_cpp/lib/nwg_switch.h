@@ -1,5 +1,5 @@
-#ifndef NW_SWITCH_H
-#define NW_SWITCH_H
+#ifndef NW_GRAPHICS_SWITCH_H
+#define NW_GRAPHICS_SWITCH_H
 #include <nwg_core.hpp>
 #ifdef NW_GAPI
 namespace NW
@@ -77,8 +77,7 @@ namespace NW
 	enum texture_types : ui32 {
 		TXT_DEFAULT = 0,
 		TXT_1D = 1, TXT_2D = 2, TXT_3D = 3,
-		TXT_2D_MULTISAMPLE, TXT_3D_MULTISAMPLE,
-		TXT_CUBE
+		TXT_2D_MULTISAMPLE, TXT_3D_MULTISAMPLE
 	};
 	enum texture_wraps : ui32 {
 		TXW_DEFAULT = 0,
@@ -108,4 +107,4 @@ namespace NW
 	NW_API size dt_get_aligned_size(data_types data_type, si32 count = 1);
 }
 #endif	// NW_GAPI
-#endif	// NW_SWITCH_H
+#endif	// NW_GRAPHICS_SWITCH_H

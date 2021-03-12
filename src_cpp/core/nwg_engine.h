@@ -29,14 +29,14 @@ namespace NW
 		template<class gtype> rsc_tab& get_table()			{ return get_table(type_indexator::get_id<gtype>()); }
 		inline rsc_ref& get_rsc(ui32 type_id, ui32 rsc_id)	{ return m_reg[type_id][rsc_id]; }
 		template<class gtype> rsc_ref& get_rsc(ui32 rsc_id)	{ return get_rsc(type_indexator::get_id<gtype>(), rsc_id); }
+		inline bit has_rsc(ui32 type_id, ui32 rsc_id)		{ return m_reg[type_id].find(rsc_id) != m_reg[type_id].end(); }
+		template<class gtype> bit has_rsc(ui32 rsc_id)		{ return has_rsc(type_indexator::get_id<gtype>(), rsc_id); }
 		// --setters
 		void set_primitive(gfx_primitives primitive_topology);
 		void set_viewport(si32 coord_x, si32 coord_y, si32 size_x, si32 size_y);
 		void set_vsync(bit enable);
 		// --predicates
-		inline bit is_vsync() const { return m_config.swap_interval == 1; }
-		inline bit has_rsc(ui32 type_id, ui32 rsc_id)		{ return m_reg[type_id].find(rsc_id) != m_reg[type_id].end(); }
-		template<class gtype> bit has_rsc(ui32 rsc_id)		{ return has_rsc(type_indexator::get_id<gtype>(), rsc_id); }
+		inline bit is_vsync() const		{ return m_config.swap_interval == 1; }
 		// --core_methods
 		void update();
 		/// --create new graphics rscource by the ref of appropriate type

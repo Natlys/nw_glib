@@ -66,7 +66,7 @@ namespace NW
 				stm_code.seekg(-static_cast<si32>(strlen(&str_buf[0])), std::ios_base::cur);
 				std::getline(stm_code, str_buf, ';');
 				if ((ncurr = str_buf.find("in ")) != -1) {
-					stm_code.seekg(-static_cast<si32>(str_buf.length()) + ncurr, std::ios_base::cur);
+					stm_code.seekg(-static_cast<si32>(stm_code.gcount()) + ncurr, std::ios_base::cur);
 					stm_code >> str_buf;	// read the token "in "
 
 					stm_code >> str_buf;	// read the type
@@ -79,15 +79,15 @@ namespace NW
 					auto& buf = *m_bufs.back();
 					buf.set_slot(m_bufs.size() - 1);
 					// come back
-					stm_code.seekg(-static_cast<si32>(str_buf.length()) + ncurr, std::ios_base::cur);
+					stm_code.seekg(-static_cast<si32>(stm_code.gcount()) + ncurr, std::ios_base::cur);
 					stm_code >> str_buf;	// read the token ")uniform{"
 					stm_code >> name;	// read the name
 					if ((ncurr = name.find("{")) != -1) {
-						if (name.length() > ncurr) { stm_code.seekg(-static_cast<si32>(name.length()), std::ios_base::cur); }
+						if (name.length() > ncurr) { stm_code.seekg(-static_cast<si32>(stm_code.gcount()), std::ios_base::cur); }
 						name = name.substr(0, ncurr);
 					}
 					// come back
-					stm_code.seekg(-static_cast<si32>(str_buf.length()) + ncurr, std::ios_base::cur);
+					stm_code.seekg(-static_cast<si32>(stm_code.gcount()) + ncurr, std::ios_base::cur);
 					// read the entire uniform block
 					std::getline(stm_code, str_buf, '{');
 					std::getline(stm_code, str_buf, '}');
