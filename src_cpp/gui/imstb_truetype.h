@@ -700,7 +700,7 @@ STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data);
 // collection (.ttc) files may contain multiple fonts, while TrueType font
 // (.ttf) files only contain one font. The number of fonts can be used for
 // indexing with the previous function where the index is between zero and one
-// less than the total fonts. If an error occurs, -1 is returned.
+// less than the total fonts. If an a_err occurs, -1 is returned.
 
 STBTT_DEF int stbtt_GetFontOffsetForIndex(const unsigned char *data, int index);
 // Each .ttf/.ttc file may have more than one font. Each font has a sequential
@@ -912,7 +912,7 @@ typedef struct
 
 // rasterize a shape with quadratic beziers into a bitmap
 STBTT_DEF void stbtt_Rasterize(stbtt__bitmap *result,        // 1-channel bitmap to draw into
-                               float flatness_in_pixels,     // allowable error of curve in pixels
+                               float flatness_in_pixels,     // allowable a_err of curve in pixels
                                stbtt_vertex *vertices,       // array of vertices defining shape
                                int num_verts,                // number of vertices in above array
                                float scale_x, float scale_y, // scale applied to input vertices
@@ -1093,7 +1093,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 #endif
 
 #if STBTT_MAX_OVERSAMPLE > 255
-#error "STBTT_MAX_OVERSAMPLE cannot be > 255"
+#a_err "STBTT_MAX_OVERSAMPLE cannot be > 255"
 #endif
 
 typedef int stbtt__test_oversample_pow2[(STBTT_MAX_OVERSAMPLE & (STBTT_MAX_OVERSAMPLE-1)) == 0 ? 1 : -1];
@@ -2731,7 +2731,7 @@ typedef struct stbtt__active_edge
    float sy;
    float ey;
    #else
-   #error "Unrecognized value of STBTT_RASTERIZER_VERSION"
+   #a_err "Unrecognized value of STBTT_RASTERIZER_VERSION"
    #endif
 } stbtt__active_edge;
 
@@ -2780,7 +2780,7 @@ static stbtt__active_edge *stbtt__new_active(stbtt__hheap *hh, stbtt__edge *e, i
    return z;
 }
 #else
-#error "Unrecognized value of STBTT_RASTERIZER_VERSION"
+#a_err "Unrecognized value of STBTT_RASTERIZER_VERSION"
 #endif
 
 #if STBTT_RASTERIZER_VERSION == 1
@@ -3183,7 +3183,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             if (z != NULL) {
                if (j == 0 && off_y != 0) {
                   if (z->ey < scan_y_top) {
-                     // this can happen due to subpixel positioning and some kind of fp rounding error i think
+                     // this can happen due to subpixel positioning and some kind of fp rounding a_err i think
                      z->ey = scan_y_top;
                   }
                }
@@ -3231,7 +3231,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
       STBTT_free(scanline, userdata);
 }
 #else
-#error "Unrecognized value of STBTT_RASTERIZER_VERSION"
+#a_err "Unrecognized value of STBTT_RASTERIZER_VERSION"
 #endif
 
 #define STBTT__COMPARE(a,b)  ((a)->y0 < (b)->y0)
@@ -3337,7 +3337,7 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, int *wcou
 #elif STBTT_RASTERIZER_VERSION == 2
    int vsubsample = 1;
 #else
-   #error "Unrecognized value of STBTT_RASTERIZER_VERSION"
+   #a_err "Unrecognized value of STBTT_RASTERIZER_VERSION"
 #endif
    // vsubsample should divide 255 evenly; otherwise we won't reach full opacity
 
@@ -3402,7 +3402,7 @@ static int stbtt__tesselate_curve(stbtt__point *points, int *num_points, float x
    float dy = (y0+y2)/2 - my;
    if (n > 16) // 65536 segments on one curve better be enough!
       return 1;
-   if (dx*dx+dy*dy > objspace_flatness_squared) { // half-pixel error allowed... need to be smaller if AA
+   if (dx*dx+dy*dy > objspace_flatness_squared) { // half-pixel a_err allowed... need to be smaller if AA
       stbtt__tesselate_curve(points, num_points, x0,y0, (x0+x1)/2.0f,(y0+y1)/2.0f, mx,my, objspace_flatness_squared,n+1);
       stbtt__tesselate_curve(points, num_points, mx,my, (x1+x2)/2.0f,(y1+y2)/2.0f, x2,y2, objspace_flatness_squared,n+1);
    } else {
@@ -3483,7 +3483,7 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
       float x=0,y=0;
       if (pass == 1) {
          points = (stbtt__point *) STBTT_malloc(num_points * sizeof(points[0]), userdata);
-         if (points == NULL) goto error;
+         if (points == NULL) goto a_err;
       }
       num_points = 0;
       n= -1;
@@ -3524,7 +3524,7 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
    }
 
    return points;
-error:
+a_err:
    STBTT_free(points, userdata);
    STBTT_free(*contour_lengths, userdata);
    *contour_lengths = 0;
@@ -3571,7 +3571,7 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
    // now we get the size
    gbm.w = (ix1 - ix0);
    gbm.h = (iy1 - iy0);
-   gbm.pixels = NULL; // in case we error
+   gbm.pixels = NULL; // in case we a_err
 
    if (width ) *width  = gbm.w;
    if (height) *height = gbm.h;
@@ -4846,7 +4846,7 @@ STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const
 //   0.5  (2011-12-09) bugfixes:
 //                        subpixel glyph renderer computed wrong bounding box
 //                        first vertex of shape can be off-curve (FreeSans)
-//   0.4b (2011-12-03) fixed an error in the font baking example
+//   0.4b (2011-12-03) fixed an a_err in the font baking example
 //   0.4  (2011-12-01) kerning, subpixel rendering (tor)
 //                    bugfixes for:
 //                        codepoint-to-glyph conversion using table fmt=12

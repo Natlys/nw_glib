@@ -252,7 +252,7 @@ imgui_style::imgui_style()
     AntiAliasedLinesUseTex  = true;             // Enable anti-aliased lines/borders using textures where possible. Require back-end to render with bilinear filtering.
     AntiAliasedFill         = true;             // Enable anti-aliased filled shapes (rounded rectangles, circles, etc.).
     CurveTessellationTol    = 1.25f;            // Tessellation tolerance when using PathBezierCurveTo() without a specific number of segments. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
-    CircleSegmentMaxError   = 1.60f;            // Maximum error (in pixels) allowed when using AddCircle()/AddCircleFilled() or drawing rounded corner rectangles with no explicit segment count specified. Decrease for higher quality but more geometry.
+    CircleSegmentMaxError   = 1.60f;            // Maximum a_err (in pixels) allowed when using AddCircle()/AddCircleFilled() or drawing rounded corner rectangles with no explicit segment count specified. Decrease for higher quality but more geometry.
 
     // Default theme
     GUI::StyleColorsDark(this);
@@ -856,7 +856,7 @@ void*   ImFileLoadToMemory(const char* filename, const char* mode, size_t* out_f
 
 // Convert UTF-8 to 32-bit character, process single character input.
 // Based on stb_from_utf8() from github.com/nothings/stb/
-// We handle UTF-8 decoding error by skipping forward.
+// We handle UTF-8 decoding a_err by skipping forward.
 int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end)
 {
     unsigned int c = (unsigned int)-1;
@@ -3387,7 +3387,7 @@ void GUI::Initialize(ImGuiContext* context)
     imgui_viewportP* viewport = IM_NEW(imgui_viewportP)();
     viewport->ID = IMGUI_VIEWPORT_DEFAULT_ID;
     viewport->Idx = 0;
-    viewport->PlatformWindowCreated = true;
+    viewport->WindowCreated = true;
     g.Viewports.push_back(viewport);
     g.PlatformIO.MainViewport = g.Viewports[0]; // Make it accessible in public-facing GetPlatformIO() immediately (before the first call to EndFrame)
     g.PlatformIO.Viewports.push_back(g.Viewports[0]);
@@ -3427,7 +3427,7 @@ void GUI::Shutdown(ImGuiContext* context)
     // Destroy platform windows
     ImGuiContext* backup_context = GUI::GetCurrentContext();
     SetCurrentContext(context);
-    DestroyPlatformWindows();
+    DestroyWindows();
     SetCurrentContext(backup_context);
 
     // Shutdown extensions
@@ -3711,7 +3711,7 @@ void GUI::EndFrame()
 
     // Notify OS when our Input Method Editor cursor has moved (e.g. CJK inputs using Microsoft IME)
     if (g.PlatformIO.Platform_SetImeInputPos && (g.PlatformImeLastPos.x == FLT_MAX || ImLengthSqr(g.PlatformImePos - g.PlatformImeLastPos) > 0.0001f))
-        if (g.PlatformImePosViewport && g.PlatformImePosViewport->PlatformWindowCreated)
+        if (g.PlatformImePosViewport && g.PlatformImePosViewport->WindowCreated)
         {
             g.PlatformIO.Platform_SetImeInputPos(g.PlatformImePosViewport, g.PlatformImePos);
             g.PlatformImeLastPos = g.PlatformImePos;
@@ -6735,15 +6735,15 @@ bool GUI::IsRectVisible(const ImVec2& rect_min, const ImVec2& rect_max)
 // We usually require settings to be in imconfig.h to make sure that they are accessible to all compilation units involved with Dear ImGui.
 bool GUI::DebugCheckVersionAndDataLayout(const char* version, size_t sz_io, size_t sz_style, size_t sz_vec2, size_t sz_vec4, size_t sz_vert, size_t sz_idx)
 {
-    bool error = false;
-    if (strcmp(version, IMGUI_VERSION) != 0) { error = true; IM_ASSERT(strcmp(version, IMGUI_VERSION) == 0 && "Mismatched version string!"); }
-    if (sz_io != sizeof(imgui_io)) { error = true; IM_ASSERT(sz_io == sizeof(imgui_io) && "Mismatched struct layout!"); }
-    if (sz_style != sizeof(imgui_style)) { error = true; IM_ASSERT(sz_style == sizeof(imgui_style) && "Mismatched struct layout!"); }
-    if (sz_vec2 != sizeof(ImVec2)) { error = true; IM_ASSERT(sz_vec2 == sizeof(ImVec2) && "Mismatched struct layout!"); }
-    if (sz_vec4 != sizeof(ImVec4)) { error = true; IM_ASSERT(sz_vec4 == sizeof(ImVec4) && "Mismatched struct layout!"); }
-    if (sz_vert != sizeof(ImDrawVert)) { error = true; IM_ASSERT(sz_vert == sizeof(ImDrawVert) && "Mismatched struct layout!"); }
-    if (sz_idx != sizeof(ImDrawIdx)) { error = true; IM_ASSERT(sz_idx == sizeof(ImDrawIdx) && "Mismatched struct layout!"); }
-    return !error;
+    bool a_err = false;
+    if (strcmp(version, IMGUI_VERSION) != 0) { a_err = true; IM_ASSERT(strcmp(version, IMGUI_VERSION) == 0 && "Mismatched version string!"); }
+    if (sz_io != sizeof(imgui_io)) { a_err = true; IM_ASSERT(sz_io == sizeof(imgui_io) && "Mismatched struct layout!"); }
+    if (sz_style != sizeof(imgui_style)) { a_err = true; IM_ASSERT(sz_style == sizeof(imgui_style) && "Mismatched struct layout!"); }
+    if (sz_vec2 != sizeof(ImVec2)) { a_err = true; IM_ASSERT(sz_vec2 == sizeof(ImVec2) && "Mismatched struct layout!"); }
+    if (sz_vec4 != sizeof(ImVec4)) { a_err = true; IM_ASSERT(sz_vec4 == sizeof(ImVec4) && "Mismatched struct layout!"); }
+    if (sz_vert != sizeof(ImDrawVert)) { a_err = true; IM_ASSERT(sz_vert == sizeof(ImDrawVert) && "Mismatched struct layout!"); }
+    if (sz_idx != sizeof(ImDrawIdx)) { a_err = true; IM_ASSERT(sz_idx == sizeof(ImDrawIdx) && "Mismatched struct layout!"); }
+    return !a_err;
 }
 
 static void GUI::ErrorCheckNewFrameSanityChecks()
@@ -6759,7 +6759,7 @@ static void GUI::ErrorCheckNewFrameSanityChecks()
     if (true) IM_ASSERT(1); else IM_ASSERT(0);
 
     // Check user data
-    // (We pass an error message in the assert expression to make it visible to programmers who are not using a debugger, as most assert handlers display their argument)
+    // (We pass an a_err message in the assert expression to make it visible to programmers who are not using a debugger, as most assert handlers display their argument)
     IM_ASSERT(g.Initialized);
     IM_ASSERT((g.IO.DeltaTime > 0.0f || g.FrameCount == 0)              && "Need a positive DeltaTime!");
     IM_ASSERT((g.FrameCount == 0 || g.FrameCountEnded == g.FrameCount)  && "Forgot to call Render() or EndFrame() at the end of the previous frame?");
@@ -6782,7 +6782,7 @@ static void GUI::ErrorCheckNewFrameSanityChecks()
     if (g.IO.ConfigWindowsResizeFromEdges && !(g.IO.BackendFlags & ImGuiBackendFlags_HasMouseCursors))
         g.IO.ConfigWindowsResizeFromEdges = false;
 
-    // Perform simple check: error if Docking or Viewport are enabled _exactly_ on frame 1 (instead of frame 0 or later), which is a common error leading to loss of .ini data.
+    // Perform simple check: a_err if Docking or Viewport are enabled _exactly_ on frame 1 (instead of frame 0 or later), which is a common a_err leading to loss of .ini data.
     if (g.FrameCount == 1 && (g.IO.ConfigFlags & ImGuiConfigFlags_DockingEnable) && (g.ConfigFlagsLastFrame & ImGuiConfigFlags_DockingEnable) == 0)
         IM_ASSERT(0 && "Please set DockingEnable before the first call to NewFrame()! Otherwise you will lose your .ini settings!");
     if (g.FrameCount == 1 && (g.IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) && (g.ConfigFlagsLastFrame & ImGuiConfigFlags_ViewportsEnable) == 0)
@@ -6793,7 +6793,7 @@ static void GUI::ErrorCheckNewFrameSanityChecks()
     {
         if ((g.IO.BackendFlags & ImGuiBackendFlags_PlatformHasViewports) && (g.IO.BackendFlags & ImGuiBackendFlags_RendererHasViewports))
         {
-            IM_ASSERT((g.FrameCount == 0 || g.FrameCount == g.FrameCountPlatformEnded) && "Forgot to call UpdatePlatformWindows() in main loop after EndFrame()? Check examples/ applications for reference.");
+            IM_ASSERT((g.FrameCount == 0 || g.FrameCount == g.FrameCountPlatformEnded) && "Forgot to call UpdateWindows() in main loop after EndFrame()? Check examples/ applications for reference.");
             IM_ASSERT(g.PlatformIO.Platform_CreateWindow  != NULL && "Platform init didn't install handlers?");
             IM_ASSERT(g.PlatformIO.Platform_DestroyWindow != NULL && "Platform init didn't install handlers?");
             IM_ASSERT(g.PlatformIO.Platform_GetWindowPos  != NULL && "Platform init didn't install handlers?");
@@ -6852,7 +6852,7 @@ static void GUI::ErrorCheckEndFrameSanityChecks()
     }
 }
 
-// Save and compare stack sizes on Begin()/End() to detect usage errors
+// Save and compare stack sizes on Begin()/End() to detect usage a_errs
 // Begin() calls this with write=true
 // End() calls this with write=false
 static void GUI::ErrorCheckBeginEndCompareStacksSize(ImGuiWindow* window, bool write)
@@ -7689,7 +7689,7 @@ void GUI::OpenPopupEx(ImGuiID id, ImGuiPopupFlags popup_flags)
     {
         // Gently handle the user mistakenly calling OpenPopup() every frame. It is a programming mistake! However, if we were to run the regular code path, the ui
         // would become completely unusable because the popup will always be in hidden-while-calculating-size state _while_ claiming focus. Which would be a very confusing
-        // situation for the programmer. Instead, we silently allow the popup to proceed, it will keep reappearing and the programming error will be more obvious to understand.
+        // situation for the programmer. Instead, we silently allow the popup to proceed, it will keep reappearing and the programming a_err will be more obvious to understand.
         if (g.OpenPopupStack[current_stack_size].PopupId == id && g.OpenPopupStack[current_stack_size].OpenFrameCount == g.FrameCount - 1)
         {
             g.OpenPopupStack[current_stack_size].OpenFrameCount = popup_ref.OpenFrameCount;
@@ -9885,7 +9885,7 @@ void GUI::LoadIniSettingsFromDisk(const char* ini_filename)
     IM_FREE(file_data);
 }
 
-// Zero-tolerance, no error reporting, cheap .ini parsing
+// Zero-tolerance, no a_err reporting, cheap .ini parsing
 void GUI::LoadIniSettingsFromMemory(const char* ini_data, size_t ini_size)
 {
     ImGuiContext& g = *GImGui;
@@ -10109,18 +10109,18 @@ static void WindowSettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandl
 // - UpdateTryMergeWindowIntoHostViewports() [Internal]
 // - TranslateWindowsInViewport() [Internal]
 // - ScaleWindowsInViewport() [Internal]
-// - FindHoveredViewportFromPlatformWindowStack() [Internal]
+// - FindHoveredViewportFromWindowStack() [Internal]
 // - UpdateViewportsNewFrame() [Internal]
 // - UpdateViewportsEndFrame() [Internal]
 // - AddUpdateViewport() [Internal]
 // - UpdateSelectWindowViewport() [Internal]
-// - UpdatePlatformWindows()
-// - RenderPlatformWindowsDefault()
+// - UpdateWindows()
+// - RenderWindowsDefault()
 // - FindPlatformMonitorForPos() [Internal]
 // - FindPlatformMonitorForRect() [Internal]
 // - UpdateViewportPlatformMonitor() [Internal]
-// - DestroyPlatformWindow() [Internal]
-// - DestroyPlatformWindows()
+// - DestroyWindow() [Internal]
+// - DestroyWindows()
 //-----------------------------------------------------------------------------
 
 imgui_viewport* GUI::GetMainViewport()
@@ -10267,7 +10267,7 @@ void GUI::ScaleWindowsInViewport(imgui_viewportP* viewport, float scale)
 // If the back-end doesn't set MouseLastHoveredViewport or doesn't honor imgui_viewportFlags_NoInputs, we do a search ourselves.
 // A) It won't take account of the possibility that non-imgui windows may be in-between our dragged window and our target window.
 // B) It requires Platform_GetWindowFocus to be implemented by back-end.
-static imgui_viewportP* FindHoveredViewportFromPlatformWindowStack(const ImVec2 mouse_platform_pos)
+static imgui_viewportP* FindHoveredViewportFromWindowStack(const ImVec2 mouse_platform_pos)
 {
     ImGuiContext& g = *GImGui;
     imgui_viewportP* best_candidate = NULL;
@@ -10295,7 +10295,7 @@ static void GUI::UpdateViewportsNewFrame()
         for (int n = 0; n < g.Viewports.Size; n++)
         {
             imgui_viewportP* viewport = g.Viewports[n];
-            const bool platform_funcs_available = viewport->PlatformWindowCreated;
+            const bool platform_funcs_available = viewport->WindowCreated;
             if (g.PlatformIO.Platform_GetWindowMinimized && platform_funcs_available)
             {
                 bool minimized = g.PlatformIO.Platform_GetWindowMinimized(viewport);
@@ -10345,18 +10345,18 @@ static void GUI::UpdateViewportsNewFrame()
 
             // Destroy
             IMGUI_DEBUG_LOG_VIEWPORT("Delete Viewport %08X (%s)\n", viewport->ID, viewport->Window ? viewport->Window->Name : "n/a");
-            DestroyPlatformWindow(viewport); // In most circumstances the platform window will already be destroyed here.
+            DestroyWindow(viewport); // In most circumstances the platform window will already be destroyed here.
             IM_ASSERT(g.PlatformIO.Viewports.contains(viewport) == false);
             IM_DELETE(viewport);
             n--;
             continue;
         }
 
-        const bool platform_funcs_available = viewport->PlatformWindowCreated;
+        const bool platform_funcs_available = viewport->WindowCreated;
         if (viewports_enabled)
         {
             // Update Position and Size (from Platform Window to ImGui) if requested.
-            // We do it early in the frame instead of waiting for UpdatePlatformWindows() to avoid a frame of lag when moving/resizing using OS facilities.
+            // We do it early in the frame instead of waiting for UpdateWindows() to avoid a frame of lag when moving/resizing using OS facilities.
             if (!(viewport->Flags & imgui_viewportFlags_Minimized) && platform_funcs_available)
             {
                 if (viewport->PlatformRequestMove)
@@ -10424,7 +10424,7 @@ static void GUI::UpdateViewportsNewFrame()
         {
             // Back-end failed at honoring its contract if it returned a viewport with the _NoInputs flag.
             IM_ASSERT(0);
-            viewport_hovered = FindHoveredViewportFromPlatformWindowStack(g.IO.MousePos);
+            viewport_hovered = FindHoveredViewportFromWindowStack(g.IO.MousePos);
         }
     }
     else
@@ -10432,7 +10432,7 @@ static void GUI::UpdateViewportsNewFrame()
         // If the back-end doesn't know how to honor imgui_viewportFlags_NoInputs, we do a search ourselves. Note that this search:
         // A) won't take account of the possibility that non-imgui windows may be in-between our dragged window and our target window.
         // B) uses LastFrameAsRefViewport as a flawed replacement for the last time a window was focused (we could/should fix that by introducing Focus functions in PlatformIO)
-        viewport_hovered = FindHoveredViewportFromPlatformWindowStack(g.IO.MousePos);
+        viewport_hovered = FindHoveredViewportFromWindowStack(g.IO.MousePos);
     }
     if (viewport_hovered != NULL)
         g.MouseLastHoveredViewport = viewport_hovered;
@@ -10479,7 +10479,7 @@ static void GUI::UpdateViewportsEndFrame()
             IM_ASSERT(viewport->Window != NULL);
         g.PlatformIO.Viewports.push_back(viewport);
     }
-    g.Viewports[0]->ClearRequestFlags(); // Clear main viewport flags because UpdatePlatformWindows() won't do it and may not even be called
+    g.Viewports[0]->ClearRequestFlags(); // Clear main viewport flags because UpdateWindows() won't do it and may not even be called
 }
 
 // FIXME: We should ideally refactor the system to call this every frame (we currently don't)
@@ -10672,10 +10672,10 @@ static void GUI::UpdateSelectWindowViewport(ImGuiWindow* window)
 
 // Called by user at the end of the main loop, after EndFrame()
 // This will handle the creation/update of all OS windows via function defined in the imgui_platform_io api.
-void GUI::UpdatePlatformWindows()
+void GUI::UpdateWindows()
 {
     ImGuiContext& g = *GImGui;
-    IM_ASSERT(g.FrameCountEnded == g.FrameCount && "Forgot to call Render() or EndFrame() before UpdatePlatformWindows()?");
+    IM_ASSERT(g.FrameCountEnded == g.FrameCount && "Forgot to call Render() or EndFrame() before UpdateWindows()?");
     IM_ASSERT(g.FrameCountPlatformEnded < g.FrameCount);
     g.FrameCountPlatformEnded = g.FrameCount;
     if (!(g.ConfigFlagsCurrFrame & ImGuiConfigFlags_ViewportsEnable))
@@ -10688,13 +10688,13 @@ void GUI::UpdatePlatformWindows()
         imgui_viewportP* viewport = g.Viewports[i];
 
         // Destroy platform window if the viewport hasn't been submitted or if it is hosting a hidden window
-        // (the implicit/fallback Debug##Default window will be registering its viewport then be disabled, causing a dummy DestroyPlatformWindow to be made each frame)
+        // (the implicit/fallback Debug##Default window will be registering its viewport then be disabled, causing a dummy DestroyWindow to be made each frame)
         bool destroy_platform_window = false;
         destroy_platform_window |= (viewport->LastFrameActive < g.FrameCount - 1);
         destroy_platform_window |= (viewport->Window && !IsWindowActiveAndVisible(viewport->Window));
         if (destroy_platform_window)
         {
-            DestroyPlatformWindow(viewport);
+            DestroyWindow(viewport);
             continue;
         }
 
@@ -10703,7 +10703,7 @@ void GUI::UpdatePlatformWindows()
             continue;
 
         // Create window
-        bool is_new_platform_window = (viewport->PlatformWindowCreated == false);
+        bool is_new_platform_window = (viewport->WindowCreated == false);
         if (is_new_platform_window)
         {
             IMGUI_DEBUG_LOG_VIEWPORT("Create Platform Window %08X (%s)\n", viewport->ID, viewport->Window ? viewport->Window->Name : "n/a");
@@ -10713,7 +10713,7 @@ void GUI::UpdatePlatformWindows()
             viewport->LastNameHash = 0;
             viewport->LastPlatformPos = viewport->LastPlatformSize = ImVec2(FLT_MAX, FLT_MAX); // By clearing those we'll enforce a call to Platform_SetWindowPos/Size below, before Platform_ShowWindow (FIXME: Is that necessary?)
             viewport->LastRendererSize = viewport->Size;                                       // We don't need to call Renderer_SetWindowSize() as it is expected Renderer_CreateWindow() already did it.
-            viewport->PlatformWindowCreated = true;
+            viewport->WindowCreated = true;
         }
 
         // Apply Position and Size (from ImGui to Platform/Renderer back-ends)
@@ -10778,7 +10778,7 @@ void GUI::UpdatePlatformWindows()
         for (int n = 0; n < g.Viewports.Size && focused_viewport == NULL; n++)
         {
             imgui_viewportP* viewport = g.Viewports[n];
-            if (viewport->PlatformWindowCreated)
+            if (viewport->WindowCreated)
                 if (g.PlatformIO.Platform_GetWindowFocus(viewport))
                     focused_viewport = viewport;
         }
@@ -10803,25 +10803,21 @@ void GUI::UpdatePlatformWindows()
 //        if ((platform_io.Viewports[i]->Flags & imgui_viewportFlags_Minimized) == 0)
 //            MySwapBufferFunction(platform_io.Viewports[i], my_args);
 //
-void GUI::RenderPlatformWindowsDefault(void* platform_render_arg, void* renderer_render_arg)
+void GUI::RenderWindowsDefault(void* platform_render_arg, void* renderer_render_arg)
 {
     // Skip the main viewport (index 0), which is always fully handled by the application!
     imgui_platform_io& platform_io = GUI::GetPlatformIO();
-    for (int i = 1; i < platform_io.Viewports.Size; i++)
-    {
+    for (int i = 1; i < platform_io.Viewports.Size; i++) {
         imgui_viewport* viewport = platform_io.Viewports[i];
-        if (viewport->Flags & imgui_viewportFlags_Minimized)
-            continue;
-        if (platform_io.Platform_RenderWindow) platform_io.Platform_RenderWindow(viewport, platform_render_arg);
-        if (platform_io.Renderer_RenderWindow) platform_io.Renderer_RenderWindow(viewport, renderer_render_arg);
+        if (viewport->Flags & imgui_viewportFlags_Minimized) { continue; }
+        if (platform_io.Platform_RenderWindow) { platform_io.Platform_RenderWindow(viewport, platform_render_arg); }
+        if (platform_io.Renderer_RenderWindow) { platform_io.Renderer_RenderWindow(viewport, renderer_render_arg); }
     }
-    for (int i = 1; i < platform_io.Viewports.Size; i++)
-    {
+    for (int i = 1; i < platform_io.Viewports.Size; i++) {
         imgui_viewport* viewport = platform_io.Viewports[i];
-        if (viewport->Flags & imgui_viewportFlags_Minimized)
-            continue;
-        if (platform_io.Platform_SwapBuffers) platform_io.Platform_SwapBuffers(viewport, platform_render_arg);
-        if (platform_io.Renderer_SwapBuffers) platform_io.Renderer_SwapBuffers(viewport, renderer_render_arg);
+        if (viewport->Flags & imgui_viewportFlags_Minimized) { continue; }
+        if (platform_io.Platform_SwapBuffers) { platform_io.Platform_SwapBuffers(viewport, platform_render_arg); }
+        if (platform_io.Renderer_SwapBuffers) { platform_io.Renderer_SwapBuffers(viewport, renderer_render_arg); }
     }
 }
 
@@ -10877,10 +10873,10 @@ static void GUI::UpdateViewportPlatformMonitor(imgui_viewportP* viewport)
     viewport->PlatformMonitor = (short)FindPlatformMonitorForRect(viewport->GetMainRect());
 }
 
-void GUI::DestroyPlatformWindow(imgui_viewportP* viewport)
+void GUI::DestroyWindow(imgui_viewportP* viewport)
 {
     ImGuiContext& g = *GImGui;
-    if (viewport->PlatformWindowCreated)
+    if (viewport->WindowCreated)
     {
         if (g.PlatformIO.Renderer_DestroyWindow)
             g.PlatformIO.Renderer_DestroyWindow(viewport);
@@ -10888,10 +10884,10 @@ void GUI::DestroyPlatformWindow(imgui_viewportP* viewport)
             g.PlatformIO.Platform_DestroyWindow(viewport);
         IM_ASSERT(viewport->RendererUserData == NULL && viewport->PlatformUserData == NULL);
 
-        // Don't clear PlatformWindowCreated for the main viewport, as we initially set that up to true in Initialize()
+        // Don't clear WindowCreated for the main viewport, as we initially set that up to true in Initialize()
         // The right-er way may be to leave it to the back-end to set this flag all-together, and made the flag public.
         if (viewport->ID != IMGUI_VIEWPORT_DEFAULT_ID)
-            viewport->PlatformWindowCreated = false;
+            viewport->WindowCreated = false;
     }
     else
     {
@@ -10901,7 +10897,7 @@ void GUI::DestroyPlatformWindow(imgui_viewportP* viewport)
     viewport->ClearRequestFlags();
 }
 
-void GUI::DestroyPlatformWindows()
+void GUI::DestroyWindows()
 {
     // We call the destroy window on every viewport (including the main viewport, index 0) to give a chance to the back-end
     // to clear any data they may have stored in e.g. PlatformUserData, RendererUserData.
@@ -10910,8 +10906,9 @@ void GUI::DestroyPlatformWindows()
     // It is expected that the back-end can handle calls to Renderer_DestroyWindow/Platform_DestroyWindow without
     // crashing if it doesn't have data stored.
     ImGuiContext& g = *GImGui;
-    for (int i = 0; i < g.Viewports.Size; i++)
-        DestroyPlatformWindow(g.Viewports[i]);
+    for (int i = 0; i < g.Viewports.Size; i++) {
+        DestroyWindow(g.Viewports[i]);
+    }
 }
 
 

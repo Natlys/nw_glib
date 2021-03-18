@@ -1,5 +1,5 @@
-#ifndef NW_GRAPHICS_SWITCH_H
-#define NW_GRAPHICS_SWITCH_H
+#ifndef NWG_SWITCH_H
+#define NWG_SWITCH_H
 #include <nwg_core.hpp>
 #ifdef NW_GAPI
 namespace NW
@@ -9,7 +9,7 @@ namespace NW
 		GAPI_OPENGL = NW_GAPI_OGL,
 		GAPI_DIRECTX = NW_GAPI_DX,
 	};
-	enum shader_types : si32 {
+	enum shd_types : si32 {
 		SHD_DEFAULT = 0,
 		SHD_VERTEX = 1, SHD_PIXEL = 2, SHD_GEOMETRY = 3,
 		SHD_PROG = 4,
@@ -27,11 +27,11 @@ namespace NW
 		FB_COLOR = 1, FB_DEPTH = 2, FB_STENCIL = 3,
 		FB_DEPTH_STENCIL,
 	};
-	enum gfx_cameraTypes : si32 {
+	enum camera_types : si32 {
 		GCT_DEFAULT = 0,
 		GCT_ORTHO = 1, GCT_PERSPECT = 2,
 	};
-	enum gfx_cameraModes : si32 {
+	enum camera_modes : si32 {
 		GCM_DEFAULT = 0,
 		GCM_2D = 2, GCM_3D = 3,
 	};
@@ -74,20 +74,20 @@ namespace NW
 		STC_INCR = 0, STC_DECR = 1,
 		STC_KEEP, STC_ZERO, STC_REPLACE, STC_INVERT,
 	};
-	enum texture_types : ui32 {
+	enum txr_types : ui32 {
 		TXT_DEFAULT = 0,
 		TXT_1D = 1, TXT_2D = 2, TXT_3D = 3,
 		TXT_2D_MULTISAMPLE, TXT_3D_MULTISAMPLE
 	};
-	enum texture_wraps : ui32 {
+	enum txr_wraps : ui32 {
 		TXW_DEFAULT = 0,
 		TXW_REPEAT = 1, TXW_CLAMP = 2, TXW_BORDER = 3,
 	};
-	enum texture_filters : ui32 {
+	enum txr_filters : ui32 {
 		TXFL_DEFAULT = 0,
 		TXFL_LINEAR, TXFL_NEAREST,
 	};
-	enum texture_formats : ui32 {
+	enum txr_formats : ui32 {
 		TXF_DEFAULT = 0u,
 		TXF_RGB = 1, TXF_RGBA = 2,
 		TXF_GRAY, TXF_IDX,
@@ -107,4 +107,4 @@ namespace NW
 	NW_API size dt_get_aligned_size(data_types data_type, si32 count = 1);
 }
 #endif	// NW_GAPI
-#endif	// NW_GRAPHICS_SWITCH_H
+#endif	// NWG_SWITCH_H

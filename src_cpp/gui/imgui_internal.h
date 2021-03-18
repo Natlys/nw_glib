@@ -40,7 +40,7 @@ Index of this file:
 //-----------------------------------------------------------------------------
 
 #ifndef IMGUI_VERSION
-#error Must include imgui.h before imgui_internal.h
+#a_err Must include imgui.h before imgui_internal.h
 #endif
 
 #include <stdio.h>      // FILE*, sscanf
@@ -75,10 +75,10 @@ Index of this file:
 
 // Legacy defines
 #ifdef IMGUI_DISABLE_FORMAT_STRING_FUNCTIONS            // Renamed in 1.74
-#error Use IMGUI_DISABLE_DEFAULT_FORMAT_FUNCTIONS
+#a_err Use IMGUI_DISABLE_DEFAULT_FORMAT_FUNCTIONS
 #endif
 #ifdef IMGUI_DISABLE_MATH_FUNCTIONS                     // Renamed in 1.74
-#error Use IMGUI_DISABLE_DEFAULT_MATH_FUNCTIONS
+#a_err Use IMGUI_DISABLE_DEFAULT_MATH_FUNCTIONS
 #endif
 
 //-----------------------------------------------------------------------------
@@ -539,7 +539,7 @@ struct IMGUI_API ImChunkStream
 // [SECTION] imgui_draw_list support
 //-----------------------------------------------------------------------------
 
-// imgui_draw_list: Helper function to calculate a circle's segment count given its radius and a "maximum error" value.
+// imgui_draw_list: Helper function to calculate a circle's segment count given its radius and a "maximum a_err" value.
 #define IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_MIN                     12
 #define IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_MAX                     512
 #define IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_CALC(_RAD,_MAXERROR)    ImClamp((int)((IM_PI * 2.0f) / ImAcos(((_RAD) - (_MAXERROR)) / (_RAD))), IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_MIN, IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_MAX)
@@ -567,7 +567,7 @@ struct IMGUI_API imgui_draw_list_shared_data
     const ImVec4*   TexUvLines;                 // UV of anti-aliased lines in the atlas
 
     imgui_draw_list_shared_data();
-    void SetCircleSegmentMaxError(float max_error);
+    void SetCircleSegmentMaxError(float max_a_err);
 };
 
 struct imgui_draw_dataBuilder
@@ -1198,7 +1198,7 @@ struct imgui_viewportP : public imgui_viewport
     float               Alpha;                    // Window opacity (when dragging dockable windows/viewports we make them transparent)
     float               LastAlpha;
     short               PlatformMonitor;
-    bool                PlatformWindowCreated;
+    bool                WindowCreated;
     ImGuiWindow*        Window;                   // Set when the viewport is owned by a window (and imgui_viewportFlags_CanHostOtherWindows is NOT set)
     imgui_draw_list*         DrawLists[2];             // Convenience background (0) and foreground (1) draw lists. We use them to draw software mouser cursor when io.MouseDrawCursor is set and to draw most debug overlays.
     imgui_draw_data          DrawDataP;
@@ -1209,7 +1209,7 @@ struct imgui_viewportP : public imgui_viewport
     ImVec2              CurrWorkOffsetMin;        // Work area top-left offset being increased during the frame
     ImVec2              CurrWorkOffsetMax;        // Work area bottom-right offset being decreased during the frame
 
-    imgui_viewportP()                { Idx = -1; LastFrameActive = LastFrameDrawLists[0] = LastFrameDrawLists[1] = LastFrontMostStampCount = -1; LastNameHash = 0; Alpha = LastAlpha = 1.0f; PlatformMonitor = -1; PlatformWindowCreated = false; Window = NULL; DrawLists[0] = DrawLists[1] = NULL; LastPlatformPos = LastPlatformSize = LastRendererSize = ImVec2(FLT_MAX, FLT_MAX); }
+    imgui_viewportP()                { Idx = -1; LastFrameActive = LastFrameDrawLists[0] = LastFrameDrawLists[1] = LastFrontMostStampCount = -1; LastNameHash = 0; Alpha = LastAlpha = 1.0f; PlatformMonitor = -1; WindowCreated = false; Window = NULL; DrawLists[0] = DrawLists[1] = NULL; LastPlatformPos = LastPlatformSize = LastRendererSize = ImVec2(FLT_MAX, FLT_MAX); }
     ~imgui_viewportP()               { if (DrawLists[0]) IM_DELETE(DrawLists[0]); if (DrawLists[1]) IM_DELETE(DrawLists[1]); }
     ImRect  GetMainRect() const     { return ImRect(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y); }
     ImRect  GetWorkRect() const     { return ImRect(Pos.x + WorkOffsetMin.x, Pos.y + WorkOffsetMin.y, Pos.x + Size.x + WorkOffsetMax.x, Pos.y + Size.y + WorkOffsetMax.y); }
@@ -2024,7 +2024,7 @@ namespace GUI
     // Viewports
     IMGUI_API void                  TranslateWindowsInViewport(imgui_viewportP* viewport, const ImVec2& old_pos, const ImVec2& new_pos);
     IMGUI_API void                  ScaleWindowsInViewport(imgui_viewportP* viewport, float scale);
-    IMGUI_API void                  DestroyPlatformWindow(imgui_viewportP* viewport);
+    IMGUI_API void                  DestroyWindow(imgui_viewportP* viewport);
     IMGUI_API void                  ShowViewportThumbnails();
 
     // Settings
@@ -2238,7 +2238,7 @@ namespace GUI
     IMGUI_API bool          ArrowButtonEx(const char* str_id, ImGuiDir dir, ImVec2 size_arg, ImGuiButtonFlags flags = 0);
     IMGUI_API void          Scrollbar(ImGuiAxis axis);
     IMGUI_API bool          ScrollbarEx(const ImRect& bb, ImGuiID id, ImGuiAxis axis, float* p_scroll_v, float avail_v, float contents_v, ImDrawCornerFlags rounding_corners);
-    IMGUI_API bool          ImageButtonEx(ImGuiID id, imgui_texture_id texture_id, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec2& padding, const ImVec4& bg_col, const ImVec4& tint_col);
+    IMGUI_API bool          ImageButtonEx(ImGuiID id, imgui_txr_id txr_id, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec2& padding, const ImVec4& bg_col, const ImVec4& tint_col);
     IMGUI_API ImRect        GetWindowScrollbarRect(ImGuiWindow* window, ImGuiAxis axis);
     IMGUI_API ImGuiID       GetWindowScrollbarID(ImGuiWindow* window, ImGuiAxis axis);
     IMGUI_API ImGuiID       GetWindowResizeID(ImGuiWindow* window, int n); // 0..3: corners, 4..7: borders

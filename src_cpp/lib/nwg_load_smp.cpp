@@ -5,17 +5,16 @@
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	bit ogl_load_smp()
-	{
+	bit gfx_load_smp() {
 		// general
-		glGenSamplers = (pfn_ogl_smp_gen)(ogl_get_proc("glGenSamplers"));
-		glDeleteSamplers = (pfn_ogl_smp_del)(ogl_get_proc("glDeleteSamplers"));
-		glBindSampler = (pfn_ogl_smp_bind)(ogl_get_proc("glBindSampler"));
+		glGenSamplers = (pfn_ogl_smp_gen)(gfx_get_proc("glGenSamplers"));
+		glDeleteSamplers = (pfn_ogl_smp_del)(gfx_get_proc("glDeleteSamplers"));
+		glBindSampler = (pfn_ogl_smp_bind)(gfx_get_proc("glBindSampler"));
 		// params
-		glSamplerParameteri = (pfn_ogl_smp_param_i)(ogl_get_proc("glSamplerParameteri"));
-		glSamplerParameteriv = (pfn_ogl_smp_param_iv)(ogl_get_proc("glSamplerParameteriv"));
-		glSamplerParameterf = (pfn_ogl_smp_param_f)(ogl_get_proc("glSamplerParameterf"));
-		glSamplerParameterfv = (pfn_ogl_smp_param_fv)(ogl_get_proc("glSamplerParameterfv"));
+		glSamplerParameteri = (pfn_ogl_smp_param_i)(gfx_get_proc("glSamplerParameteri"));
+		glSamplerParameteriv = (pfn_ogl_smp_param_iv)(gfx_get_proc("glSamplerParameteriv"));
+		glSamplerParameterf = (pfn_ogl_smp_param_f)(gfx_get_proc("glSamplerParameterf"));
+		glSamplerParameterfv = (pfn_ogl_smp_param_fv)(gfx_get_proc("glSamplerParameterfv"));
 		
 		return true;
 	}
@@ -36,7 +35,9 @@ namespace NW
 #if (NW_GAPI & NW_GAPI_DX)
 namespace NW
 {
-	//
+	bit gfx_load_smp() {
+		return true;
+	}
 }
 #endif
 #endif	// NW_GAPI

@@ -1,9 +1,14 @@
 #include <nwg_pch.hpp>
 #include "nwg_switch.h"
-#ifdef NW_GAPI
+#if (defined NW_GAPI)
+#include <lib/nwg_load_core.h>
+#include <lib/nwg_load_txr.h>
+#include <lib/nwg_load_buf.h>
+#include <lib/nwg_load_fmbuf.h>
+#include <lib/nwg_load_shd.h>
 namespace NW
 {
-	template<> cstring convert_enum<data_types, cstring>(data_types data_type) {
+	template<> cstr convert_enum<data_types, cstr>(data_types data_type) {
 		switch (data_type) {
 		case DT_BOOL: return "DT_BOOL";
 		case DT_SINT8: return "DT_SINT8";
@@ -43,11 +48,11 @@ namespace NW
 
 		case DT_USER_DATA: return "DT_USER_DATA";
 
-		default: throw error("unsupported format", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return "DT_DEFAULT";
 	}
-	template<> cstring convert_enum<pixel_formats, cstring>(pixel_formats pxl_format) {
+	template<> cstr convert_enum<pixel_formats, cstr>(pixel_formats pxl_format) {
 		switch (pxl_format) {
 		case PXF_R8_SINT8: return "PXF_R8_SINT8"; break;
 
@@ -62,17 +67,17 @@ namespace NW
 		case PXF_R8G8B8A8_UINT32: return "PXF_R8G8B8A8_UINT32"; break;
 
 		case PXF_D24S8_UINT32: return "PXF_D24S8_UINT32"; break;
-		default: throw error("unsupported pixel format", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return "PXF_DEFAULT";
 	}
-	template<> cstring convert_enum<shader_types, cstring>(shader_types shdType) {
+	template<> cstr convert_enum<shd_types, cstr>(shd_types shdType) {
 		switch (shdType) {
 		case SHD_PROG: return "SHD_PROG"; break;
 		case SHD_VERTEX: return "SHD_VERTEX"; break;
 		case SHD_PIXEL: return "SHD_PIXEL"; break;
 		case SHD_GEOMETRY: return "SHD_GEOMETRY"; break;
-		default: throw error("unsupported pixel format", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return "SHD_DEFAULT";
 	}
@@ -118,12 +123,6 @@ namespace NW
 	template<>data_types convert_enum<m4f32, data_types>() { return DT_MAT4_FLOAT32; }
 }
 #if (NW_GAPI & NW_GAPI_OGL)
-#include <lib/nwg_load_base.h>
-#include <lib/nwg_load_txr.h>
-#include <lib/nwg_load_buf.h>
-#include <lib/nwg_load_fbuf.h>
-#include <lib/nwg_load_shd.h>
-#include <gl/GL.h>
 namespace NW
 {
 	template<> data_types convert_enum<const GLchar*, data_types>(const GLchar* type_string) {
@@ -195,7 +194,7 @@ namespace NW
 		case DT_VEC3_FLOAT32: return GL_FLOAT;
 		case DT_VEC4_FLOAT32: return GL_FLOAT;
 
-		default: throw error("unsupported format", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return DT_DEFAULT;
 	}
@@ -208,18 +207,18 @@ namespace NW
 		case GPT_LINES: return GL_LINES; break;
 		case GPT_LINE_LOOP: return GL_LINE_LOOP; break;
 		case GPT_LINE_STRIP: return GL_LINE_STRIP; break;
-		default: throw error("unavailable primitive topology", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return GL_TRIANGLES;
 	}
-	template<> GLenum convert_enum<texture_types, GLenum>(texture_types txr_type) {
+	template<> GLenum convert_enum<txr_types, GLenum>(txr_types txr_type) {
 		switch (txr_type) {
 		case TXT_1D: return GL_TEXTURE_1D; break;
 		case TXT_2D: return GL_TEXTURE_2D; break;
 		case TXT_3D: return GL_TEXTURE_3D; break;
 		case TXT_2D_MULTISAMPLE: return GL_TEXTURE_2D_MULTISAMPLE; break;
 		case TXT_3D_MULTISAMPLE: return GL_TEXTURE_2D_MULTISAMPLE_ARRAY; break;
-		default: throw error("unsupported texture type", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return GL_TEXTURE_2D;
 	}
@@ -237,17 +236,17 @@ namespace NW
 		case PXF_R8G8B8A8_UINT32: return GL_RGBA32UI; break;
 
 		case PXF_D24S8_UINT32: return GL_DEPTH24_STENCIL8; break;
-		default: throw error("unsupported pixel format", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return GL_RGB;
 	}
-	template<> GLenum convert_enum<shader_types, GLenum>(shader_types shd_type) {
+	template<> GLenum convert_enum<shd_types, GLenum>(shd_types shd_type) {
 		switch (shd_type) {
 		case SHD_VERTEX: return GL_VERTEX_SHADER; break;
 		case SHD_PIXEL: return GL_FRAGMENT_SHADER; break;
 		case SHD_GEOMETRY: return GL_GEOMETRY_SHADER; break;
 		case SHD_PROG: return GL_SHADER; break;
-		default: throw error("unsupported pixel format", ERC_NO_SUPPORT); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return GL_SHADER;
 	}
@@ -257,7 +256,7 @@ namespace NW
 		case PM_MULTISAMPLE: return GL_MULTISAMPLE; break;
 		case PM_DEPTH_TEST: return GL_DEPTH_TEST; break;
 		case PM_STENCIL_TEST: return GL_STENCIL_TEST; break;
-		default: throw error("undefined processing mode", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return PM_DEFAULT;
 	}
@@ -265,7 +264,7 @@ namespace NW
 		switch (draw_mode) {
 		case DM_LINE: return GL_LINE; break;
 		case DM_FILL: return GL_FILL; break;
-		default: throw error("undefined draw mode", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return DM_DEFAULT;
 	}
@@ -274,7 +273,7 @@ namespace NW
 		case FACE_FRONT: return GL_FRONT; break;
 		case FACE_BACK: return GL_BACK; break;
 		case FACE_FRONT_AND_BACK: return GL_FRONT_AND_BACK; break;
-		default: throw error("undefined face plane", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return FACE_DEFAULT;
 	}
@@ -282,7 +281,7 @@ namespace NW
 		switch (cfg) {
 		case BC_SRC_ALPHA: return GL_SRC_ALPHA; break;
 		case BC_ONE_MINUS_SRC_ALPHA: return GL_ONE_MINUS_SRC_ALPHA; break;
-		default: throw error("invalid blending config", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return BC_SRC_DEFAULT;
 	}
@@ -295,7 +294,7 @@ namespace NW
 		case DTC_GEQUAL: return GL_GEQUAL; break;
 		case DTC_LESS: return GL_LESS; break;
 		case DTC_LEQUAL: return GL_LEQUAL; break;
-		default: throw error("invalid depth config", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return DTC_DEFAULT;
 	}
@@ -303,11 +302,11 @@ namespace NW
 		switch (cfg) {
 		case STC_KEEP: return GL_KEEP; break;
 		case STC_REPLACE: return GL_REPLACE; break;
-		default: throw error("invalid depth config", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return STC_DEFAULT;
 	}
-	template<> GLenum convert_enum<texture_formats, GLenum>(texture_formats txr_format) {
+	template<> GLenum convert_enum<txr_formats, GLenum>(txr_formats txr_format) {
 		switch (txr_format) {
 		case TXF_RGB: return GL_RGB; break;
 		case TXF_RGBA: return GL_RGBA; break;
@@ -316,24 +315,24 @@ namespace NW
 		case TXF_DEPTH: return GL_DEPTH_ATTACHMENT; break;
 		case TXF_STENCIL: return GL_STENCIL_ATTACHMENT; break;
 		case TXF_DEPTH_STENCIL: return GL_DEPTH_STENCIL_ATTACHMENT; break;
-		default: throw error("invalid texture filter", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return TXF_DEFAULT;
 	}
-	template<> GLenum convert_enum<texture_filters, GLenum>(texture_filters txr_filter) {
+	template<> GLenum convert_enum<txr_filters, GLenum>(txr_filters txr_filter) {
 		switch (txr_filter) {
 		case TXFL_LINEAR: return GL_LINEAR; break;
 		case TXFL_NEAREST: return GL_NEAREST; break;
-		default: throw error("invalid texture filter", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return TXF_DEFAULT;
 	}
-	template<> GLenum convert_enum<texture_wraps, GLenum>(texture_wraps txr_wrap) {
+	template<> GLenum convert_enum<txr_wraps, GLenum>(txr_wraps txr_wrap) {
 		switch (txr_wrap) {
 		case TXW_REPEAT: return GL_REPEAT; break;
 		case TXW_CLAMP: return GL_CLAMP_TO_BORDER; break;
 		case TXW_BORDER: return GL_CLAMP_TO_BORDER; break;
-		default: throw error("invalid texture wrap", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return TXW_DEFAULT;
 	}
@@ -381,7 +380,7 @@ namespace NW
 		case DT_VEC2_FLOAT32: return 2;
 		case DT_VEC3_FLOAT32: return 3;
 		case DT_VEC4_FLOAT32: return 4;
-		default: throw(error("invalid data type")); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return 0;
 	}
@@ -410,7 +409,7 @@ namespace NW
 			return 4 * 4;
 
 		case DT_USER_DATA: return 4;
-		default: throw error("invalid data type", ERC_INVALID_ENUM); break;
+		default: throw run_error(__FILE__, __LINE__); break;
 		}
 		return 0;
 	}
@@ -441,118 +440,117 @@ namespace NW
 
 		case DT_USER_DATA: aligned_size = 4; break;
 
-		default: throw error("invalid data type", ERC_INVALID_ENUM); aligned_size = 0; break;
+		default: throw run_error(__FILE__, __LINE__); aligned_size = 0; break;
 		}
 		return count * ((aligned_size + (aligned_size - 1)) & ~(aligned_size - 1));
 	}
 }
 #endif
 #if (NW_GAPI & NW_GAPI_DX)
-#include <lib/nwg_dx_loader.h>
 namespace NW
 {
-template<> data_types convert_enum<cstring, data_types>(cstring type_string) {
-	if (str_is_equal(type_string, "int")) { return DT_SINT32; }
-	if (str_is_equal(type_string, "int2")) { return DT_VEC2_SINT32; }
-	if (str_is_equal(type_string, "int3")) { return DT_VEC3_SINT32; }
-	if (str_is_equal(type_string, "int4")) { return DT_VEC4_SINT32; }
-	if (str_is_equal(type_string, "float")) { return DT_FLOAT32; }
-	if (str_is_equal(type_string, "float2")) { return DT_VEC2_FLOAT32; }
-	if (str_is_equal(type_string, "float3")) { return DT_VEC3_FLOAT32; }
-	if (str_is_equal(type_string, "float4")) { return DT_VEC4_FLOAT32; }
-	return DT_DEFAULT;
-}
-template<> DXGI_FORMAT convert_enum<data_types, DXGI_FORMAT>(data_types dType) {
-	switch (dType) {
-	case DT_BOOL: return DXGI_FORMAT_R8_UINT;
-	case DT_SINT8: return DXGI_FORMAT_R8_SINT;
-	case DT_VEC2_SINT8: return DXGI_FORMAT_R8_SINT;
-	case DT_VEC3_SINT8: case DT_VEC4_SINT8: return DXGI_FORMAT_R8G8B8A8_SINT;
-
-	case DT_UINT8: return DXGI_FORMAT_R8_UINT;
-	case DT_VEC2_UINT8: return DXGI_FORMAT_R8_UINT;
-	case DT_VEC3_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
-	case DT_VEC4_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
-
-	case DT_SINT16: return DXGI_FORMAT_R16_SINT;
-	case DT_VEC2_SINT16: return DXGI_FORMAT_R16_SINT;
-	case DT_VEC3_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
-	case DT_VEC4_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
-
-	case DT_UINT16: return DXGI_FORMAT_R16_UINT;
-	case DT_VEC2_UINT16: return DXGI_FORMAT_R16_UINT;
-	case DT_VEC3_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
-	case DT_VEC4_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
-
-	case DT_SINT32: return DXGI_FORMAT_R32_SINT;
-	case DT_VEC2_SINT32: return DXGI_FORMAT_R32_SINT;
-	case DT_VEC3_SINT32: return DXGI_FORMAT_R32G32B32_SINT;
-	case DT_VEC4_SINT32: return DXGI_FORMAT_R32G32B32A32_SINT;
-
-	case DT_UINT32: return DXGI_FORMAT_R32_UINT;
-	case DT_VEC2_UINT32: return DXGI_FORMAT_R32_UINT;
-	case DT_VEC3_UINT32: return DXGI_FORMAT_R32G32B32_UINT;
-	case DT_VEC4_UINT32: return DXGI_FORMAT_R32G32B32A32_UINT;
-
-	case DT_FLOAT32: return DXGI_FORMAT_R32_FLOAT;
-	case DT_VEC2_FLOAT32: return DXGI_FORMAT_R32G32_FLOAT;
-	case DT_VEC3_FLOAT32: return DXGI_FORMAT_R32G32B32_FLOAT;
-	case DT_VEC4_FLOAT32: return DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-	default: throw error("unsupported format", ERC_NO_SUPPORT); break;
+	template<> data_types convert_enum<cstr, data_types>(cstr type_string) {
+		if (str_is_equal(type_string, "int")) { return DT_SINT32; }
+		if (str_is_equal(type_string, "int2")) { return DT_VEC2_SINT32; }
+		if (str_is_equal(type_string, "int3")) { return DT_VEC3_SINT32; }
+		if (str_is_equal(type_string, "int4")) { return DT_VEC4_SINT32; }
+		if (str_is_equal(type_string, "float")) { return DT_FLOAT32; }
+		if (str_is_equal(type_string, "float2")) { return DT_VEC2_FLOAT32; }
+		if (str_is_equal(type_string, "float3")) { return DT_VEC3_FLOAT32; }
+		if (str_is_equal(type_string, "float4")) { return DT_VEC4_FLOAT32; }
+		return DT_DEFAULT;
 	}
-	return DXGI_FORMAT_R32_FLOAT;
-}
-template<> D3D11_PRIMITIVE_TOPOLOGY convert_enum<gfx_primitives, D3D11_PRIMITIVE_TOPOLOGY>(gfx_primitives gpType) {
-	switch (gpType) {
-	case GPT_POINTS: return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST; break;
-	case GPT_TRIANGLES: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
-	case GPT_TRIANGLE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; break;
-	case GPT_TRIANGLE_FAN: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ; break;
-	case GPT_LINES: return D3D11_PRIMITIVE_TOPOLOGY_LINELIST; break;
-	case GPT_LINE_LOOP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ; break;
-	case GPT_LINE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
-	default: throw error("unavailable primitive topology", ERC_INVALID_ENUM); break;
+	template<> DXGI_FORMAT convert_enum<data_types, DXGI_FORMAT>(data_types dType) {
+		switch (dType) {
+		case DT_BOOL: return DXGI_FORMAT_R8_UINT;
+		case DT_SINT8: return DXGI_FORMAT_R8_SINT;
+		case DT_VEC2_SINT8: return DXGI_FORMAT_R8_SINT;
+		case DT_VEC3_SINT8: case DT_VEC4_SINT8: return DXGI_FORMAT_R8G8B8A8_SINT;
+
+		case DT_UINT8: return DXGI_FORMAT_R8_UINT;
+		case DT_VEC2_UINT8: return DXGI_FORMAT_R8_UINT;
+		case DT_VEC3_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
+		case DT_VEC4_UINT8: return DXGI_FORMAT_R8G8B8A8_UINT;
+
+		case DT_SINT16: return DXGI_FORMAT_R16_SINT;
+		case DT_VEC2_SINT16: return DXGI_FORMAT_R16_SINT;
+		case DT_VEC3_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
+		case DT_VEC4_SINT16: return DXGI_FORMAT_R16G16B16A16_SINT;
+
+		case DT_UINT16: return DXGI_FORMAT_R16_UINT;
+		case DT_VEC2_UINT16: return DXGI_FORMAT_R16_UINT;
+		case DT_VEC3_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
+		case DT_VEC4_UINT16: return DXGI_FORMAT_R16G16B16A16_UINT;
+
+		case DT_SINT32: return DXGI_FORMAT_R32_SINT;
+		case DT_VEC2_SINT32: return DXGI_FORMAT_R32_SINT;
+		case DT_VEC3_SINT32: return DXGI_FORMAT_R32G32B32_SINT;
+		case DT_VEC4_SINT32: return DXGI_FORMAT_R32G32B32A32_SINT;
+
+		case DT_UINT32: return DXGI_FORMAT_R32_UINT;
+		case DT_VEC2_UINT32: return DXGI_FORMAT_R32_UINT;
+		case DT_VEC3_UINT32: return DXGI_FORMAT_R32G32B32_UINT;
+		case DT_VEC4_UINT32: return DXGI_FORMAT_R32G32B32A32_UINT;
+
+		case DT_FLOAT32: return DXGI_FORMAT_R32_FLOAT;
+		case DT_VEC2_FLOAT32: return DXGI_FORMAT_R32G32_FLOAT;
+		case DT_VEC3_FLOAT32: return DXGI_FORMAT_R32G32B32_FLOAT;
+		case DT_VEC4_FLOAT32: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+		default: throw run_error(__FILE__, __LINE__); break;
+		}
+		return DXGI_FORMAT_R32_FLOAT;
 	}
-	return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-}
-template<> si32 convert_enum<texture_types, si32>(texture_types txr_type) {
-	switch (txr_type) {
-	case TXT_1D: return 0; break;
-	case TXT_2D: return 0; break;
-	case TXT_3D: return 0; break;
-	default: throw error("unsupported texture type", ERC_NO_SUPPORT); break;
+	template<> D3D11_PRIMITIVE_TOPOLOGY convert_enum<gfx_primitives, D3D11_PRIMITIVE_TOPOLOGY>(gfx_primitives gpType) {
+		switch (gpType) {
+		case GPT_POINTS: return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST; break;
+		case GPT_TRIANGLES: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+		case GPT_TRIANGLE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; break;
+		case GPT_TRIANGLE_FAN: return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ; break;
+		case GPT_LINES: return D3D11_PRIMITIVE_TOPOLOGY_LINELIST; break;
+		case GPT_LINE_LOOP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ; break;
+		case GPT_LINE_STRIP: return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
+		default: throw run_error(__FILE__, __LINE__); break;
+		}
+		return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	}
-	return 0;
-}
-template<> DXGI_FORMAT convert_enum <pixel_formats, DXGI_FORMAT>(pixel_formats pxl_format) {
-	switch (pxl_format) {
-	case PXF_R32_SINT32: return DXGI_FORMAT_R32_SINT; break;
-	case PXF_R8G8B8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
-	case PXF_R8G8B8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
-	case PXF_R8G8B8A8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
-	case PXF_R8G8B8A8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
-	default: throw error("unsupported pixel format", ERC_NO_SUPPORT); break;
+	template<> si32 convert_enum<txr_types, si32>(txr_types txr_type) {
+		switch (txr_type) {
+		case TXT_1D: return 0; break;
+		case TXT_2D: return 0; break;
+		case TXT_3D: return 0; break;
+		default: throw run_error(__FILE__, __LINE__); break;
+		}
+		return 0;
 	}
-	return DXGI_FORMAT_R8G8B8A8_UNORM;
-}
-template<> D3D11_FILTER convert_enum <texture_filters, D3D11_FILTER>(texture_filters txr_filter) {
-	switch (txr_filter) {
-	case TXF_LINEAR: return D3D11_FILTER_MIN_MAG_MIP_LINEAR; break;
-	case TXF_NEAREST: return D3D11_FILTER_MIN_MAG_MIP_POINT; break;
-	default: throw error("unsupported pixel filter", ERC_NO_SUPPORT); break;
+	template<> DXGI_FORMAT convert_enum <pixel_formats, DXGI_FORMAT>(pixel_formats pxl_format) {
+		switch (pxl_format) {
+		case PXF_R32_SINT32: return DXGI_FORMAT_R32_SINT; break;
+		case PXF_R8G8B8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
+		case PXF_R8G8B8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
+		case PXF_R8G8B8A8_SINT32: return DXGI_FORMAT_R8G8B8A8_SNORM; break;
+		case PXF_R8G8B8A8_UINT32: return DXGI_FORMAT_B8G8R8A8_UNORM; break;
+		default: throw run_error(__FILE__, __LINE__); break;
+		}
+		return DXGI_FORMAT_R8G8B8A8_UNORM;
 	}
-	return D3D11_FILTER_MIN_MAG_MIP_POINT;
-}
-template<> D3D11_TEXTURE_ADDRESS_MODE convert_enum<texture_wraps, D3D11_TEXTURE_ADDRESS_MODE>(texture_wraps txr_wrap) {
-	switch (txr_wrap) {
-	case TXW_REPEAT: return D3D11_TEXTURE_ADDRESS_WRAP; break;
-	case TXW_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
-	case TXW_BORDER: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
-	default: throw error("unsupported pixel filter", ERC_NO_SUPPORT); break;
+	template<> D3D11_FILTER convert_enum <txr_filters, D3D11_FILTER>(txr_filters txr_filter) {
+		switch (txr_filter) {
+		case TXFL_LINEAR: return D3D11_FILTER_MIN_MAG_MIP_LINEAR; break;
+		case TXFL_NEAREST: return D3D11_FILTER_MIN_MAG_MIP_POINT; break;
+		default: throw run_error(__FILE__, __LINE__); break;
+		}
+		return D3D11_FILTER_MIN_MAG_MIP_POINT;
 	}
-	return D3D11_TEXTURE_ADDRESS_WRAP;
-}
+	template<> D3D11_TEXTURE_ADDRESS_MODE convert_enum<txr_wraps, D3D11_TEXTURE_ADDRESS_MODE>(txr_wraps txr_wrap) {
+		switch (txr_wrap) {
+		case TXW_REPEAT: return D3D11_TEXTURE_ADDRESS_WRAP; break;
+		case TXW_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
+		case TXW_BORDER: return D3D11_TEXTURE_ADDRESS_CLAMP; break;
+		default: throw run_error(__FILE__, __LINE__); break;
+		}
+		return D3D11_TEXTURE_ADDRESS_WRAP;
+	}
 }
 #endif
 #endif	// NW_GAPI

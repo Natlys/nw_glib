@@ -1,12 +1,12 @@
-#ifndef NW_WGL_LOADER_H
-#define NW_WGL_LOADER_H
+#ifndef NWG_LOAD_WINDOWS_GRAPHICS_LIBRARY_H
+#define NWG_LOAD_WINDOWS_GRAPHICS_LIBRARY_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	extern bit ogl_load_wgl();
+	extern bit gfx_load_wgl();
 }
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// context
@@ -17,7 +17,7 @@ namespace NW
 	// device
 	typedef device_handle(__stdcall* pfn_ogl_get_device)();
 	// other
-	typedef ptr(__stdcall* pfn_ogl_get_proc)(cstring name);
+	typedef ptr(__stdcall* pfn_gfx_get_proc)(cstr name);
 }
 namespace NW
 {
@@ -29,7 +29,7 @@ namespace NW
 	// device
 	extern pfn_ogl_get_device ogl_get_device;
 	// other
-	extern pfn_ogl_get_proc ogl_get_proc_address;
+	extern pfn_gfx_get_proc gfx_get_proc_address;
 }
 // context
 #define wglCreateContext ogl_new_context
@@ -39,9 +39,13 @@ namespace NW
 // device
 #define wglGetCurrentDC ogl_get_device
 // other
-#define wglGetProcAddress ogl_get_proc_address
+#define wglGetProcAddress gfx_get_proc_address
 #endif
 #if (NW_GAPI & NW_GAPI_DX)
+namespace NW
+{
+	//
+}
 #endif
 #endif	// NW_GAPI
-#endif	// NW_WGL_LOADER_H
+#endif	// NWG_LOAD_WINDOWS_GRAPHICS_LIBRARY_H

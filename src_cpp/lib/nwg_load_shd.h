@@ -1,13 +1,13 @@
-#ifndef NW_LOAD_SHD_H
-#define NW_LOAD_SHD_H
+#ifndef NWG_LOAD_SHADER_H
+#define NWG_LOAD_SHADER_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include "nwg_load_base.h"
-#if (NW_GAPI & NW_GAPI_OGL)
+#include "nwg_load_core.h"
 namespace NW
 {
-	extern bit ogl_load_shd();
+	extern bit gfx_load_shd();
 }
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// general
@@ -72,4 +72,4 @@ namespace NW
 }
 #endif
 #endif	// NW_GAPI
-#endif	// NW_LOAD_SHD_H
+#endif	// NWG_LOAD_SHD_H

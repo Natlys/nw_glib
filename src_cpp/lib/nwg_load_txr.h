@@ -1,12 +1,12 @@
-#ifndef NW_LOAD_TXR_H
-#define NW_LOAD_TXR_H
+#ifndef NWG_LOAD_TEXTURE_H
+#define NWG_LOAD_TEXTURE_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include "nwg_load_base.h"
+#include "nwg_load_core.h"
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	extern bit ogl_load_txr();
+	extern bit gfx_load_txr();
 }
 namespace NW
 {
@@ -278,4 +278,4 @@ namespace NW
 }
 #endif
 #endif	// NW_GAPI
-#endif	// NW_LOAD_TXR_H
+#endif	// NWG_LOAD_TEXTURE_H

@@ -1,14 +1,13 @@
-#ifndef NW_LOAD_LAYT_H
-#define NW_LOAD_LAYT_H
+#ifndef NWG_LOAD_LAYOUT_H
+#define NWG_LOAD_LAYOUT_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include "nwg_load_base.h"
-#if (NW_GAPI & NW_GAPI_OGL)
+#include "nwg_load_core.h"
 namespace NW
 {
-	/// load opengl layout - vertex array
-	extern bit ogl_load_varr();
+	extern bit gfx_load_layt();
 }
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// general
@@ -50,6 +49,10 @@ namespace NW
 #endif	// __gl_h__
 #endif
 #if (NW_GAPI & NW_GAPI_DX)
+namespace NW
+{
+	//
+}
 #endif
 #endif	// NW_GAPI
-#endif	// NW_LOAD_BUF_H
+#endif	// NWG_LOAD_LAYOUT_H

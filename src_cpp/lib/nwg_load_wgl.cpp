@@ -5,8 +5,8 @@
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	bit ogl_load_wgl() {
-		library_handle graphics_library = ogl_get_lib();
+	bit gfx_load_wgl() {
+		library_handle graphics_library = gfx_get_lib();
 		// context
 		wglCreateContext = (pfn_ogl_new_context)(::GetProcAddress(graphics_library, "wglCreateContext"));
 		wglDeleteContext = (pfn_ogl_del_context)(::GetProcAddress(graphics_library, "wglDeleteContext"));
@@ -15,7 +15,7 @@ namespace NW
 		// device
 		wglGetCurrentDC = (pfn_ogl_get_device)(::GetProcAddress(graphics_library, "wglGetCurrentDC"));
 		// other
-		wglGetProcAddress = (pfn_ogl_get_proc)(::GetProcAddress(graphics_library, "wglGetProcAddress"));
+		wglGetProcAddress = (pfn_gfx_get_proc)(::GetProcAddress(graphics_library, "wglGetProcAddress"));
 
 		return true;
 	}
@@ -30,9 +30,15 @@ namespace NW
 	// device
 	pfn_ogl_get_device wglGetCurrentDC = NULL;
 	// other
-	pfn_ogl_get_proc wglGetProcAddress = NULL;
+	pfn_gfx_get_proc wglGetProcAddress = NULL;
 }
 #endif
 #if (NW_GAPI & NW_GAPI_DX)
+namespace NW
+{
+	bit gfx_load_wgl() {
+		return true;
+	}
+}
 #endif
 #endif	// NW_GAPI

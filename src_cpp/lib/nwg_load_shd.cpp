@@ -5,16 +5,16 @@
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	bit ogl_load_shd() {
+	bit gfx_load_shd() {
 		// general
-		glCreateShader = (pfn_ogl_shd_crt)(ogl_get_proc("glCreateShader"));
-		glDeleteShader = (pfn_ogl_shd_del)(ogl_get_proc("glDeleteShader"));
-		glCompileShader = (pfn_ogl_shd_compile)(ogl_get_proc("glCompileShader"));
+		glCreateShader = (pfn_ogl_shd_crt)(gfx_get_proc("glCreateShader"));
+		glDeleteShader = (pfn_ogl_shd_del)(gfx_get_proc("glDeleteShader"));
+		glCompileShader = (pfn_ogl_shd_compile)(gfx_get_proc("glCompileShader"));
 		// getters
-		glGetShaderiv = (pfn_ogl_shd_get_iv)(ogl_get_proc("glGetShaderiv"));
-		glGetShaderInfoLog = (pfn_ogl_shd_get_info_log)(ogl_get_proc("glGetShaderInfoLog"));
+		glGetShaderiv = (pfn_ogl_shd_get_iv)(gfx_get_proc("glGetShaderiv"));
+		glGetShaderInfoLog = (pfn_ogl_shd_get_info_log)(gfx_get_proc("glGetShaderInfoLog"));
 		// setters
-		glShaderSource = (pfn_ogl_shd_set_source)(ogl_get_proc("glShaderSource"));
+		glShaderSource = (pfn_ogl_shd_set_source)(gfx_get_proc("glShaderSource"));
 		
 		return true;
 	}
@@ -36,7 +36,9 @@ namespace NW
 #if (NW_GAPI & NW_GAPI_DX)
 namespace NW
 {
-	//
+	bit gfx_load_shd() {
+		return true;
+	}
 }
 #endif
 #endif	// NW_GAPI

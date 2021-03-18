@@ -118,11 +118,11 @@ namespace
 
     bool FreeTypeFont::InitFont(FT_Library ft_library, const ImFontConfig& cfg, unsigned int extra_user_flags)
     {
-        FT_Error error = FT_New_Memory_Face(ft_library, (uint8_t*)cfg.FontData, (uint32_t)cfg.FontDataSize, (uint32_t)cfg.FontNo, &Face);
-        if (error != 0)
+        FT_Error a_err = FT_New_Memory_Face(ft_library, (uint8_t*)cfg.FontData, (uint32_t)cfg.FontDataSize, (uint32_t)cfg.FontNo, &Face);
+        if (a_err != 0)
             return false;
-        error = FT_Select_Charmap(Face, FT_ENCODING_UNICODE);
-        if (error != 0)
+        a_err = FT_Select_Charmap(Face, FT_ENCODING_UNICODE);
+        if (a_err != 0)
             return false;
 
         memset(&Info, 0, sizeof(Info));
@@ -189,8 +189,8 @@ namespace
         uint32_t glyph_index = FT_Get_Char_Index(Face, codepoint);
         if (glyph_index == 0)
             return NULL;
-        FT_Error error = FT_Load_Glyph(Face, glyph_index, LoadFlags);
-        if (error)
+        FT_Error a_err = FT_Load_Glyph(Face, glyph_index, LoadFlags);
+        if (a_err)
             return NULL;
 
         // Need an outline for this to work
@@ -215,8 +215,8 @@ namespace
     const FT_Bitmap* FreeTypeFont::RenderGlyphAndGetInfo(GlyphInfo* out_glyph_info)
     {
         FT_GlyphSlot slot = Face->glyph;
-        FT_Error error = FT_Render_Glyph(slot, RenderMode);
-        if (error != 0)
+        FT_Error a_err = FT_Render_Glyph(slot, RenderMode);
+        if (a_err != 0)
             return NULL;
 
         FT_Bitmap* ft_bitmap = &Face->glyph->bitmap;
@@ -321,7 +321,7 @@ bool ImFontAtlasBuildWithFreeType(FT_Library ft_library, ImFontAtlas* atlas, uns
     ImFontAtlasBuildInit(atlas);
 
     // Clear atlas
-    atlas->TexID = (imgui_texture_id)NULL;
+    atlas->TexID = (imgui_txr_id)NULL;
     atlas->TexWidth = atlas->TexHeight = 0;
     atlas->TexUvScale = ImVec2(0.0f, 0.0f);
     atlas->TexUvWhitePixel = ImVec2(0.0f, 0.0f);
@@ -653,8 +653,8 @@ bool ImGuiFreeType::BuildFontAtlas(ImFontAtlas* atlas, unsigned int extra_flags)
 
     // https://www.freetype.org/freetype2/docs/reference/ft2-module_management.html#FT_New_Library
     FT_Library ft_library;
-    FT_Error error = FT_New_Library(&memory_rec, &ft_library);
-    if (error != 0)
+    FT_Error a_err = FT_New_Library(&memory_rec, &ft_library);
+    if (a_err != 0)
         return false;
 
     // If you don't call FT_Add_Default_Modules() the rest of code may work, but FreeType won't use our custom allocator.

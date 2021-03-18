@@ -331,11 +331,11 @@ imgui_draw_list_shared_data::imgui_draw_list_shared_data()
     TexUvLines = NULL;
 }
 
-void imgui_draw_list_shared_data::SetCircleSegmentMaxError(float max_error)
+void imgui_draw_list_shared_data::SetCircleSegmentMaxError(float max_a_err)
 {
-    if (CircleSegmentMaxError == max_error)
+    if (CircleSegmentMaxError == max_a_err)
         return;
-    CircleSegmentMaxError = max_error;
+    CircleSegmentMaxError = max_a_err;
     for (int i = 0; i < IM_ARRAYSIZE(CircleSegmentCounts); i++)
     {
         const float radius = i + 1.0f;
@@ -351,7 +351,7 @@ void imgui_draw_list::_ResetForNewFrame()
     // (those should be IM_STATIC_ASSERT() in theory but with our pre C++11 setup the whole check doesn't compile with GCC)
     IM_ASSERT(IM_OFFSETOF(imgui_draw_cmd, ClipRect) == 0);
     IM_ASSERT(IM_OFFSETOF(imgui_draw_cmd, TextureId) == sizeof(ImVec4));
-    IM_ASSERT(IM_OFFSETOF(imgui_draw_cmd, VtxOffset) == sizeof(ImVec4) + sizeof(imgui_texture_id));
+    IM_ASSERT(IM_OFFSETOF(imgui_draw_cmd, VtxOffset) == sizeof(ImVec4) + sizeof(imgui_txr_id));
 
     CmdBuffer.resize(0);
     IdxBuffer.resize(0);
@@ -529,17 +529,17 @@ void imgui_draw_list::PopClipRect()
     _OnChangedClipRect();
 }
 
-void imgui_draw_list::PushTextureID(imgui_texture_id texture_id)
+void imgui_draw_list::PushTextureID(imgui_txr_id txr_id)
 {
-    _TextureIdStack.push_back(texture_id);
-    _CmdHeader.TextureId = texture_id;
+    _TextureIdStack.push_back(txr_id);
+    _CmdHeader.TextureId = txr_id;
     _OnChangedTextureID();
 }
 
 void imgui_draw_list::PopTextureID()
 {
     _TextureIdStack.pop_back();
-    _CmdHeader.TextureId = (_TextureIdStack.Size == 0) ? (imgui_texture_id)NULL : _TextureIdStack.Data[_TextureIdStack.Size - 1];
+    _CmdHeader.TextureId = (_TextureIdStack.Size == 0) ? (imgui_txr_id)NULL : _TextureIdStack.Data[_TextureIdStack.Size - 1];
     _OnChangedTextureID();
 }
 
@@ -1316,52 +1316,52 @@ void imgui_draw_list::AddText(const ImVec2& pos, ImU32 col, const char* text_beg
     AddText(NULL, 0.0f, pos, col, text_begin, text_end);
 }
 
-void imgui_draw_list::AddImage(imgui_texture_id user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
+void imgui_draw_list::AddImage(imgui_txr_id user_txr_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
-    const bool push_texture_id = user_texture_id != _CmdHeader.TextureId;
-    if (push_texture_id)
-        PushTextureID(user_texture_id);
+    const bool push_txr_id = user_txr_id != _CmdHeader.TextureId;
+    if (push_txr_id)
+        PushTextureID(user_txr_id);
 
     PrimReserve(6, 4);
     PrimRectUV(p_min, p_max, uv_min, uv_max, col);
 
-    if (push_texture_id)
+    if (push_txr_id)
         PopTextureID();
 }
 
-void imgui_draw_list::AddImageQuad(imgui_texture_id user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1, const ImVec2& uv2, const ImVec2& uv3, const ImVec2& uv4, ImU32 col)
+void imgui_draw_list::AddImageQuad(imgui_txr_id user_txr_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1, const ImVec2& uv2, const ImVec2& uv3, const ImVec2& uv4, ImU32 col)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
-    const bool push_texture_id = user_texture_id != _CmdHeader.TextureId;
-    if (push_texture_id)
-        PushTextureID(user_texture_id);
+    const bool push_txr_id = user_txr_id != _CmdHeader.TextureId;
+    if (push_txr_id)
+        PushTextureID(user_txr_id);
 
     PrimReserve(6, 4);
     PrimQuadUV(p1, p2, p3, p4, uv1, uv2, uv3, uv4, col);
 
-    if (push_texture_id)
+    if (push_txr_id)
         PopTextureID();
 }
 
-void imgui_draw_list::AddImageRounded(imgui_texture_id user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners)
+void imgui_draw_list::AddImageRounded(imgui_txr_id user_txr_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
     if (rounding <= 0.0f || (rounding_corners & ImDrawCornerFlags_All) == 0)
     {
-        AddImage(user_texture_id, p_min, p_max, uv_min, uv_max, col);
+        AddImage(user_txr_id, p_min, p_max, uv_min, uv_max, col);
         return;
     }
 
-    const bool push_texture_id = _TextureIdStack.empty() || user_texture_id != _TextureIdStack.back();
-    if (push_texture_id)
-        PushTextureID(user_texture_id);
+    const bool push_txr_id = _TextureIdStack.empty() || user_txr_id != _TextureIdStack.back();
+    if (push_txr_id)
+        PushTextureID(user_txr_id);
 
     int vert_start_idx = VtxBuffer.Size;
     PathRect(p_min, p_max, rounding, rounding_corners);
@@ -1369,7 +1369,7 @@ void imgui_draw_list::AddImageRounded(imgui_texture_id user_texture_id, const Im
     int vert_end_idx = VtxBuffer.Size;
     GUI::ShadeVertsLinearUV(this, vert_start_idx, vert_end_idx, p_min, p_max, uv_min, uv_max, true);
 
-    if (push_texture_id)
+    if (push_txr_id)
         PopTextureID();
 }
 
@@ -1688,7 +1688,7 @@ ImFontAtlas::ImFontAtlas()
 {
     Locked = false;
     Flags = ImFontAtlasFlags_None;
-    TexID = (imgui_texture_id)NULL;
+    TexID = (imgui_txr_id)NULL;
     TexDesiredWidth = 0;
     TexGlyphPadding = 1;
 
@@ -2046,7 +2046,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     ImFontAtlasBuildInit(atlas);
 
     // Clear atlas
-    atlas->TexID = (imgui_texture_id)NULL;
+    atlas->TexID = (imgui_txr_id)NULL;
     atlas->TexWidth = atlas->TexHeight = 0;
     atlas->TexUvScale = ImVec2(0.0f, 0.0f);
     atlas->TexUvWhitePixel = ImVec2(0.0f, 0.0f);
@@ -3399,7 +3399,7 @@ void GUI::RenderMouseCursor(imgui_draw_list* draw_list, ImVec2 pos, float scale,
     if (font_atlas->GetMouseCursoinfoTexData(mouse_cursor, &offset, &size, &uv[0], &uv[2]))
     {
         pos -= offset;
-        const imgui_texture_id tex_id = font_atlas->TexID;
+        const imgui_txr_id tex_id = font_atlas->TexID;
         draw_list->PushTextureID(tex_id);
         draw_list->AddImage(tex_id, pos + ImVec2(1, 0) * scale, pos + (ImVec2(1, 0) + size) * scale,    uv[2], uv[3], col_shadow);
         draw_list->AddImage(tex_id, pos + ImVec2(2, 0) * scale, pos + (ImVec2(2, 0) + size) * scale,    uv[2], uv[3], col_shadow);
@@ -3642,7 +3642,7 @@ static unsigned int stb_adler32(unsigned int adler32, unsigned char *buffer, uns
 static unsigned int stb_decompress(unsigned char *output, const unsigned char *i, unsigned int /*length*/)
 {
     if (stb__in4(0) != 0x57bC0000) return 0;
-    if (stb__in4(4) != 0)          return 0; // error! stream is > 4GB
+    if (stb__in4(4) != 0)          return 0; // a_err! stream is > 4GB
     const unsigned int olen = stb_decompress_length(i);
     stb__barrier_in_b = i;
     stb__barrier_out_e = output + olen;

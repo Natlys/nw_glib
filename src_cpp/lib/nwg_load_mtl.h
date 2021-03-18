@@ -1,13 +1,13 @@
-#ifndef NW_LOAD_MATERIAL_H
-#define NW_LOAD_MATERIAL_H
+#ifndef NWG_LOAD_MATERIAL_H
+#define NWG_LOAD_MATERIAL_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include "nwg_load_base.h"
-#if (NW_GAPI & NW_GAPI_OGL)
+#include "nwg_load_core.h"
 namespace NW
 {
-	extern bit ogl_load_mtl();
+	extern bit gfx_load_mtl();
 }
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// general

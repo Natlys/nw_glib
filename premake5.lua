@@ -1,6 +1,6 @@
 --==<graphics_library_project>==--
 project "nw_gfx"
-	kind "staticlib" --.lib
+	kind "staticlib"
 	staticruntime "on"
 	language "c++"
 	cppdialect "c++17"
@@ -8,37 +8,8 @@ project "nw_gfx"
 	objdir (dir_out_int)
 	pchheader "nwg_pch.hpp"
 	pchsource "src_cpp/nwg_pch.cpp"
-	files
-	{
-		"%{dir_cpp.own}**.c**",
-		"%{dir_cpp.own}**.h**",
-		dir_data,
-		dir_glsl.."**.glsl",
-		dir_hlsl.."**.hlsl",
-		dir_data.."**.h", dir_data.."**.rc",  dir_data.."**.aps",
-	}
-	includedirs
-	{
-		"%{dir_cpp.own}",
-		"%{dir_cpp.ext}",
-		"%{dir_cpp.nw_lib}",
-		dir_data,
-	}
-	libdirs
-	{
-		"%{dir_lib.nw_lib}",
-	}
-	links
-	{
-		"nw_lib",
-	}
-	filter "system:windows"
-		systemversion "latest"
-		defines { "NW_PLATFORM_WINDOWS" }
-	filter "configurations:debug"
-		defines { "NW_DEBUG" }
-		symbols "on"
-	filter "configurations:release"
-		defines { "NW_RELEASE" }
-		optimize "on"
---==</graphics_project>==--
+	files { "%{dir_cpp.own}**.c**", "%{dir_cpp.own}**.h**" }
+	includedirs { "%{dir_cpp.own}", "%{dir_cpp.ext}", "%{dir_cpp.nw_lib}" }
+	libdirs { "%{dir_lib.nw_lib}" }
+	links { "nw_lib" }
+--==</graphics_library_project>==--

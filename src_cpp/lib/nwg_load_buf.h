@@ -1,13 +1,13 @@
-#ifndef NW_LOAD_BUF_H
-#define NW_LOAD_BUF_H
+#ifndef NWG_LOAD_BUFFER_H
+#define NWG_LOAD_BUFFER_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include "nwg_load_base.h"
-#if (NW_GAPI & NW_GAPI_OGL)
+#include "nwg_load_core.h"
 namespace NW
 {
-	extern bit ogl_load_buf();
+	extern bit gfx_load_buf();
 }
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// general
@@ -89,6 +89,10 @@ namespace NW
 #endif	// __gl_h__
 #endif
 #if (NW_GAPI & NW_GAPI_DX)
+namespace NW
+{
+	//
+}
 #endif
 #endif	// NW_GAPI
-#endif	// NW_LOAD_BUF_H
+#endif	// NWG_LOAD_BUFFER_H

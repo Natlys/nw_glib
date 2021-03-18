@@ -1,5 +1,5 @@
-#ifndef NW_DATA_H
-#define NW_DATA_H
+#ifndef NWG_DATA_H
+#define NWG_DATA_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
 #include <lib/nwg_switch.h>
@@ -61,12 +61,12 @@ namespace NW
 	/// --update_idx_data for required topology;
 	/// --use index and vertex data for drawing;
 	template<typename vtype, typename itype = ui32>
-	class NW_API gfx_mesh_data
+	class NW_API mesh_data
 	{
 		using vertices = darray<vtype>;
 		using indices = darray<itype>;
 	public:
-		gfx_mesh_data() : m_vtxs(vertices()), m_idxs(indices()), m_iter(0) { }
+		mesh_data() : m_vtxs(vertices()), m_idxs(indices()), m_iter(0) { }
 		// --getters
 		inline vtype* get_vtx_data() { return &m_vtxs[0]; }
 		inline size get_vtx_count()	const { return m_vtxs.size(); }
@@ -137,5 +137,5 @@ namespace NW
 		ui32 m_iter;
 	};
 }
-#endif	// NW_GAPI
-#endif	// NW_DATA_H
+#endif	// NWG_GAPI
+#endif	// NWG_DATA_H

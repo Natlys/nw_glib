@@ -144,8 +144,8 @@ typedef int imgui_viewportFlags;     // -> enum imgui_viewportFlags_   // Flags:
 typedef int ImGuiWindowFlags;       // -> enum ImGuiWindowFlags_     // Flags: for Begin(), BeginChild()
 
 // Other types
-#ifndef imgui_texture_id                 // imgui_texture_id [configurable type: override in imconfig.h with '#define imgui_texture_id xxx']
-typedef void* imgui_texture_id;          // User data for rendering back-end to identify a texture. This is whatever to you want it to be! read the FAQ about imgui_texture_id for details.
+#ifndef imgui_txr_id                 // imgui_txr_id [configurable type: override in imconfig.h with '#define imgui_txr_id xxx']
+typedef void* imgui_txr_id;          // User data for rendering back-end to identify a texture. This is whatever to you want it to be! read the FAQ about imgui_txr_id for details.
 #endif
 typedef unsigned int ImGuiID;       // A unique ID used by widgets, typically hashed from a stack of string.
 typedef int (*ImGuiInputTextCallback)(ImGuiInputTextCallbackData* data);
@@ -417,8 +417,8 @@ namespace GUI
     IMGUI_API bool          SmallButton(const char* label);                                 // button with FramePadding=(0,0) to easily embed within text
     IMGUI_API bool          InvisibleButton(const char* str_id, const ImVec2& size, ImGuiButtonFlags flags = 0); // flexible button behavior without the visuals, frequently useful to build custom behaviors using the public api (along with IsItemActive, IsItemHovered, etc.)
     IMGUI_API bool          ArrowButton(const char* str_id, ImGuiDir dir);                  // square button with an arrow shape
-    IMGUI_API void          Image(imgui_texture_id user_texture_id, const ImVec2& size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1,1), const ImVec4& tint_col = ImVec4(1,1,1,1), const ImVec4& border_col = ImVec4(0,0,0,0));
-    IMGUI_API bool          ImageButton(imgui_texture_id user_texture_id, const ImVec2& size, const ImVec2& uv0 = ImVec2(0, 0),  const ImVec2& uv1 = ImVec2(1,1), int frame_padding = -1, const ImVec4& bg_col = ImVec4(0,0,0,0), const ImVec4& tint_col = ImVec4(1,1,1,1));    // <0 frame_padding uses default frame padding settings. 0 for no padding
+    IMGUI_API void          Image(imgui_txr_id user_txr_id, const ImVec2& size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1,1), const ImVec4& tint_col = ImVec4(1,1,1,1), const ImVec4& border_col = ImVec4(0,0,0,0));
+    IMGUI_API bool          ImageButton(imgui_txr_id user_txr_id, const ImVec2& size, const ImVec2& uv0 = ImVec2(0, 0),  const ImVec2& uv1 = ImVec2(1,1), int frame_padding = -1, const ImVec4& bg_col = ImVec4(0,0,0,0), const ImVec4& tint_col = ImVec4(1,1,1,1));    // <0 frame_padding uses default frame padding settings. 0 for no padding
     IMGUI_API bool          Checkbox(const char* label, bool* v);
     IMGUI_API bool          CheckboxFlags(const char* label, unsigned int* flags, unsigned int flags_value);
     IMGUI_API bool          RadioButton(const char* label, bool active);                    // use with e.g. if (RadioButton("one", my_value==1)) { my_value = 1; }
@@ -783,9 +783,9 @@ namespace GUI
     // Note: You may use GetWindowViewport() to get the current viewport of the current window.
     IMGUI_API imgui_platform_io&  GetPlatformIO();                                                // platform/renderer functions, for back-end to setup + viewports list.
     IMGUI_API imgui_viewport*    GetMainViewport();                                              // main viewport. same as GetPlatformIO().MainViewport == GetPlatformIO().Viewports[0].
-    IMGUI_API void              UpdatePlatformWindows();                                        // call in main loop. will call CreateWindow/ResizeWindow/etc. platform functions for each secondary viewport, and DestroyWindow for each inactive viewport.
-    IMGUI_API void              RenderPlatformWindowsDefault(void* platform_render_arg = NULL, void* renderer_render_arg = NULL); // call in main loop. will call RenderWindow/SwapBuffers platform functions for each secondary viewport which doesn't have the imgui_viewportFlags_Minimized flag set. May be reimplemented by user for custom rendering needs.
-    IMGUI_API void              DestroyPlatformWindows();                                       // call DestroyWindow platform functions for all viewports. call from back-end Shutdown() if you need to close platform windows before imgui shutdown. otherwise will be called by DestroyContext().
+    IMGUI_API void              UpdateWindows();                                        // call in main loop. will call CreateWindow/ResizeWindow/etc. platform functions for each secondary viewport, and DestroyWindow for each inactive viewport.
+    IMGUI_API void              RenderWindowsDefault(void* platform_render_arg = NULL, void* renderer_render_arg = NULL); // call in main loop. will call RenderWindow/SwapBuffers platform functions for each secondary viewport which doesn't have the imgui_viewportFlags_Minimized flag set. May be reimplemented by user for custom rendering needs.
+    IMGUI_API void              DestroyWindows();                                       // call DestroyWindow platform functions for all viewports. call from back-end Shutdown() if you need to close platform windows before imgui shutdown. otherwise will be called by DestroyContext().
     IMGUI_API imgui_viewport*    FindViewportByID(ImGuiID id);                                   // this is a helper for back-ends.
     IMGUI_API imgui_viewport*    FindViewportByPlatformHandle(void* platform_handle);            // this is a helper for back-ends. the type platform_handle is decided by the back-end (e.g. HWND, MyWindow*, GLFWwindow* etc.)
 
@@ -1517,7 +1517,7 @@ struct imgui_style
     bool        AntiAliasedLinesUseTex;     // Enable anti-aliased lines/borders using textures where possible. Require back-end to render with bilinear filtering. Latched at the beginning of the frame (copied to imgui_draw_list).
     bool        AntiAliasedFill;            // Enable anti-aliased edges around filled shapes (rounded rectangles, circles, etc.). Disable if you are really tight on CPU/GPU. Latched at the beginning of the frame (copied to imgui_draw_list).
     float       CurveTessellationTol;       // Tessellation tolerance when using PathBezierCurveTo() without a specific number of segments. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
-    float       CircleSegmentMaxError;      // Maximum error (in pixels) allowed when using AddCircle()/AddCircleFilled() or drawing rounded corner rectangles with no explicit segment count specified. Decrease for higher quality but more geometry.
+    float       CircleSegmentMaxError;      // Maximum a_err (in pixels) allowed when using AddCircle()/AddCircleFilled() or drawing rounded corner rectangles with no explicit segment count specified. Decrease for higher quality but more geometry.
     ImVec4      Colors[ImGuiCol_COUNT];
 
     IMGUI_API imgui_style();
@@ -2048,11 +2048,11 @@ typedef void (*ImDrawCallback)(const imgui_draw_list* parent_list, const imgui_d
 struct imgui_draw_cmd
 {
     ImVec4          ClipRect;           // 4*4  // Clipping rectangle (x1, y1, x2, y2). Subtract imgui_draw_data->DisplayPos to get clipping rectangle in "viewport" coordinates
-    imgui_texture_id     TextureId;          // 4-8  // User-provided texture ID. Set by user in ImfontAtlas::SetTexID() for fonts or passed to Image*() functions. Ignore if never using images or multiple fonts atlas.
+    imgui_txr_id     TextureId;          // 4-8  // User-provided texture ID. Set by user in ImfontAtlas::SetTexID() for fonts or passed to Image*() functions. Ignore if never using images or multiple fonts atlas.
     unsigned int    VtxOffset;          // 4    // Start offset in vertex buffer. ImGuiBackendFlags_RendererHasVtxOffset: always 0, otherwise may be >0 to support meshes larger than 64K vertices with 16-bit indices.
     unsigned int    IdxOffset;          // 4    // Start offset in index buffer. Always equal to sum of ElemCount drawn so far.
     unsigned int    ElemCount;          // 4    // Number of indices (multiple of 3) to be rendered as triangles. Vertices are stored in the callee imgui_draw_list's buf_vtxfer[] array, indices in buf_idxfer[].
-    ImDrawCallback  UserCallback;       // 4-8  // If != NULL, call the function instead of rendering the vertices. clip_rect and texture_id will be set normally.
+    ImDrawCallback  UserCallback;       // 4-8  // If != NULL, call the function instead of rendering the vertices. clip_rect and txr_id will be set normally.
     void*           UserCallbackData;   // 4-8  // The draw callback code can access this.
 
     imgui_draw_cmd() { memset(this, 0, sizeof(*this)); } // Also ensure our padding fields are zeroed
@@ -2153,7 +2153,7 @@ struct imgui_draw_list
     ImDrawVert*             _VtxWritePtr;       // [Internal] point within VtxBuffer.Data after each add command (to avoid using the ImVector<> operators too much)
     ImDrawIdx*              _IdxWritePtr;       // [Internal] point within IdxBuffer.Data after each add command (to avoid using the ImVector<> operators too much)
     ImVector<ImVec4>        _ClipRectStack;     // [Internal]
-    ImVector<imgui_texture_id>   _TextureIdStack;    // [Internal]
+    ImVector<imgui_txr_id>   _TextureIdStack;    // [Internal]
     ImVector<ImVec2>        _Path;              // [Internal] current path building
     imgui_draw_cmd               _CmdHeader;         // [Internal] Template of active commands. Fields should match those of CmdBuffer.back().
     imgui_draw_listSplitter      _Splitter;          // [Internal] for channels api (note: prefer using your own persistent instance of imgui_draw_listSplitter!)
@@ -2165,7 +2165,7 @@ struct imgui_draw_list
     IMGUI_API void  PushClipRect(ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect = false);  // Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level GUI::PushClipRect() to affect logic (hit-testing and widget culling)
     IMGUI_API void  PushClipRectFullScreen();
     IMGUI_API void  PopClipRect();
-    IMGUI_API void  PushTextureID(imgui_texture_id texture_id);
+    IMGUI_API void  PushTextureID(imgui_txr_id txr_id);
     IMGUI_API void  PopTextureID();
     inline ImVec2   GetClipRectMin() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.x, cr.y); }
     inline ImVec2   GetClipRectMax() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.z, cr.w); }
@@ -2195,12 +2195,12 @@ struct imgui_draw_list
     IMGUI_API void  AddBezierCurve(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0);
 
     // Image primitives
-    // - Read FAQ to understand what imgui_texture_id is.
+    // - Read FAQ to understand what imgui_txr_id is.
     // - "p_min" and "p_max" represent the upper-left and lower-right corners of the rectangle.
     // - "uv_min" and "uv_max" represent the normalized texture coordinates to use for those corners. Using (0,0)->(1,1) texture coordinates will generally display the entire texture.
-    IMGUI_API void  AddImage(imgui_texture_id user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = IM_COL32_WHITE);
-    IMGUI_API void  AddImageQuad(imgui_texture_id user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = IM_COL32_WHITE);
-    IMGUI_API void  AddImageRounded(imgui_texture_id user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All);
+    IMGUI_API void  AddImage(imgui_txr_id user_txr_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = IM_COL32_WHITE);
+    IMGUI_API void  AddImageQuad(imgui_txr_id user_txr_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = IM_COL32_WHITE);
+    IMGUI_API void  AddImageRounded(imgui_txr_id user_txr_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All);
 
     // Stateful path API, add points then finish with PathFillConvex() or PathStroke()
     inline    void  PathClear()                                                 { _Path.Size = 0; }
@@ -2361,7 +2361,7 @@ enum ImFontAtlasFlags_
 //  - Call GetTexDataAsAlpha8() or GetTexDataAsRGBA32() to build and retrieve pixels data.
 //  - Upload the pixels data into a texture within your graphics system (see imgui_impl_xxxx.cpp examples)
 //  - Call SetTexID(my_tex_id); and pass the pointer/identifier to your texture in a format natural to your graphics API.
-//    This value will be passed back to you during rendering to identify the texture. Read FAQ entry about imgui_texture_id for more details.
+//    This value will be passed back to you during rendering to identify the texture. Read FAQ entry about imgui_txr_id for more details.
 // Common pitfalls:
 // - If you pass a 'glyph_ranges' array to AddFont*** functions, you need to make sure that your array persist up until the
 //   atlas is build (when calling GetTexData*** or Build()). We only copy the pointer, not the data.
@@ -2393,7 +2393,7 @@ struct ImFontAtlas
     IMGUI_API void              GetTexDataAsAlpha8(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = NULL);  // 1 byte per-pixel
     IMGUI_API void              GetTexDataAsRGBA32(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = NULL);  // 4 bytes-per-pixel
     bool                        IsBuilt() const             { return Fonts.Size > 0 && (TexPixelsAlpha8 != NULL || TexPixelsRGBA32 != NULL); }
-    void                        SetTexID(imgui_texture_id id)    { TexID = id; }
+    void                        SetTexID(imgui_txr_id id)    { TexID = id; }
 
     //-------------------------------------------
     // Glyph Ranges
@@ -2435,7 +2435,7 @@ struct ImFontAtlas
 
     bool                        Locked;             // Marked as Locked by GUI::NewFrame() so attempt to modify the atlas will assert.
     ImFontAtlasFlags            Flags;              // Build flags (see ImFontAtlasFlags_)
-    imgui_texture_id                 TexID;              // User data to refer to the texture once it has been uploaded to user's graphic systems. It is passed back to you during rendering via the imgui_draw_cmd structure.
+    imgui_txr_id                 TexID;              // User data to refer to the texture once it has been uploaded to user's graphic systems. It is passed back to you during rendering via the imgui_draw_cmd structure.
     int                         TexDesiredWidth;    // Texture width desired by user before Build(). Must be a power-of-two. If have many glyphs your graphics API have texture size restrictions you may want to increase texture width to decrease height.
     int                         TexGlyphPadding;    // Padding between glyphs within texture in pixels. Defaults to 1. If your rendering method doesn't rely on bilinear filtering you may set this to 0.
 
@@ -2537,7 +2537,7 @@ struct ImFont
 // Steps to use multi-viewports in your application, when using a default back-end from the examples/ folder:
 // - Application:  Enable feature with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
 // - Back-end:     The back-end initialization will setup all necessary imgui_platform_io's functions and update monitors info every frame.
-// - Application:  In your main loop, call GUI::UpdatePlatformWindows(), GUI::RenderPlatformWindowsDefault() after EndFrame() or Render().
+// - Application:  In your main loop, call GUI::UpdateWindows(), GUI::RenderWindowsDefault() after EndFrame() or Render().
 // - Application:  Fix absolute coordinates used in GUI::SetWindowPos() or GUI::SetNextWindowPos() calls.
 //
 // Steps to use multi-viewports in your application, when using a custom back-end:
@@ -2549,18 +2549,18 @@ struct ImFont
 //                 Set 'io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports' and 'io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports'.
 //                 Update imgui_platform_io's Monitors list every frame.
 //                 Update MousePos every frame, in absolute coordinates.
-// - Application:  In your main loop, call GUI::UpdatePlatformWindows(), GUI::RenderPlatformWindowsDefault() after EndFrame() or Render().
-//                 You may skip calling RenderPlatformWindowsDefault() if its API is not convenient for your needs. Read comments below.
+// - Application:  In your main loop, call GUI::UpdateWindows(), GUI::RenderWindowsDefault() after EndFrame() or Render().
+//                 You may skip calling RenderWindowsDefault() if its API is not convenient for your needs. Read comments below.
 // - Application:  Fix absolute coordinates used in GUI::SetWindowPos() or GUI::SetNextWindowPos() calls.
 //
-// About GUI::RenderPlatformWindowsDefault():
+// About GUI::RenderWindowsDefault():
 // - This function is a mostly a _helper_ for the common-most cases, and to facilitate using default back-ends.
 // - You can check its simple source code to understand what it does.
 //   It basically iterates secondary viewports and call 4 functions that are setup in imgui_platform_io, if available:
 //     Platform_RenderWindow(), Renderer_RenderWindow(), Platform_SwapBuffers(), Renderer_SwapBuffers()
-//   Those functions pointers exists only for the benefit of RenderPlatformWindowsDefault().
+//   Those functions pointers exists only for the benefit of RenderWindowsDefault().
 // - If you have very specific rendering needs (e.g. flipping multiple swap-chain simultaneously, unusual sync/threading issues, etc.),
-//   you may be tempted to ignore RenderPlatformWindowsDefault() and write customized code to perform your renderingg.
+//   you may be tempted to ignore RenderWindowsDefault() and write customized code to perform your renderingg.
 //   You may decide to setup the platform_io's *RenderWindow and *SwapBuffers pointers and call your functions through those pointers,
 //   or you may decide to never setup those pointers and call your code directly. They are a convenience, not an obligatory interface.
 //-----------------------------------------------------------------------------
@@ -2576,10 +2576,10 @@ struct imgui_platform_io
     // For reference, the second column shows which function are generally calling the Platform Functions:
     //   N = GUI::NewFrame()                        ~ beginning of the dear imgui frame: read info from platform/OS windows (latest size/position)
     //   F = GUI::Begin(), GUI::EndFrame()        ~ during the dear imgui frame
-    //   U = GUI::UpdatePlatformWindows()           ~ after the dear imgui frame: create and update all platform/OS windows
-    //   R = GUI::RenderPlatformWindowsDefault()    ~ render
-    //   D = GUI::DestroyPlatformWindows()          ~ shutdown
-    // The general idea is that NewFrame() we will read the current Platform/OS state, and UpdatePlatformWindows() will write to it.
+    //   U = GUI::UpdateWindows()           ~ after the dear imgui frame: create and update all platform/OS windows
+    //   R = GUI::RenderWindowsDefault()    ~ render
+    //   D = GUI::DestroyWindows()          ~ shutdown
+    // The general idea is that NewFrame() we will read the current Platform/OS state, and UpdateWindows() will write to it.
     //
     // The functions are designed so we can mix and match 2 imgui_impl_xxxx files, one for the Platform (~window/input handling), one for Renderer.
     // Custom engine back-ends will often provide both Platform and Renderer interfaces and so may not need to use all functions.
@@ -2598,9 +2598,9 @@ struct imgui_platform_io
     bool    (*Platform_GetWindowMinimized)(imgui_viewport* vp);              // N . . . .  // Get platform window minimized state. When minimized, we generally won't attempt to get/set size and contents will be culled more easily
     void    (*Platform_SetWindowTitle)(imgui_viewport* vp, const char* str); // . . U . .  // Set platform window title (given an UTF-8 string)
     void    (*Platform_SetWindowAlpha)(imgui_viewport* vp, float alpha);     // . . U . .  // (Optional) Setup window transparency
-    void    (*Platform_UpdateWindow)(imgui_viewport* vp);                    // . . U . .  // (Optional) Called by UpdatePlatformWindows(). Optional hook to allow the platform back-end from doing general book-keeping every frame.
-    void    (*Platform_RenderWindow)(imgui_viewport* vp, void* render_arg);  // . . . R .  // (Optional) Main rendering (platform side! This is often unused, or just setting a "current" context for OpenGL bindings). 'render_arg' is the value passed to RenderPlatformWindowsDefault().
-    void    (*Platform_SwapBuffers)(imgui_viewport* vp, void* render_arg);   // . . . R .  // (Optional) Call Present/SwapBuffers (platform side! This is often unused!). 'render_arg' is the value passed to RenderPlatformWindowsDefault().
+    void    (*Platform_UpdateWindow)(imgui_viewport* vp);                    // . . U . .  // (Optional) Called by UpdateWindows(). Optional hook to allow the platform back-end from doing general book-keeping every frame.
+    void    (*Platform_RenderWindow)(imgui_viewport* vp, void* render_arg);  // . . . R .  // (Optional) Main rendering (platform side! This is often unused, or just setting a "current" context for OpenGL bindings). 'render_arg' is the value passed to RenderWindowsDefault().
+    void    (*Platform_SwapBuffers)(imgui_viewport* vp, void* render_arg);   // . . . R .  // (Optional) Call Present/SwapBuffers (platform side! This is often unused!). 'render_arg' is the value passed to RenderWindowsDefault().
     float   (*Platform_GetWindowDpiScale)(imgui_viewport* vp);               // N . . . .  // (Optional) [BETA] FIXME-DPI: DPI handling: Return DPI scale for this viewport. 1.0f = 96 DPI.
     void    (*Platform_OnChangedViewport)(imgui_viewport* vp);               // . F . . .  // (Optional) [BETA] FIXME-DPI: DPI handling: Called during Begin() every time the viewport we are outputting into changes, so back-end has a chance to swap fonts to adjust style.
     void    (*Platform_SetImeInputPos)(imgui_viewport* vp, ImVec2 pos);      // . F . . .  // (Optional) Set IME (Input Method Editor, e.g. for Asian languages) input position, so text preview appears over the imgui input box. FIXME: The call timing of this is inconsistent because we want to support without multi-viewports.
@@ -2610,8 +2610,8 @@ struct imgui_platform_io
     void    (*Renderer_CreateWindow)(imgui_viewport* vp);                    // . . U . .  // Create swap chain, frame buffers etc. (called after Platform_CreateWindow)
     void    (*Renderer_DestroyWindow)(imgui_viewport* vp);                   // N . U . D  // Destroy swap chain, frame buffers etc. (called before Platform_DestroyWindow)
     void    (*Renderer_SetWindowSize)(imgui_viewport* vp, ImVec2 size);      // . . U . .  // Resize swap chain, frame buffers etc. (called after Platform_SetWindowSize)
-    void    (*Renderer_RenderWindow)(imgui_viewport* vp, void* render_arg);  // . . . R .  // (Optional) Clear framebuffer, setup render target, then render the viewport->DrawData. 'render_arg' is the value passed to RenderPlatformWindowsDefault().
-    void    (*Renderer_SwapBuffers)(imgui_viewport* vp, void* render_arg);   // . . . R .  // (Optional) Call Present/SwapBuffers. 'render_arg' is the value passed to RenderPlatformWindowsDefault().
+    void    (*Renderer_RenderWindow)(imgui_viewport* vp, void* render_arg);  // . . . R .  // (Optional) Clear framebuffer, setup render target, then render the viewport->DrawData. 'render_arg' is the value passed to RenderWindowsDefault().
+    void    (*Renderer_SwapBuffers)(imgui_viewport* vp, void* render_arg);   // . . . R .  // (Optional) Call Present/SwapBuffers. 'render_arg' is the value passed to RenderWindowsDefault().
 
     // (Optional) Monitor list
     // - Updated by: app/back-end. Update every frame to dynamically support changing monitor or DPI configuration.

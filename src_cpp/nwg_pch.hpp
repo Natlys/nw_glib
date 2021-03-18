@@ -1,6 +1,10 @@
-#ifndef NATIVE_GRAPHICS_PCH_HPP
-#define NATIVE_GRAPHICS_PCH_HPP
+#ifndef NWG_PCH_HPP
+#define NWG_PCH_HPP
 
-#include <native_library.hpp>
+#ifndef NW_BUILD_DLL
+#	define NW_BUILD_DLL
+#endif
 
-#endif	// NATIVE_GRAPHICS_PCH_HPP
+#include <nwl.hpp>
+
+#endif	// NWG_PCH_HPP

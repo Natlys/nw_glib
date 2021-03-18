@@ -5,15 +5,15 @@
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	bit ogl_load_varr() {
+	bit gfx_load_layt() {
 		// general
-		glGenVertexArrays = (pfn_ogl_varr_gen)(ogl_get_proc("glGenVertexArrays"));
-		glDeleteVertexArrays = (pfn_ogl_varr_del)(ogl_get_proc("glDeleteVertexArrays"));
-		glBindVertexArray = (pfn_ogl_varr_bind)(ogl_get_proc("glBindVertexArray"));
+		glGenVertexArrays = (pfn_ogl_varr_gen)(gfx_get_proc("glGenVertexArrays"));
+		glDeleteVertexArrays = (pfn_ogl_varr_del)(gfx_get_proc("glDeleteVertexArrays"));
+		glBindVertexArray = (pfn_ogl_varr_bind)(gfx_get_proc("glBindVertexArray"));
 		// data
-		glEnableVertexAttribArray = (pfn_ogl_varr_enable_atb)(ogl_get_proc("glEnableVertexAttribArray"));
-		glDisableVertexAttribArray = (pfn_ogl_varr_disable_atb)(ogl_get_proc("glEnableVertexAttribArray"));
-		glVertexAttribPointer = (pfn_ogl_varr_set_atb)(ogl_get_proc("glVertexAttribPointer"));
+		glEnableVertexAttribArray = (pfn_ogl_varr_enable_atb)(gfx_get_proc("glEnableVertexAttribArray"));
+		glDisableVertexAttribArray = (pfn_ogl_varr_disable_atb)(gfx_get_proc("glEnableVertexAttribArray"));
+		glVertexAttribPointer = (pfn_ogl_varr_set_atb)(gfx_get_proc("glVertexAttribPointer"));
 
 		return true;
 	}
@@ -33,7 +33,9 @@ namespace NW
 #if (NW_GAPI & NW_GAPI_DX)
 namespace NW
 {
-	//
+	bit gfx_load_layt() {
+		return true;
+	}
 }
 #endif
 #endif	// NW_GAPI

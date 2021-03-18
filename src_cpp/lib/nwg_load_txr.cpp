@@ -5,25 +5,25 @@
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	bit ogl_load_txr() {
+	bit gfx_load_txr() {
 		// general
-		glGenTextures = (pfn_ogl_txr_gen)(ogl_get_proc("glGenTextures"));
-		glDeleteTextures = (pfn_ogl_txr_del)(ogl_get_proc("glGenTextures"));
-		glBindTexture = (pfn_ogl_txr_bind)(ogl_get_proc("glBindTexture"));
-		glActiveTexture = (pfn_ogl_txr_active)(ogl_get_proc("glActiveTexture"));
-		glGenerateMipmap = (pfn_ogl_txr_mipmap_gen)(ogl_get_proc("glGenerateMipmap"));
-		glTexImage1D = (pfn_ogl_txr_img_1d)(ogl_get_proc("glTexImage1D"));
-		glTexImage2D = (pfn_ogl_txr_img_2d)(ogl_get_proc("glTexImage2D"));
-		glTexImage3D = (pfn_ogl_txr_img_3d)(ogl_get_proc("glTexImage3D"));
-		glTexImage2DMultisample = (pfn_ogl_txr_img_2d_mulsmp)(ogl_get_proc("glTexImage2DMultisample"));
-		glTexImage3DMultisample = (pfn_ogl_txr_img_3d_mulsmp)(ogl_get_proc("glTexImage3DMultisample"));
+		glGenTextures = (pfn_ogl_txr_gen)(gfx_get_proc("glGenTextures"));
+		glDeleteTextures = (pfn_ogl_txr_del)(gfx_get_proc("glGenTextures"));
+		glBindTexture = (pfn_ogl_txr_bind)(gfx_get_proc("glBindTexture"));
+		glActiveTexture = (pfn_ogl_txr_active)(gfx_get_proc("glActiveTexture"));
+		glGenerateMipmap = (pfn_ogl_txr_mipmap_gen)(gfx_get_proc("glGenerateMipmap"));
+		glTexImage1D = (pfn_ogl_txr_img_1d)(gfx_get_proc("glTexImage1D"));
+		glTexImage2D = (pfn_ogl_txr_img_2d)(gfx_get_proc("glTexImage2D"));
+		glTexImage3D = (pfn_ogl_txr_img_3d)(gfx_get_proc("glTexImage3D"));
+		glTexImage2DMultisample = (pfn_ogl_txr_img_2d_mulsmp)(gfx_get_proc("glTexImage2DMultisample"));
+		glTexImage3DMultisample = (pfn_ogl_txr_img_3d_mulsmp)(gfx_get_proc("glTexImage3DMultisample"));
 		// params
-		glTexParameteri = (pfn_ogl_txr_param_i)(ogl_get_proc("glTexParameteri"));
-		glTexParameteriv = (pfn_ogl_txr_param_vi)(ogl_get_proc("glTexParameteriv"));
-		glTexParameterf = (pfn_ogl_txr_param_f)(ogl_get_proc("glTexParameterf"));
-		glTexParameterfv = (pfn_ogl_txr_param_vf)(ogl_get_proc("glTexParameterfv"));
+		glTexParameteri = (pfn_ogl_txr_param_i)(gfx_get_proc("glTexParameteri"));
+		glTexParameteriv = (pfn_ogl_txr_param_vi)(gfx_get_proc("glTexParameteriv"));
+		glTexParameterf = (pfn_ogl_txr_param_f)(gfx_get_proc("glTexParameterf"));
+		glTexParameterfv = (pfn_ogl_txr_param_vf)(gfx_get_proc("glTexParameterfv"));
 		// other
-		glClearTexImage = (pfn_ogl_txr_img_clear)(ogl_get_proc("glClearTexImage"));
+		glClearTexImage = (pfn_ogl_txr_img_clear)(gfx_get_proc("glClearTexImage"));
 
 		return true;
 	}

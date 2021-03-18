@@ -1,13 +1,13 @@
-#ifndef NW_LOAD_SMP_H
-#define NW_LOAD_SMP_H
+#ifndef NWG_LOAD_SAMPLER_H
+#define NWG_LOAD_SAMPLER_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include "nwg_load_base.h"
-#if (NW_GAPI & NW_GAPI_OGL)
+#include "nwg_load_core.h"
 namespace NW
 {
-	extern bit ogl_load_smp();
+	extern bit gfx_load_smp();
 }
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// general
@@ -64,4 +64,4 @@ namespace NW
 }
 #endif
 #endif	// NW_GAPI
-#endif	// NW_LOAD_SMP_H
+#endif	// NWG_LOAD_SMP_H

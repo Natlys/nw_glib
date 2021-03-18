@@ -895,24 +895,24 @@ static void ShowDemoWindowWidgets()
     if (GUI::TreeNode("Images"))
     {
         imgui_io& io = GUI::GetIO();
-        GUI::TextWrapped("Below we are displaying the font texture (which is the only texture we have access to in this demo). Use the 'imgui_texture_id' type as storage to pass pointers or identifier to your own texture data. Hover the texture for a zoomed view!");
+        GUI::TextWrapped("Below we are displaying the font texture (which is the only texture we have access to in this demo). Use the 'imgui_txr_id' type as storage to pass pointers or identifier to your own texture data. Hover the texture for a zoomed view!");
 
         // Below we are displaying the font texture because it is the only texture we have access to inside the demo!
-        // Remember that imgui_texture_id is just storage for whatever you want it to be. It is essentially a value that
+        // Remember that imgui_txr_id is just storage for whatever you want it to be. It is essentially a value that
         // will be passed to the rendering back-end via the imgui_draw_cmd structure.
         // If you use one of the default imgui_impl_XXXX.cpp rendering back-end, they all have comments at the top
-        // of their respective source file to specify what they expect to be stored in imgui_texture_id, for example:
+        // of their respective source file to specify what they expect to be stored in imgui_txr_id, for example:
         // - The imgui_impl_dx11.cpp renderer expect a 'ID3D11ShaderResourceView*' pointer
         // - The imgui_impl_opengl3.cpp renderer expect a GLuint OpenGL texture identifier, etc.
         // More:
-        // - If you decided that imgui_texture_id = MyEngineTexture*, then you can pass your MyEngineTexture* pointers
+        // - If you decided that imgui_txr_id = MyEngineTexture*, then you can pass your MyEngineTexture* pointers
         //   to GUI::Image(), and gather width/height through your own functions, etc.
         // - You can use ShowMetricsWindow() to inspect the draw data that are being passed to your renderer,
         //   it will help you debug issues if you are confused about it.
         // - Consider using the lower-level imgui_draw_list::AddImage() API, via GUI::GetWindowDrawList()->AddImage().
         // - Read https://github.com/ocornut/imgui/blob/master/docs/FAQ.md
         // - Read https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-        imgui_texture_id my_tex_id = io.Fonts->TexID;
+        imgui_txr_id my_tex_id = io.Fonts->TexID;
         float my_tex_w = (float)io.Fonts->TexWidth;
         float my_tex_h = (float)io.Fonts->TexHeight;
         {
@@ -4232,7 +4232,7 @@ struct ExampleAppConsole
         // TODO: display items starting from the bottom
 
         if (GUI::SmallButton("Add Debug Text"))  { AddLog("%d some text", Items.Size); AddLog("some more text"); AddLog("display very important message here!"); } GUI::SameLine();
-        if (GUI::SmallButton("Add Debug Error")) { AddLog("[error] something went wrong"); } GUI::SameLine();
+        if (GUI::SmallButton("Add Debug Error")) { AddLog("[a_err] something went wrong"); } GUI::SameLine();
         if (GUI::SmallButton("Clear"))           { ClearLog(); } GUI::SameLine();
         bool copy_to_clipboard = GUI::SmallButton("Copy");
         //static float t = 0.0f; if (GUI::GetTime() - t > 0.02f) { t = GUI::GetTime(); AddLog("Spam %f", t); }
@@ -4250,7 +4250,7 @@ struct ExampleAppConsole
         if (GUI::Button("Options"))
             GUI::OpenPopup("Options");
         GUI::SameLine();
-        Filter.Draw("Filter (\"incl,-excl\") (\"error\")", 180);
+        Filter.Draw("Filter (\"incl,-excl\") (\"a_err\")", 180);
         GUI::Separator();
 
         // Reserve enough left-over height for 1 separator + 1 input text
@@ -4298,7 +4298,7 @@ struct ExampleAppConsole
             // (e.g. make Items[] an array of structure, store color/type etc.)
             ImVec4 color;
             bool has_color = false;
-            if (strstr(item, "[error]"))          { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
+            if (strstr(item, "[a_err]"))          { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
             else if (strncmp(item, "# ", 2) == 0) { color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f); has_color = true; }
             if (has_color)
                 GUI::PushStyleColor(ImGuiCol_Text, color);
@@ -4636,7 +4636,7 @@ static void ShowExampleAppLog(bool* p_open)
     if (GUI::SmallButton("[Debug] Add 5 entries"))
     {
         static int counter = 0;
-        const char* categories[3] = { "info", "warn", "error" };
+        const char* categories[3] = { "info", "warn", "a_err" };
         const char* words[] = { "Bumfuzzled", "Cattywampus", "Snickersnee", "Abibliophobia", "Absquatulate", "Nincompoop", "Pauciloquent" };
         for (int n = 0; n < 5; n++)
         {
