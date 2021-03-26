@@ -3,11 +3,12 @@
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
 #include "nwg_load_core.h"
-#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	extern bit gfx_load_txr();
 }
+#define NW_MAX_SLOTS_TXR	10u
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	// general

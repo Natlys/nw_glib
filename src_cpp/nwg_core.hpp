@@ -11,8 +11,8 @@ namespace NW
 	class NW_API a_gfx_cmp;
 
 	class NW_API a_gfx_ent;
-	class NW_API ent_vtx;
-	class NW_API ent_idx;
+	class NW_API gfx_ent_vtx;
+	class NW_API gfx_ent_idx;
 
 	class NW_API gfx_mtl;
 	
@@ -40,9 +40,9 @@ namespace NW
 	class NW_API txr_smp;
 
 	class NW_API a_gfx_stt;
-	class NW_API stt_depth;
+	class NW_API gfx_stt_ds;
 	class NW_API stt_stenc;
-	class NW_API stt_draw;
+	class NW_API gfx_stt_draw;
 	class NW_API stt_cull;
 	class NW_API stt_blend;
 	class NW_API stt_scis;
@@ -75,6 +75,7 @@ struct ID3D11Texture1D;
 struct ID3D11Texture2D;
 struct ID3D11Texture3D;
 struct ID3D11CubeTexture;
+struct ID3D11RasterizerState;
 #endif
 #endif	// NW_GAPI
 #endif	// NWG_CORE_HPP

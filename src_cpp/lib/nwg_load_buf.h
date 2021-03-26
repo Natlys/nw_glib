@@ -7,6 +7,7 @@ namespace NW
 {
 	extern bit gfx_load_buf();
 }
+#define NW_MAX_SLOTS_BUF	10u
 #if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {

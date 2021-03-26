@@ -25,7 +25,7 @@ namespace NW
 		// other
 		glClearTexImage = (pfn_ogl_txr_img_clear)(gfx_get_proc("glClearTexImage"));
 
-		return true;
+		return TRUE;
 	}
 }
 namespace NW
@@ -53,7 +53,10 @@ namespace NW
 #if (NW_GAPI & NW_GAPI_DX)
 namespace NW
 {
-	//
+	bit gfx_load_txr()
+	{
+		return TRUE;
+	}
 }
 #endif
 #endif	// NW_GAPI

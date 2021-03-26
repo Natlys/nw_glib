@@ -33,9 +33,9 @@ namespace NW
 		return true;
 	}
 	void gfx_clear_err() { while (glGetError() != GL_NO_ERROR); }
-	bit gfx_get_err_log(cstr strLoc, cstr strFile, si32 nLine)
+	bit gfx_get_err_log(cstr strLoc, cstr strFile, v1ui nLine)
 	{
-		si32 err_code = 0u;
+		v1si err_code = 0u;
 		while ((err_code = glGetError()) != GL_NO_ERROR) {
 			dstr err_comment;
 			switch (err_code) {
@@ -84,7 +84,9 @@ namespace NW
 {
 	bit gfx_load_core() {
 		if (gfx_get_lib() == NULL) { return false; }
-		gfx_new_context_and_swap_chain = (PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN)gfx_get_proc("D3D11CreateDeviceAndSwapChain");
+		
+		D3D11CreateDevice = (PFN_D3D11_CREATE_DEVICE)gfx_get_proc("D3D11CreateDevice");
+		D3D11CreateDeviceAndSwapChain = (PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN)gfx_get_proc("D3D11CreateDeviceAndSwapChain");
 		
 		return true;
 	}
@@ -97,7 +99,8 @@ namespace NW
 }
 namespace NW
 {
-	PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN gfx_new_context_and_swap_chain = NULL;
+	PFN_D3D11_CREATE_DEVICE D3D11CreateDevice = NULL;
+	PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN D3D11CreateDeviceAndSwapChain = NULL;
 }
 #endif
 #endif	// NW_GAPI

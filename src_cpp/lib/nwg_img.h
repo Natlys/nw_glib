@@ -5,7 +5,7 @@
 namespace NW
 {
 	/// image class
-	class NW_API img_cmp : public t_cmp<img_cmp>, public a_data_cmp
+	class NW_API img_cmp : public a_data_cmp
 	{
 	public:
 		using pxl_fmt = pixel_formats;
@@ -13,73 +13,39 @@ namespace NW
 	public:
 		img_cmp();
 		img_cmp(const img_cmp& cpy);
-		img_cmp(const img_cmp& cpy, si32 offset_x, si32 offset_y, si32 width, si32 height);
+		img_cmp(const img_cmp& cpy, v1si offset_x, v1si offset_y, v1si width, v1si height);
 		// --getters
-		inline si32 get_size_x() const		{ return m_size_x; }
-		inline si32 get_size_y() const		{ return m_size_y; }
-		inline si32 get_channels() const	{ return m_channels; }
-		inline size get_data_size() const	{ return static_cast<size>(abs(m_size_x)) * static_cast<size>(abs(m_size_y)) * static_cast<size>(abs(m_channels)); }
-		inline ui64 get_pxl_size() const	{ return static_cast<size>(abs(m_size_x)) * static_cast<size>(abs(m_size_y)); }
-		inline pxl_fmt get_pxl_fmt() const	{ return m_pxl_fmt; }
-		inline data_types get_data_type() const						{ return m_data_type; }
-		inline ubyte* get_data()									{ return &m_pxl_data[0]; }
-		inline const ubyte* get_data() const						{ return &m_pxl_data[0]; }
-		inline ubyte* get_data(ui32 pxl_x, ui32 pxl_y)				{ return &m_pxl_data[NW_XY_TO_X(pxl_x * m_channels, pxl_y * m_channels, m_size_x) % get_data_size()]; }
-		inline const ubyte* get_data(ui32 pxl_x, ui32 pxl_y) const	{ return &m_pxl_data[NW_XY_TO_X(pxl_x * m_channels, pxl_y * m_channels, m_size_x) % get_data_size()]; }
+		inline v1si get_size_x() const      { return m_size_x; }
+		inline v1si get_size_y() const      { return m_size_y; }
+		inline v1si get_channels() const    { return m_channels; }
+		inline size get_data_size() const   { return static_cast<size>(abs(m_size_x)) * static_cast<size>(abs(m_size_y)) * static_cast<size>(abs(m_channels)); }
+		inline size get_pxl_size() const    { return static_cast<size>(abs(m_size_x)) * static_cast<size>(abs(m_size_y)); }
+		inline pxl_fmt get_format() const   { return m_format; }
+		inline native_types get_data_type() const                   { return m_data_type; }
+		inline ubyte* get_data()                                    { return &m_pxl_data[0]; }
+		inline const ubyte* get_data() const                        { return &m_pxl_data[0]; }
+		inline ubyte* get_data(v1ui pxl_x, v1ui pxl_y)              { return &m_pxl_data[NW_XY_TO_X(pxl_x * m_channels, pxl_y * m_channels, m_size_x) % get_data_size()]; }
+		inline const ubyte* get_data(v1ui pxl_x, v1ui pxl_y) const  { return &m_pxl_data[NW_XY_TO_X(pxl_x * m_channels, pxl_y * m_channels, m_size_x) % get_data_size()]; }
 		// --setters
 		void set_data(const ubyte* data_ptr);
 		void set_data(const img_cmp& source);
-		void set_data(const img_cmp& source, si32 crd_x, si32 crd_y, si32 size_x, si32 size_y);
+		void set_data(const img_cmp& source, v1si crd_x, v1si crd_y, v1si size_x, v1si size_y);
 		// --operators
 		virtual stm_out& operator<<(stm_out& stm) const = 0;
 		virtual stm_in& operator>>(stm_in& stm) = 0;
 		// --core_methods
-		data make_region(si32 crd_x, si32 crd_y, si32 size_x, si32 size_y) const;
+		data make_region(v1si crd_x, v1si crd_y, v1si size_x, v1si size_y) const;
 	protected:
-		si32 m_size_x;
-		si32 m_size_y;
-		si32 m_channels;
-		pxl_fmt m_pxl_fmt;
-		data_types m_data_type;
+		v1si m_size_x;
+		v1si m_size_y;
+		v1si m_channels;
+		pixel_formats m_format;
+		native_types m_data_type;
 		data m_pxl_data;
 	};
 }
 namespace NW
 {
-	struct img_bmp_info : a_info
-	{
-	public:
-#pragma pack(push, 1) // add padding 16->14
-		struct {
-		public:
-			ui16 type_code = 0x4d;		// two encoded letters;usually "bm"
-			ui32 file_size = 54;		// size of the entire file in bytes
-			ui16 reserved1 = 0;			// it is reserved, (can be used by a programmer)
-			ui16 reserved2 = 0;			// so it is always zero
-			ui32 data_offset = 54;		// offset to the pixel data
-		} file;	// file information
-#pragma pack(pop)
-#pragma pack(push, 1)
-		struct {
-		public:
-			ui32 header_size = 3;	// size of the header in bytes
-			si32 width = 1;			// bitmap width in pixels
-			si32 height = 1;		// bitmap height in pixels
-			ui16 nof_planes = 1;		// always 1
-			ui16 nof_pixel_bits = 24;	// bpp
-			ui32 compression_type = 0;	// 24bpp = 0; 32bpp = 3
-			ui32 image_size = 0;		// 0 for uncompressed
-			si32 ppm_x = 0;
-			si32 ppm_y = 0;
-			ui32 clrs_used = 0;	// indexed pallete count; zero for all available collors;
-			ui32 clrs_need = 0;	// required colors for bitmap
-		} data;	// data description
-#pragma pack(pop)
-	public:
-		// --operators
-		virtual stm_out& operator<<(stm_out& stm) const override;
-		virtual stm_in& operator>>(stm_in& stm) override;
-	};
 	/// img_bmp class
 	/// description:
 	/// --used for loading of .bmp formatted files
@@ -88,7 +54,7 @@ namespace NW
 	/// ->if the image is indexed - load color pallete
 	/// ->read pixel data with offset which is defined in "file" header
 	/// ->in the case of 24bit and not multiple-of-4 sizes, we need to consider padding
-	class NW_API img_bmp : public img_cmp
+	class NW_API img_bmp : public t_cmp<img_bmp>, public img_cmp
 	{
 	public:
 		img_bmp();

@@ -6,7 +6,7 @@ namespace NW
 {
 	extern NW_API bit gfx_load_core();
 	extern NW_API void gfx_clear_err();
-	extern NW_API bit gfx_get_err_log(cstr info, cstr location, si32 line);
+	extern NW_API bit gfx_get_err_log(cstr info, cstr location, v1ui line);
 #	if (defined NW_DEBUG)
 #		define NW_DEBUG_CALL(code) ( gfx_clear_err(); (code) if (gfx_get_err_log(#code, __FILE__, __LINE__, "GL_ERROR: ") == false) { NW_BREAK(); } )
 #	else
@@ -296,8 +296,11 @@ namespace NW
 #pragma comment(lib, "d3dcompiler.lib")
 namespace NW
 {
-	extern PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN gfx_new_context_and_swap_chain;
+	extern PFN_D3D11_CREATE_DEVICE gfx_new_device_context;
+	extern PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN gfx_new_device_context_swap;
 }
+#	define D3D11CreateDevice               gfx_new_device_context
+#	define D3D11CreateDeviceAndSwapChain   gfx_new_device_context_swap
 #endif
 #endif	// NW_GAPI
 #endif	// NWG_LOAD_CORE_H

@@ -1,5 +1,6 @@
 #include <nwg_pch.hpp>
 #include "nwg_load.h"
+#if (defined NW_GAPI)
 #include "nwg_load_buf.h"
 #include "nwg_load_fmbuf.h"
 #include "nwg_load_layt.h"
@@ -7,74 +8,118 @@
 #include "nwg_load_txr.h"
 #include "nwg_load_shd.h"
 #include "nwg_load_mtl.h"
-#if (defined NW_GAPI)
-namespace NW
-{
-	static library_handle s_gfx_lib= NULL;
-}
+#include "nwg_load_wapi.h"
 #if (NW_GAPI & NW_GAPI_OGL)
-#include <lib/nwg_load_wgl.h>
 namespace NW
 {
-	struct ogl_version
+	gfx_lib_loader::gfx_lib_loader() :
+		m_handle(NULL),
+		m_ver_num(0), m_ver_str("default"),
+		m_drawer("default"),
+		m_vendor("default"),
+		m_shd_lang("default"),
+		m_pxl_range(0),
+		m_pxl_gran(0),
+		m_max_slot_txr(0),
+		m_max_slot_atb(0)
 	{
-		si32 major = 0;
-		si32 minor = 0;
-		// --predicates
-		inline bit is_supported(si32 major_ver, si32 minor_ver) {
-			if (major_ver < 3) { return false; }
-			if (major == minor_ver) { return minor >= minor_ver; }
-			return major >= major_ver;
-		}
-	};
-
-	static ogl_version s_version{ 0 };
-}
-namespace NW
-{
+	}
+	gfx_lib_loader::~gfx_lib_loader()
+	{
+	}
 	// --getters
-	ptr gfx_get_proc(cstr name) {
+	ptr gfx_lib_loader::get_proc(cstr name) {
+		
 		ptr resource = wglGetProcAddress(name);
-		return resource == NULL ? ::GetProcAddress(s_gfx_lib, name) : resource;
+		if (resource == NULL) { resource = ::GetProcAddress(m_handle, name); }
+
+		return resource;
 	}
-	library_handle gfx_get_lib() { return s_gfx_lib; }
 	// --==<core_methods>==--
-	bit gfx_init_lib() {
-		if (gfx_open_lib() == FALSE) { return FALSE; }
-		if (gfx_load_lib() == FALSE) { return FALSE; }
-		if (gfx_close_lib() == FALSE) { return FALSE; }
+	bool gfx_lib_loader::init()
+	{
+		if (m_handle == NULL) { return FALSE; }
 
-		if (glGetIntegerv == NULL) { return FALSE; }
-		glGetIntegerv(GL_MAJOR_VERSION, &s_version.major);
-		glGetIntegerv(GL_MINOR_VERSION, &s_version.minor);
-		if (s_version.major < 3) { return FALSE; }
+		if (gfx_load_core() == TRUE) {
+			if (glGetIntegerv == NULL) { return FALSE; }
+
+			v1si version_nums[2] = { 0, 0 };
+			glGetIntegerv(GL_MAJOR_VERSION, &version_nums[0]);
+			glGetIntegerv(GL_MINOR_VERSION, &version_nums[1]);
+			m_ver_num = (version_nums[0] * 100) + (version_nums[1] * 10);
+
+			m_ver_str = reinterpret_cast<cstr>(glGetString(GL_VERSION));
+			//m_ext_str = reinterpret_cast<cstr>(glGetString(GL_EXTENSIONS));
+			m_drawer = reinterpret_cast<cstr>(glGetString(GL_RENDERER));
+			m_vendor = reinterpret_cast<cstr>(glGetString(GL_VENDOR));
+			m_shd_lang = reinterpret_cast<cstr>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+			glGetIntegerv(GL_POINT_SIZE_RANGE, &m_pxl_range);
+			glGetIntegerv(GL_POINT_SIZE_GRANULARITY, &m_pxl_gran);
+			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &m_max_slot_txr);
+			glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &m_max_slot_atb);
+		}
+		else { return FALSE; }
+		if (gfx_load_buf() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_fmbuf() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_layt() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_smp() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_txr() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_shd() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_mtl() == TRUE) {
+		}
+		else { return FALSE; }
+		// extensions
+		if (gfx_ext_load_wapi() == TRUE) {
+		}
+		else { return FALSE; }
 
 		return TRUE;
 	}
-	bit gfx_open_lib()
+	bool gfx_lib_loader::quit()
 	{
-		if (s_gfx_lib != NULL) { return FALSE; }
-		s_gfx_lib = ::LoadLibraryA("opengl32.dll");
-		if (gfx_load_wgl() == FALSE) { return FALSE; }
+		if (m_handle != NULL) { return FALSE; }
+		
+		m_ver_str = "default";
+		m_drawer = "default";
+		m_vendor = "default";
+		m_shd_lang = "default";
+
+		m_ver_num = 0;
+		m_max_slot_atb = 0;
+		m_max_slot_txr = 0;
 
 		return TRUE;
 	}
-	bit gfx_close_lib()
+	bool gfx_lib_loader::load()
 	{
-		if (s_gfx_lib == NULL) { return FALSE; }
-		::FreeLibrary(s_gfx_lib); s_gfx_lib = NULL;
+		if (m_handle != NULL) { return FALSE; }
+
+		m_handle = ::LoadLibrary("opengl32.dll");
+		if (gfx_load_wapi() == TRUE) {
+		}
+		else { return FALSE; }
+
 		return TRUE;
 	}
-	bit gfx_load_lib()
+	bool gfx_lib_loader::free()
 	{
-		if (gfx_load_core() == FALSE) { return FALSE; }
-		if (gfx_load_buf() == FALSE) { return FALSE; }
-		if (gfx_load_fmbuf() == FALSE) { return FALSE; }
-		if (gfx_load_layt() == FALSE) { return FALSE; }
-		if (gfx_load_smp() == FALSE) { return FALSE; }
-		if (gfx_load_txr() == FALSE) { return FALSE; }
-		if (gfx_load_shd() == FALSE) { return FALSE; }
-		if (gfx_load_mtl() == FALSE) { return FALSE; }
+		if (m_handle == NULL) { return FALSE; }
+
+		::FreeLibrary(m_handle);
+		m_handle = NULL;
 
 		return TRUE;
 	}
@@ -84,34 +129,93 @@ namespace NW
 #if (NW_GAPI & NW_GAPI_DX)
 namespace NW
 {
-	// --getters
-	ptr gfx_get_proc(cstr name) {
-		return ::GetProcAddress(s_gfx_lib, name);
+	gfx_lib_loader::gfx_lib_loader() :
+		m_handle(NULL),
+		m_ver_num(0), m_ver_str("default"),
+		m_drawer("default"),
+		m_vendor("default"),
+		m_shd_lang("default"),
+		m_pxl_range(0),
+		m_pxl_gran(0),
+		m_max_slot_txr(0),
+		m_max_slot_atb(0)
+	{
 	}
-	library_handle gfx_get_lib() { return s_gfx_lib; }
+	gfx_lib_loader::~gfx_lib_loader() { quit(); }
+	// --getters
+	ptr gfx_lib_loader::get_proc(cstr name) {
+
+		ptr resource = ::GetProcAddress(m_handle, name);
+		
+		return resource;
+	}
 	// --==<core_methods>==--
-	bit gfx_init_lib() {
-		if (gfx_open_lib() == FALSE) { return FALSE; }
-		if (gfx_load_lib() == FALSE) { return FALSE; }
-		if (gfx_close_lib() == FALSE) { return FALSE; }
+	bool gfx_lib_loader::init() {
+		if (m_handle == NULL) { return FALSE; }
+
+		if (gfx_load_core() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_buf() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_fmbuf() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_layt() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_smp() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_txr() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_shd() == TRUE) {
+		}
+		else { return FALSE; }
+		if (gfx_load_mtl() == TRUE) {
+		}
+		else { return FALSE; }
+		// extensions
+		if (gfx_ext_load_wapi() == TRUE) {
+		}
+		else { return FALSE; }
 
 		return TRUE;
 	}
-	bit gfx_open_lib()
+	bool gfx_lib_loader::quit()
 	{
-		if (s_gfx_lib != NULL) { return FALSE; }
-		s_gfx_lib = ::LoadLibraryA("d3d11.dll");
+		if (m_handle != NULL) { return FALSE; }
+		
+		m_ver_str = "default";
+		m_drawer = "default";
+		m_vendor = "default";
+		m_shd_lang = "default";
+
+		m_ver_num = 0;
+		m_max_slot_atb = 0;
+		m_max_slot_txr = 0;
+
 		return TRUE;
 	}
-	bit gfx_close_lib()
+	bool gfx_lib_loader::load()
 	{
-		if (s_gfx_lib == NULL) { return FALSE; }
-		::FreeLibrary(s_gfx_lib); s_gfx_lib = NULL;
+		if (m_handle != NULL) { return FALSE; }
+		
+		m_handle = ::LoadLibrary("d3d11.dll");
+		if (gfx_load_wapi() == TRUE) {
+		}
+		else { return FALSE; }
+		
 		return TRUE;
 	}
-	bit gfx_load_lib()
+	bool gfx_lib_loader::free()
 	{
-		if (gfx_load_core() == FALSE) { return FALSE; }
+		if (m_handle == NULL) { return FALSE; }
+
+		::FreeLibrary(m_handle);
+		m_handle = NULL;
 
 		return TRUE;
 	}

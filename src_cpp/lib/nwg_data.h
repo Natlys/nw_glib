@@ -2,7 +2,7 @@
 #define NWG_DATA_H
 #include <nwg_core.hpp>
 #if (defined NW_GAPI)
-#include <lib/nwg_switch.h>
+#include <lib/nwg_const.h>
 namespace NW
 {
 	struct NW_API vtx_2f
@@ -53,36 +53,46 @@ namespace NW
 }
 namespace NW
 {
-	/// graphics mesh data class
+	/// templated graphics_data class
 	/// description:
 	/// --makes render data for primitives;
 	/// interface:
 	/// --add vertex data one by one;
 	/// --update_idx_data for required topology;
 	/// --use index and vertex data for drawing;
-	template<typename vtype, typename itype = ui32>
-	class NW_API mesh_data
+	template<typename vtype, typename itype = v1ui>
+	class NW_API t_gfx_data
 	{
+		using cvtype = const vtype;
+		using citype = const itype;
 		using vertices = darray<vtype>;
+		using cvertices = const darray<vtype>;
 		using indices = darray<itype>;
+		using cindices = const darray<itype>;
 	public:
-		mesh_data() : m_vtxs(vertices()), m_idxs(indices()), m_iter(0) { }
+		t_gfx_data() :
+			m_vtxs(vertices()), m_idxs(indices()), m_iter(0) { }
 		// --getters
-		inline vtype* get_vtx_data() { return &m_vtxs[0]; }
-		inline size get_vtx_count()	const { return m_vtxs.size(); }
-		inline vertices& get_vertices() { return m_vtxs; }
-		inline vtype& get_vertex(ui32 idx) { return m_vtxs[idx % m_vtxs.size()]; }
-		inline itype* get_idx_data() { return &m_idxs[0]; }
-		inline ui32 get_idx_count()	const { return m_idxs.size(); }
-		inline indices& get_indices() { return m_idxs; }
-		inline itype& get_index(ui32 idx) { return m_idxs[idx % m_idxs.size()]; }
+		inline cvertices& get_vtx_buf() const  { return m_vtxs; }
+		inline cvtype* get_vtx_data() const    { return &m_vtxs[0]; }
+		inline size get_vtx_count()	const      { return m_vtxs.size(); }
+		inline vtype get_vtx(v1ui idx) const   { return m_vtxs[idx % m_vtxs.size()]; }
+		inline cindices& get_idx_buf() const   { return m_idxs; }
+		inline citype* get_idx_data() const    { return &m_idxs[0]; }
+		inline v1ui get_idx_count()	const      { return m_idxs.size(); }
+		inline itype get_idx(v1ui idx) const   { return m_idxs[idx % m_idxs.size()]; }
 		// --setters
-		void add_vertex(const vtype& vtx) { m_vtxs.push_back(vtx); }
+		void set_vtx_buf(cvertices& buffer)    { m_vtxs = buffer; }
+		void add_vtx_buf(cvertices& buffer)    { for (auto& ivtx : buffer) { add_vtx(ivtx); } }
+		void add_vtx(cvtype& vtx)              { m_vtxs.push_back(vtx); }
 		// --core_methods
-		void update_indices(gfx_primitives primitive_topology) {
+		void update_indices(primitives primitive_topology) {
 			switch (primitive_topology) {
 				if (m_vtxs.size() < 1) { break; }
-			case GPT_POINTS: case GPT_LINE_LOOP: case GPT_LINE_STRIP: case GPT_TRIANGLE_FAN: {
+			case PRIM_POINTS:
+			case PRIM_LINE_LOOP:
+			case PRIM_LINE_STRIP:
+			case PRIM_TRIANGLE_FAN: {
 				while (m_iter < m_vtxs.size() - 0) {
 					m_idxs.push_back(m_iter + 0);
 					m_iter++;
@@ -90,7 +100,7 @@ namespace NW
 				m_iter++;
 				break;
 			}
-			case GPT_LINES: {
+			case PRIM_LINES: {
 				if (m_vtxs.size() < 2) { break; }
 				while (m_iter < m_vtxs.size() - 1) {
 					m_idxs.push_back(m_iter + 0);
@@ -100,21 +110,21 @@ namespace NW
 				m_iter++;
 				break;
 			}
-			case GPT_TRIANGLES: {
+			case PRIM_TRIANGLES: {
 				if (m_vtxs.size() < 3) { break; }
-				ui32 first = m_iter;
-				while (m_iter < m_vtxs.size() - 1) {
+				v1ui first = m_iter;
+				while (m_iter < m_vtxs.size() - 2) {
 					m_idxs.push_back(first);
-					m_idxs.push_back(m_iter + 0);
 					m_idxs.push_back(m_iter + 1);
+					m_idxs.push_back(m_iter + 2);
 					m_iter++;
 				}
 				m_iter++;
 				break;
 			}
-			case GPT_TRIANGLE_STRIP: {
+			case PRIM_TRIANGLE_STRIP: {
 				if (m_vtxs.size() < 3) { break; }
-				ui32 first = m_iter;
+				v1ui first = m_iter;
 				while (m_iter < m_vtxs.size() - 0) {
 					m_idxs.push_back(first);
 					m_idxs.push_back(m_iter + 0);
@@ -134,7 +144,7 @@ namespace NW
 	private:
 		vertices m_vtxs;
 		indices m_idxs;
-		ui32 m_iter;
+		v1ui m_iter;
 	};
 }
 #endif	// NWG_GAPI
