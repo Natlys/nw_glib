@@ -2,7 +2,7 @@
 
 in VS_INFO{vec3 txr_crd;}psi;
 
-layout(location=0)out vec4 pso_pxl_clr_0;
+layout(location=0)out vec4 pso_pxl_clr;
 
 layout(location=0)uniform samplerCube cst_txr_idx;
 
@@ -12,5 +12,7 @@ void main()
 	
 	//if (txr_clr.r == 0.0f || txr_clr.g == 0.0f || txr_clr.b == 0.0f) { discard; }
 
-	pso_pxl_clr_0 = txr_clr;
+	txr_clr = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	pso_pxl_clr = txr_clr;
 }

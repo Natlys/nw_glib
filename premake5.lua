@@ -6,8 +6,8 @@ project("nw_gfx")
 	cppdialect("c++17")
 	targetdir(dir_out_res)
 	objdir(dir_out_int)
-	pchheader("nwgfx_pch.hpp")
-	pchsource("src_cpp/nwgfx_pch.cpp")
+	pchheader("nw_gfx_pch.hpp")
+	pchsource("src_cpp/nw_gfx_pch.cpp")
 	files{ "%{dir_cpp.own}**.c**", "%{dir_cpp.own}**.h**" }
 	includedirs{ "%{dir_cpp.own}", "%{dir_cpp.ext}", "%{dir_cpp.nw_lib}" }
 	libdirs{ "%{dir_lib.nw_lib}" }
