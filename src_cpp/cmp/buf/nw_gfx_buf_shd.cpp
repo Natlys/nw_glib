@@ -11,11 +11,6 @@ namespace NW
 		m_slot(NW_NULL)
 	{
 	}
-	gfx_buf_shd::gfx_buf_shd(layt_tc& layout, cv1u count, ptr_tc data) :
-		a_gfx_buf(layout, count, data),
-		m_slot(NW_NULL)
-	{
-	}
 	gfx_buf_shd::~gfx_buf_shd()
 	{
 	}
@@ -23,9 +18,9 @@ namespace NW
 	v1nil gfx_buf_shd::set_slot(cv1u slot) {
 		m_slot = slot;
 	}
-	v1nil gfx_buf_shd::set_data(cv1u key, ptr_tc data, cv1u count) {
-		a_gfx_buf::set_data(key, data, count);
-		glBufferSubData(GL_UNIFORM_BUFFER, get_stride() * key, get_stride() * count, get_data(get_stride() * key));
+	v1nil gfx_buf_shd::set_data(cv1u count, ptr_tc data, cv1u offset) {
+		a_gfx_buf::set_data(count, data, offset);
+		glBufferSubData(GL_UNIFORM_BUFFER, get_stride() * offset, get_stride() * count, get_data(get_stride() * offset));
 	}
 	// --==<core_methods>==--
 	v1bit gfx_buf_shd::remake()
@@ -40,7 +35,8 @@ namespace NW
 	v1nil gfx_buf_shd::on_draw()
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, get_handle());
-		glBindBufferRange(GL_UNIFORM_BUFFER, get_slot(), get_handle(), get_space_used(), get_space());
+		glBindBufferBase(GL_UNIFORM_BUFFER, get_slot(), get_handle());
+		//glBindBufferRange(GL_UNIFORM_BUFFER, get_slot(), get_handle(), NW_NULL, get_space());
 	}
 	// --==</core_methods>==--
 }
@@ -62,13 +58,13 @@ namespace NW
 	{
 	}
 	// --setters
-	v1nil gfx_buf_shd::set_slot(v1u bind_slot) {
+	void gfx_buf_shd::set_slot(v1u bind_slot) {
 		m_slot = bind_slot;
 	}
-	v1nil gfx_buf_shd::set_offset(size offset) {
+	void gfx_buf_shd::set_offset(size offset) {
 		m_offset = offset;
 	}
-	v1nil gfx_buf_shd::set_data_bytes(size nof_bytes, cptr buffer, size offset) {
+	void gfx_buf_shd::set_data_bytes(size nof_bytes, cptr buffer, size offset) {
 		D3D11_MAPPED_SUBRESOURCE msub_res{ 0 };
 		m_gfx->get_ctxh()->Map(m_handle, 0u, D3D11_MAP_WRITE_NO_OVERWRITE, 0u, &msub_res);
 		memcpy(static_cast<ubyte*>(msub_res.pData) + m_offset + offset, buffer, nof_bytes);
@@ -106,7 +102,7 @@ namespace NW
 		if (m_handle == NW_NULL) { throw init_error(__FILE__, __LINE__); return NW_FALSE; }
 		return NW_TRUE;
 	}
-	v1nil gfx_buf_shd::on_draw()
+	void gfx_buf_shd::on_draw()
 	{
 		m_gfx->get_ctxh()->VSSetConstantBuffers(m_slot, 1u, &m_handle);
 		m_gfx->get_ctxh()->PSSetConstantBuffers(m_slot, 1u, &m_handle);

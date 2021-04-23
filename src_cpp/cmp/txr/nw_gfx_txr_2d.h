@@ -23,9 +23,9 @@ namespace NW
 		virtual v1nil clear(ptr_tc data) override;
 		virtual v1nil on_draw() override;
 	public:
-#if (NW_GAPI & NW_GAPI_D3D)
+#	if (NW_GAPI & NW_GAPI_D3D)
 		ID3D11Texture2D* m_native;
-#endif
+#	endif
 	};
 	// gfx_txr_2d_multisample class
 	class NW_API gfx_txr_2d_mulsmp : public gfx_txr_2d
@@ -45,9 +45,9 @@ namespace NW
 		virtual v1nil on_draw() override;
 	private:
 		v1u m_samples;
-#if (NW_GAPI & NW_GAPI_D3D)
+#	if (NW_GAPI & NW_GAPI_D3D)
 		ID3D11Texture2D* m_native;
-#endif
+#	endif
 	};
 }
 #endif	// NW_GAPI

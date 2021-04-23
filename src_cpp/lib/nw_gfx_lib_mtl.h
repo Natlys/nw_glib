@@ -12,46 +12,46 @@ namespace NW
 {
 	// general
 	typedef GLuint(NW_API_ENTRYP pfn_gfx_mtl_crt)(GLvoid);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_del)(GLuint mtl_id);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_use)(GLuint mtl_id);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_attach_shd)(GLuint mtl_id, GLuint shd_id);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_detach_shd)(GLuint mtl_id, GLuint shd_id);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_link_shds)(GLuint mtl_id);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_del)(GLuint mtl_id);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_use)(GLuint mtl_id);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_attach_shd)(GLuint mtl_id, GLuint shd_id);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_detach_shd)(GLuint mtl_id, GLuint shd_id);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_link_shds)(GLuint mtl_id);
 	// getters
 	typedef GLint(NW_API_ENTRYP pfn_gfx_mtl_get_loc_atb)(GLuint mtl_id, const GLchar* atb_name);
 	typedef GLint(NW_API_ENTRYP pfn_gfx_mtl_get_loc_unf)(GLuint mtl_id, const GLchar* unf_name);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_get_iv)(GLuint shd_id, GLenum param_type, GLint* param_buf);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_get_info_log)(GLuint shd_id, GLsizei max_length, GLsizei* length, GLchar* info_log_buf);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_get_iv)(GLuint shd_id, GLenum param_type, GLint* param_buf);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_get_info_log)(GLuint shd_id, GLsizei max_length, GLsizei* length, GLchar* info_log_buf);
 	// uniforms
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_1si32)(GLint loc_idx, GLint val0);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_2si32)(GLint loc_idx, GLint val0, GLint val1);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_3si32)(GLint loc_idx, GLint val0, GLint val1, GLint val2);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_4si32)(GLint loc_idx, GLint val0, GLint val1, GLint val2, GLint val3);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v1s32)(GLint loc_idx, GLsizei count, const GLint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v2s32)(GLint loc_idx, GLsizei count, const GLint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v3s32)(GLint loc_idx, GLsizei count, const GLint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v4s32)(GLint loc_idx, GLsizei count, const GLint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_1ui32)(GLint loc_idx, GLuint val0);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_2ui32)(GLint loc_idx, GLuint val0, GLuint val1);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_3ui32)(GLint loc_idx, GLuint val0, GLuint val1, GLuint val2);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_4ui32)(GLint loc_idx, GLuint val0, GLuint val1, GLuint val2, GLuint val3);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v1u32)(GLint loc_idx, GLsizei count, const GLuint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v2u32)(GLint loc_idx, GLsizei count, const GLuint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v3u32)(GLint loc_idx, GLsizei count, const GLuint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v4u32)(GLint loc_idx, GLsizei count, const GLuint* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_1f32)(GLint loc_idx, GLfloat val0);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_2f32)(GLint loc_idx, GLfloat val0, GLfloat val1);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_3f32)(GLint loc_idx, GLfloat val0, GLfloat val1, GLfloat val2);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_4f32)(GLint loc_idx, GLfloat val0, GLfloat val1, GLfloat val2, GLfloat val3);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v1f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v2f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v3f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_v4f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_m2f32)(GLint loc_idx, GLsizei coiunt, GLboolean transpose, const GLfloat* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_m3f32)(GLint loc_idx, GLsizei count, GLboolean transpose, const GLfloat* val);
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unf_m4f32)(GLint loc_idx, GLsizei count, GLboolean transpose, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_1si32)(GLint loc_idx, GLint val0);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_2si32)(GLint loc_idx, GLint val0, GLint val1);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_3si32)(GLint loc_idx, GLint val0, GLint val1, GLint val2);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_4si32)(GLint loc_idx, GLint val0, GLint val1, GLint val2, GLint val3);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v1s32)(GLint loc_idx, GLsizei count, const GLint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v2s32)(GLint loc_idx, GLsizei count, const GLint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v3s32)(GLint loc_idx, GLsizei count, const GLint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v4s32)(GLint loc_idx, GLsizei count, const GLint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_1ui32)(GLint loc_idx, GLuint val0);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_2ui32)(GLint loc_idx, GLuint val0, GLuint val1);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_3ui32)(GLint loc_idx, GLuint val0, GLuint val1, GLuint val2);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_4ui32)(GLint loc_idx, GLuint val0, GLuint val1, GLuint val2, GLuint val3);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v1u32)(GLint loc_idx, GLsizei count, const GLuint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v2u32)(GLint loc_idx, GLsizei count, const GLuint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v3u32)(GLint loc_idx, GLsizei count, const GLuint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v4u32)(GLint loc_idx, GLsizei count, const GLuint* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_1f32)(GLint loc_idx, GLfloat val0);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_2f32)(GLint loc_idx, GLfloat val0, GLfloat val1);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_3f32)(GLint loc_idx, GLfloat val0, GLfloat val1, GLfloat val2);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_4f32)(GLint loc_idx, GLfloat val0, GLfloat val1, GLfloat val2, GLfloat val3);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v1f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v2f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v3f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_v4f32)(GLint loc_idx, GLsizei count, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_m2f32)(GLint loc_idx, GLsizei coiunt, GLboolean transpose, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_m3f32)(GLint loc_idx, GLsizei count, GLboolean transpose, const GLfloat* val);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unf_m4f32)(GLint loc_idx, GLsizei count, GLboolean transpose, const GLfloat* val);
 	// uniform blocks
-	typedef v1nil(NW_API_ENTRYP pfn_gfx_mtl_unfb_binding)(GLuint mtl_id, GLuint unf_block_idx, GLuint unf_block_binding);
+	typedef void (NW_API_ENTRYP pfn_gfx_mtl_unfb_binding)(GLuint mtl_id, GLuint unf_block_idx, GLuint unf_block_binding);
 }
 namespace NW
 {

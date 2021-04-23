@@ -10,12 +10,12 @@ namespace NW
 	class NW_API a_gfx_buf : public t_cmp<a_gfx_buf>, public a_gfx_cmp, public mem_buf
 	{
 	public:
-#if (NW_GAPI & NW_GAPI_OGL)
+#	if (NW_GAPI & NW_GAPI_OGL)
 		using handle_t = GLuint;
-#endif
-#if (NW_GAPI & NW_GAPI_D3D)
+#	endif
+#	if (NW_GAPI & NW_GAPI_D3D)
 		using handle_t = ID3D11Buffer*;
-#endif
+#	endif
 		using handle_tc = const handle_t;
 	public:
 		a_gfx_buf();

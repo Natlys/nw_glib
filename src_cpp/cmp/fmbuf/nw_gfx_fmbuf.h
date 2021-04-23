@@ -4,7 +4,6 @@
 #if (defined NW_GAPI)
 #	include "../nw_gfx_cmp.h"
 #	include "nw_gfx_fmbuf_part.h"
-#	include "mem/nw_mem_layt.h"
 namespace NW
 {
 	/// graphics_framebuffer class
@@ -55,7 +54,8 @@ namespace NW
 		virtual op_stream_t& operator<<(op_stream_t& stm) const override;
 		virtual ip_stream_t& operator>>(ip_stream_t& stm) override;
 		// --core_methods
-		v1bit remake(layt_tc& layout, cv2u size_xy);
+		v1bit remake();
+		inline v1bit remake(layt_tc& layt, cv2u size_xy) { set_layt(layt); set_size_xy(size_xy); return remake(); }
 		v1nil clear();
 		virtual v1nil on_draw() override;
 	protected:

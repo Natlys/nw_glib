@@ -6,9 +6,7 @@ namespace NW
 	a_gfx_cmp::a_gfx_cmp()
 	{
 	}
-	a_gfx_cmp::~a_gfx_cmp()
-	{
-	}
-	// --==<core_methods>==--
+	a_gfx_cmp::~a_gfx_cmp() { }
+	// --core_methods
 }
 #endif	// NW_GAPI

@@ -47,7 +47,7 @@ namespace NW
 	}
 	v1nil a_gfx_txr::clear(ptr_tc data)
 	{
-		glClearTexImage(get_handle(), 0, m_format, m_pxtype, data);
+		glClearTexImage(get_handle(), 0, get_format(), get_pxtype(), data);
 	}
 	v1nil a_gfx_txr::on_draw()
 	{

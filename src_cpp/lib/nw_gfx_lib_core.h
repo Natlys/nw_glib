@@ -28,6 +28,28 @@ namespace NW
 	typedef v1nil(NW_API_ENTRYP pfn_gfx_polygon_mode)(GLenum face, GLenum mode);
 	// other
 	typedef v1nil(NW_API_ENTRYP pfn_gfx_clear_error)(void);
+	typedef void (NW_API_ENTRYP pfn_gfx_get_int_v)(GLenum info, GLint* param);
+	typedef const GLubyte* (NW_API_ENTRYP pfn_gfx_get_string)(GLenum info);
+	typedef GLenum (NW_API_ENTRYP pfn_gfx_get_error)(void);
+	// predicates
+	typedef GLboolean (NW_API_ENTRYP pfn_gfx_is_enabled)(GLenum what);
+	// drawing
+	typedef void (NW_API_ENTRYP pfn_gfx_draw_vtx)(GLenum primitive, GLint first, GLsizei count);
+	typedef void (NW_API_ENTRYP pfn_gfx_draw_idx)(GLenum primitive, GLsizei count, GLenum data_type, const GLvoid* index_data);
+	// configs
+	typedef void (NW_API_ENTRYP pfn_gfx_viewport)(GLint crd_x, GLint crd_y, GLsizei size_x, GLsizei size_y);
+	typedef void (NW_API_ENTRYP pfn_gfx_scissor)(GLint crd_x, GLint crd_y, GLsizei size_x, GLsizei size_y);
+	typedef void (NW_API_ENTRYP pfn_gfx_enable)(GLenum mode_to_enable);
+	typedef void (NW_API_ENTRYP pfn_gfx_disable)(GLenum mode_to_disable);
+	typedef void (NW_API_ENTRYP pfn_gfx_blend_equation)(GLenum blend_mode);
+	typedef void (NW_API_ENTRYP pfn_gfx_blend_equation_separate)(GLenum blend_mode_rgb, GLenum blend_mode_alpha);
+	typedef void (NW_API_ENTRYP pfn_gfx_blend_function)(GLenum src_factor, GLenum dest_factor);
+	typedef void (NW_API_ENTRYP pfn_gfx_blend_function_separate)(GLenum src_factor_rgb, GLenum dest_factor_rgb, GLenum src_factor_alpha, GLenum dest_factor_alpha);
+	typedef void (NW_API_ENTRYP pfn_gfx_depth_mask)(GLboolean enable);
+	typedef void (NW_API_ENTRYP pfn_gfx_depth_func)(GLenum operation);
+	typedef void (NW_API_ENTRYP pfn_gfx_polygon_mode)(GLenum face, GLenum mode);
+	// other
+	typedef void (NW_API_ENTRYP pfn_gfx_clear_error)(void);
 }
 namespace NW
 {

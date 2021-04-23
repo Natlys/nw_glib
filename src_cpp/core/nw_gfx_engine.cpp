@@ -59,10 +59,10 @@ namespace NW
 				sbuf_layt.add_node<m4f>("cst_model");
 				sbuf_layt.add_node<m4f>("cst_view");
 				sbuf_layt.add_node<m4f>("cst_proj");
-				NW_CHECK(sbuf_tform.get_ref<mem_buf>()->remake(sbuf_layt, 1u), "failed remake", throw init_error());
+				NW_CHECK(sbuf_tform.get_ref<mem_buf>()->remake(sbuf_layt, 1u), "failed remake", return NW_FALSE);
 				// vertex buffers
 				auto& vbuf_rect = cmp_sys::get().new_ref<gfx_buf_vtx>();
-				NW_CHECK(vbuf_rect.get_ref<mem_buf>()->remake(layt_rect, 4u, vtx_quad_2f), "failed remake!", throw init_error());
+				NW_CHECK(vbuf_rect.get_ref<mem_buf>()->remake(layt_rect, 4u, vtx_quad_2f), "failed remake!", return NW_FALSE);
 				// index buffers
 				// layouts again
 				NW_CHECK(layt_rect->remake(), "failed remake!", throw init_error());
@@ -225,8 +225,13 @@ namespace NW
 		m_ent_reg.clear();
 		m_cmp_reg.clear();
 	}
+<<<<<<< HEAD
 	// --setters
 	v1nil gfx_engine::set_fmbuf_size(v1u size_x, v1u size_y) {
+=======
+	// -- setters
+	v1nil gfx_engine::set_fbuf_size(v1u size_x, v1u size_y) {
+>>>>>>> 5ec48b78bf51cdaf84eb36840c5ed9ec4bcddd88
 		if (m_draw_target != NW_NW_NULL) { m_draw_target->Release(); m_draw_target = NW_NW_NULL; }
 		
 		m_ctxh->OMSetRenderTargets(0u, NW_NW_NULL, NW_NW_NULL);
@@ -282,6 +287,7 @@ namespace NW
 		m_ctxh->IASetPrimitiveTopology(convert<primitives, D3D11_PRIMITIVE_TOPOLOGY>(primitive));
 	}
 	// --==<core_methods>==--
+<<<<<<< HEAD
 	v1bit gfx_engine::init()
 	{
 		if constexpr (NW_TRUE) {
@@ -296,6 +302,19 @@ namespace NW
 		return NW_TRUE;
 	}
 	v1bit gfx_engine::quit()
+=======
+	v1nil gfx_engine::update()
+	{
+		HRESULT h_result;
+		if ((h_result = m_swap_chain->Present(m_swap_delay, 0u)) != S_OK) { throw(run_error("something went wrong")); return; }
+		m_ctxh->ClearRenderTargetView(m_draw_target, &m_clear_color[0]);
+	}
+	v1nil gfx_engine::draw_vtx(gfx_buf_vtx* buffer)
+	{
+		m_ctxh->Draw(buffer->get_count(), buffer->get_offset() / buffer->get_stride());
+	}
+	v1nil gfx_engine::draw_vtx(v1u buffer_id)
+>>>>>>> 5ec48b78bf51cdaf84eb36840c5ed9ec4bcddd88
 	{
 		if constexpr (NW_TRUE) {
 			if (m_libh == NW_NULL) { return NW_FALSE; }
@@ -310,13 +329,21 @@ namespace NW
 		}
 		return NW_TRUE;
 	}
+<<<<<<< HEAD
 	v1nil gfx_engine::update()
+=======
+	v1nil gfx_engine::draw_idx(gfx_buf_idx* buffer)
+>>>>>>> 5ec48b78bf51cdaf84eb36840c5ed9ec4bcddd88
 	{
 		HRESULT h_result;
 		if ((h_result = m_swap_chain->Present(m_swap_delay, 0u)) != S_OK) { throw(run_error("something went wrong")); return; }
 		m_ctxh->ClearRenderTargetView(m_draw_target, &m_clear_color[0]);
 	}
+<<<<<<< HEAD
 	ptr_t gfx_engine::get_proc(cstr_t name)
+=======
+	v1nil gfx_engine::draw_idx(v1u buffer_id)
+>>>>>>> 5ec48b78bf51cdaf84eb36840c5ed9ec4bcddd88
 	{
 		ptr_t resource = NW_NULL;
 		if (resource == NW_NULL) {

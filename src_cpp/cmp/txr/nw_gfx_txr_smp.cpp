@@ -1,10 +1,10 @@
 #include "nw_gfx_pch.hpp"
 #include "nw_gfx_txr_smp.h"
 #if (defined NW_GAPI)
-#	include "core/nw_gfx_engine.h"
-#	include "lib/nw_gfx_lib_smp.h"
-#	include "lib/nw_gfx_lib_txr.h"
-#	if (NW_GAPI & NW_GAPI_OGL)
+#include "core/nw_gfx_engine.h"
+#include "lib/nw_gfx_lib_smp.h"
+#include "lib/nw_gfx_lib_txr.h"
+#if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	gfx_txr_smp::gfx_txr_smp() :
@@ -33,9 +33,7 @@ namespace NW
 	// --==<core_methods>==--
 	v1bit gfx_txr_smp::remake()
 	{
-		if (m_handle != NW_NULL) { glDeleteSamplers(1, &m_handle); m_handle = NW_NULL; }
-
-		glGenSamplers(1, &m_handle);
+		glGenSamplers(1u, &m_handle);
 		glSamplerParameteri(get_handle(), GL_TEXTURE_MIN_FILTER, get_filter());
 		glSamplerParameteri(get_handle(), GL_TEXTURE_MAG_FILTER, get_filter());
 		glSamplerParameteri(get_handle(), GL_TEXTURE_WRAP_S, get_border());
@@ -51,8 +49,8 @@ namespace NW
 	}
 	// --==</core_methods>==--
 }
-#	endif	// GAPI_OGL
-#	if (NW_GAPI & NW_GAPI_D3D)
+#endif
+#if (NW_GAPI & NW_GAPI_D3D)
 namespace NW
 {
 	gfx_txr_smp::gfx_txr_smp(
@@ -72,7 +70,7 @@ namespace NW
 	}
 	gfx_txr_smp::~gfx_txr_smp() { if (m_handle != NW_NULL) { m_handle->Release(); m_handle = NW_NULL; } }
 	// --setters
-	v1nil gfx_txr_smp::set_slot(v1u slot) {
+	void gfx_txr_smp::set_slot(v1u slot) {
 		m_slot = slot;
 	}
 	// --==<core_methods>==--
@@ -102,7 +100,7 @@ namespace NW
 
 		return NW_TRUE;
 	}
-	v1nil gfx_txr_smp::on_draw()
+	void gfx_txr_smp::on_draw()
 	{
 		m_gfx->get_ctxh()->VSSetSamplers(m_slot, 1u, &m_handle);
 		m_gfx->get_ctxh()->PSSetSamplers(m_slot, 1u, &m_handle);
@@ -112,5 +110,5 @@ namespace NW
 	}
 	// --==</core_methods>==--
 }
-#	endif	// GAPI_D3D
+#endif
 #endif	// NW_GAPI

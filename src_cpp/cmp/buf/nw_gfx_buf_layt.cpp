@@ -89,7 +89,11 @@ namespace NW
 		if (m_handle == NW_NULL) { throw init_error(__FILE__, __LINE__); return NW_FALSE; }
 		return NW_TRUE;
 	}
+<<<<<<< HEAD
 	v1nil gfx_buf_layt::on_draw()
+=======
+	void gfx_buf_layt::on_draw()
+>>>>>>> 5ec48b78bf51cdaf84eb36840c5ed9ec4bcddd88
 	{
 		m_gfx->get_ctxh()->IASetInputLayout(m_handle);
 	}

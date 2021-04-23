@@ -2,7 +2,7 @@
 #define NW_GFX_VERTEX_SHADER_H
 #include "nw_gfx_core.hpp"
 #if (defined NW_GAPI)
-#include "nw_gfx_shd.h"
+#	include "nw_gfx_shd.h"
 namespace NW
 {
 	class NW_API gfx_shd_vtx : public a_gfx_shd
@@ -20,9 +20,9 @@ namespace NW
 		virtual v1bit remake() override;
 		virtual v1nil on_draw() override;
 	private:
-#if (NW_GAPI & NW_GAPI_D3D)
+#	if (NW_GAPI & NW_GAPI_D3D)
 		ID3D11VertexShader* m_native;
-#endif
+#	endif
 	};
 }
 #endif	// NW_GAPI

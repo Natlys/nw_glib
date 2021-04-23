@@ -24,6 +24,15 @@ namespace NW
 		using handle_tc = const handle_t;
 	public:
 		gfx_buf_layt();
+#if (NW_GAPI & NW_GAPI_OGL)
+		using handle_t = GLuint;
+#endif
+#if (NW_GAPI & NW_GAPI_D3D)
+		using handle_t = ID3D11InputLayout*;
+#endif
+		using handle_tc = const handle_t;
+	public:
+		gfx_buf_layt(gfx_engine& graphics);
 		virtual ~gfx_buf_layt();
 		// --getters
 		inline handle_t get_handle()        { return m_handle; }

@@ -11,22 +11,17 @@ namespace NW
 		a_gfx_buf()
 	{
 	}
-	gfx_buf_idx::gfx_buf_idx(layt_tc& layout, cv1u count, ptr_tc data) :
-		a_gfx_buf(layout, count, data)
-	{
-	}
 	gfx_buf_idx::~gfx_buf_idx()
 	{
 	}
 	// --setters
-	v1nil gfx_buf_idx::set_data(cv1u key, ptr_tc data, cv1u count) {
-		a_gfx_buf::set_data(key, data, count);
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, get_stride() * key, get_stride() * count, get_data(get_stride() * key));
+	v1nil gfx_buf_idx::set_data(cv1u count, ptr_tc data, cv1u offset) {
+		a_gfx_buf::set_data(count, data, offset);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, get_stride() * offset, get_stride() * count, get_data(get_stride() * offset));
 	}
 	// --==<core_methods>==--
 	v1bit gfx_buf_idx::remake() {
 		NW_CHECK(a_gfx_buf::remake(), "failed remake!", return NW_FALSE);
-		NW_CHECK(get_layt().has_vtype<v1u08>() || get_layt().has_vtype<v1u16>() || get_layt().has_vtype<v1u32>(), "type error!", return NW_FALSE);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_handle());
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, get_space(), get_data(), has_data() ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);

@@ -40,7 +40,7 @@ namespace NW
 			}
 			else if (word == "usemtl") { // material name is found;
 				stm >> word;
-				m_gmtl->set_name(&word[0]);
+				// m_gmtl->set_name(&word[0]);
 			}
 			else if (word[0] == 'v') { // vertex data processing;
 				if (word == "v") { // vertex coordinate;

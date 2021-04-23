@@ -10,17 +10,13 @@ namespace NW
 		a_gfx_buf()
 	{
 	}
-	gfx_buf_vtx::gfx_buf_vtx(layt_tc& layout, cv1u count, ptr_tc data) :
-		a_gfx_buf(layout, count, data)
-	{
-	}
 	gfx_buf_vtx::~gfx_buf_vtx()
 	{ 
 	}
 	// --setters
-	v1nil gfx_buf_vtx::set_data(cv1u key, ptr_tc data, cv1u count) {
-		a_gfx_buf::set_data(key, data, count);
-		glBufferSubData(GL_ARRAY_BUFFER, get_stride() * key, get_stride() * count, get_data(get_stride() * key));
+	v1nil gfx_buf_vtx::set_data(cv1u count, ptr_tc data, cv1u offset) {
+		a_gfx_buf::set_data(count, data, offset);
+		glBufferSubData(GL_ARRAY_BUFFER, get_stride() * offset, get_stride() * count, get_data(get_stride() * offset));
 	}
 	// --==<core_methods>==--
 	v1bit gfx_buf_vtx::remake()
@@ -55,7 +51,7 @@ namespace NW
 	{
 	}
 	// --setters
-	v1nil gfx_buf_vtx::set_data_bytes(size nof_bytes, cptr buffer, size offset) {
+	void gfx_buf_vtx::set_data_bytes(size nof_bytes, cptr buffer, size offset) {
 		D3D11_MAPPED_SUBRESOURCE msub_rsc{ 0 };
 		m_gfx->get_ctxh()->Map(m_handle, 0u, D3D11_MAP_WRITE_NO_OVERWRITE, 0u, &msub_rsc);
 		memcpy(static_cast<ubyte*>(msub_rsc.pData) + m_offset + offset, buffer, nof_bytes);
@@ -93,7 +89,7 @@ namespace NW
 		if (m_handle == NW_NULL) { throw init_error(__FILE__, __LINE__); return NW_FALSE; }
 		return NW_TRUE;
 	}
-	v1nil gfx_buf_vtx::on_draw()
+	void gfx_buf_vtx::on_draw()
 	{
 		m_gfx->get_ctxh()->IASetVertexBuffers(0, 1, &m_handle, reinterpret_cast<UINT*>(&m_stride), reinterpret_cast<UINT*>(&m_offset));
 	}

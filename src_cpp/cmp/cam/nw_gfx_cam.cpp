@@ -4,7 +4,6 @@
 namespace NW
 {
 	gfx_cam::gfx_cam() :
-		t_cmp(), a_gfx_cmp(),
 		m_fov(1.0f), m_ratio(16.0f / 9.0f),
 		m_near(0.01f), m_far(100.0f),
 		m_crd{ 0.0f, 0.0f, 1.0f }, m_rtn{ 0.0f, 0.0f, 0.0f },
@@ -38,7 +37,7 @@ namespace NW
 	v1nil gfx_cam::set_rtn(cv3f& rotation) {
 		m_rtn = rotation;
 	}
-	v1nil gfx_cam::set_mode(mode_tc mode) {
+	v1nil gfx_cam::set_mode(mode_t mode) {
 		m_mode = mode;
 		switch (mode) {
 		case NW_CAMERA_2D: {
@@ -108,44 +107,45 @@ namespace NW
 {
 	gfx_cam_lad::gfx_cam_lad() :
 		gfx_cam(),
+		m_zoom_speed(-100.0f),
+		m_move_speed(-4.0f),
 		m_rtn_speed(-180.0f),
-		m_rtn_limit{ 89.0f, 180.0f, 180.0f },
-		m_zoom_speed(-100.0f), m_move_speed(-4.0f)
+		m_rtn_limit{ 89.0f, 180.0f, 180.0f }
 	{
 	}
 	// --==<core_methods>==--
-	v1nil gfx_cam_lad::on_draw(keybod_tc* keybod, cursor_tc* cursor, timer_tc* timer)
+	v1nil gfx_cam_lad::on_draw(keybod_tc* keyboard, cursor_tc* cursor, timer_tc* timer)
 	{
-		on_draw();
+		gfx_cam::on_draw();
 		if (timer == NW_NULL) { return; }
-		if (keybod != NW_NULL) {
+		if (keyboard != NW_NULL) {
 			v1f move_delta = timer->get_delta(m_move_speed);
 			// movement
 			switch (m_mode) {
 			case NW_CAMERA_2D:
-				if (keybod->is_held(NW_KEYCODE_W)) { m_crd[1] += move_delta; }
-				if (keybod->is_held(NW_KEYCODE_S)) { m_crd[1] -= move_delta; }
-				if (keybod->is_held(NW_KEYCODE_D)) { m_crd[0] += move_delta; }
-				if (keybod->is_held(NW_KEYCODE_A)) { m_crd[0] -= move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_W)) { m_crd[1] += move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_S)) { m_crd[1] -= move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_D)) { m_crd[0] += move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_A)) { m_crd[0] -= move_delta; }
 				break;
 			case NW_CAMERA_3D:
-				if (keybod->is_held(NW_KEYCODE_W)) { m_crd += v3f::make_norm(v3f{ m_front[0], 0.0f, m_front[2] }) * move_delta; }
-				if (keybod->is_held(NW_KEYCODE_S)) { m_crd -= v3f::make_norm(v3f{ m_front[0], 0.0f, m_front[2] }) * move_delta; }
-				if (keybod->is_held(NW_KEYCODE_D)) { m_crd += m_right * move_delta; }
-				if (keybod->is_held(NW_KEYCODE_A)) { m_crd -= m_right * move_delta; }
-				if (keybod->is_held(NW_KEYCODE_SPACE)) { m_crd[1] += move_delta; }
-				if (keybod->is_held(NW_KEYCODE_SHIFT)) { m_crd[1] -= move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_W)) { m_crd += (v3f{ m_front[0], 0.0f, m_front[2] }) * move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_S)) { m_crd -= (v3f{ m_front[0], 0.0f, m_front[2] }) * move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_D)) { m_crd += m_right * move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_A)) { m_crd -= m_right * move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_SPACE)) { m_crd[1] += move_delta; }
+				if (keyboard->is_held(NW_KEYCODE_SHIFT)) { m_crd[1] -= move_delta; }
 				break;
 			}
 			// configuration
-			if (keybod->is_held(NW_KEYCODE_C)) {
-				if (keybod->is_press(NW_KEYCODE_1)) {
+			if (keyboard->is_held(NW_KEYCODE_C)) {
+				if (keyboard->is_press(NW_KEYCODE_1)) {
 					set_mode(NW_CAMERA_2D);
 					m_crd = v3f{ 0.0f, 0.0f, 0.0f };
 					m_rtn = v3f{ 0.0f, 0.0f, 0.0f };
 				}
-				if (keybod->is_press(NW_KEYCODE_2)) { set_mode(NW_CAMERA_2D); }
-				if (keybod->is_press(NW_KEYCODE_3)) { set_mode(NW_CAMERA_3D); }
+				if (keyboard->is_press(NW_KEYCODE_2)) { set_mode(NW_CAMERA_2D); }
+				if (keyboard->is_press(NW_KEYCODE_3)) { set_mode(NW_CAMERA_3D); }
 			}
 		}
 		if (cursor != NW_NULL) {
@@ -176,16 +176,12 @@ namespace NW
 				break;
 			}
 			// panning
-			if (cursor->is_held(NW_CURCODE_MIDL)) {
+			if (cursor->is_held(NW_CURCODE_2)) {
 				v1f move_delta = timer->get_delta(m_move_speed);
 				m_crd[0] -= cursor->get_move_delta_x() * move_delta * m_fov;
 				m_crd[1] += cursor->get_move_delta_y() * move_delta * m_fov;
 			}
 		}
-	}
-	v1nil gfx_cam_lad::on_draw()
-	{
-		gfx_cam::on_draw();
 	}
 	// --==</core_methods>==--
 }

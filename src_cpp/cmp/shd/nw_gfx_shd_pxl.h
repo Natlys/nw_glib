@@ -9,7 +9,7 @@ namespace NW
 	{
 	public:
 		gfx_shd_pxl();
-		gfx_shd_pxl(source_tc& source_code);
+		gfx_shd_pxl(source_tc& source);
 		~gfx_shd_pxl();
 		// --getters
 		// --setters
@@ -20,9 +20,9 @@ namespace NW
 		virtual v1bit remake() override;
 		virtual v1nil on_draw() override;
 	private:
-#if (NW_GAPI & NW_GAPI_D3D)
+#	if (NW_GAPI & NW_GAPI_D3D)
 		ID3D11PixelShader* m_native;
-#endif
+#	endif
 	};
 }
 #endif	// NW_GAPI

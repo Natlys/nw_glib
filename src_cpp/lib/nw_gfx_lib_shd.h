@@ -2,7 +2,7 @@
 #define NW_GFX_LIB_SHADER_H
 #include "nw_gfx_core.hpp"
 #if (defined NW_GAPI)
-#include "nw_gfx_lib_core.h"
+#	include "nw_gfx_lib_core.h"
 #	if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {

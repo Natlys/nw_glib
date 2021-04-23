@@ -11,32 +11,30 @@ namespace NW
 		a_gfx_shd()
 	{
 	}
-	gfx_shd_pxl::gfx_shd_pxl(source_tc& source_code) :
-		a_gfx_shd(source_code)
+	gfx_shd_pxl::gfx_shd_pxl(source_tc& source) :
+		a_gfx_shd(source)
 	{
 	}
 	gfx_shd_pxl::~gfx_shd_pxl() { }
 	// --setters
 	// --operators
 	op_stream_t& gfx_shd_pxl::operator<<(op_stream_t& stm) const {
-		a_gfx_shd::operator<<(stm);
 		return stm;
 	}
 	ip_stream_t& gfx_shd_pxl::operator>>(ip_stream_t& stm) {
-		a_gfx_shd::operator>>(stm);
 		return stm;
 	}
 	// --==<core_methods>==--
-	v1bit gfx_shd_pxl::remake()
+	v1b gfx_shd_pxl::remake()
 	{
 		NW_CHECK(a_gfx_shd::remake(), "failed remake!", return NW_FALSE);
 		
 		m_handle = glCreateShader(GL_FRAGMENT_SHADER);
 		cstr_t final_code = &get_source()[0];
-		glShaderSource(get_handle(), 1, &final_code, NW_NULL);
+		glShaderSource(get_handle(), 1u, &final_code, NW_NULL);
 		glCompileShader(get_handle());
 
-		if (!gfx_check_shader(get_handle())) { return NW_FALSE; }
+		NW_CHECK(gfx_check_shader(get_handle()), "failed remake!", return NW_FALSE);
 
 		return NW_TRUE;
 	}
@@ -63,14 +61,14 @@ namespace NW
 	gfx_shd_pxl::~gfx_shd_pxl() { if (m_native != NW_NULL) { m_native->Release(); m_native = NW_NULL; } }
 	// --setters
 	// --operators
-	op_stream_t& gfx_shd_pxl::operator<<(op_stream_t& stm) const {
+	stm_out& gfx_shd_pxl::operator<<(stm_out& stm) const {
 		return stm;
 	}
-	ip_stream_t& gfx_shd_pxl::operator>>(ip_stream_t& stm) {
+	stm_in& gfx_shd_pxl::operator>>(stm_in& stm) {
 		return stm;
 	}
 	// --==<core_methods>==--
-	v1bit gfx_shd_pxl::remake(cstr source_code)
+	v1b gfx_shd_pxl::remake(cstr source_code)
 	{
 		if (m_native != NW_NULL) { m_native->Release(); m_native = NW_NULL; }
 		
@@ -98,7 +96,7 @@ namespace NW
 		
 		return NW_TRUE;
 	}
-	v1nil gfx_shd_pxl::on_draw()
+	void gfx_shd_pxl::on_draw()
 	{
 		a_gfx_shd::on_draw();
 

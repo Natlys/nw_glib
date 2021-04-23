@@ -6,23 +6,23 @@
 // vertex
 namespace NW
 {
-	static inline const v1f vtx_quad_2f[] = {
-		-1.0f,	-1.0f,	// lt-bt
-		-1.0f,	+1.0f,	// lt-tp
-		+1.0f,	+1.0f,	// rt-tp
-		+1.0f,	-1.0f,	// rt-bt
+	static inline v1f vtx_quad_2f[] = {
+		-1.0f,	-1.0f, // lt-bt
+		-1.0f,	+1.0f, // lt-tp
+		+1.0f,	+1.0f, // rt-tp
+		+1.0f,	-1.0f, // rt-bt
 	};
-	static inline const v1f vtx_quad_2f2f[] = {
-		-1.0f,	-1.0f,		0.00f,	0.00f,	// lt-bt
-		-1.0f,	+1.0f,		0.00f,	1.00f,	// lt-tp
-		+1.0f,	+1.0f,		1.00f,	1.00f,	// rt-tp
-		+1.0f,	-1.0f,		1.00f,	0.00f,	// rt-bt
+	static inline v1f vtx_quad_2f2f[] = {
+	-1.0f,	-1.0f,	0.00f,	0.00f,	// lt-bt
+	-1.0f,	+1.0f,	0.00f,	1.00f,	// lt-tp
+	+1.0f,	+1.0f,	1.00f,	1.00f,	// rt-tp
+	+1.0f,	-1.0f,	1.00f,	0.00f,	// rt-bt
 	};
 	static inline const v1f vtx_quad_3f2f3f[] = {
-		-0.5f,	-0.5f,	-0.0f,		0.00f,	0.00f,		+0.0f,	+0.0f,	-1.0f,
-		-0.5f,	+0.5f,	-0.0f,		0.00f,	1.00f,		+0.0f,	+0.0f,	-1.0f,
-		+0.5f,	+0.5f,	-0.0f,		1.00f,	1.00f,		+0.0f,	+0.0f,	-1.0f,
-		+0.5f,	-0.5f,	-0.0f,		1.00f,	0.00f,		+0.0f,	+0.0f,	-1.0f,
+		-0.5f,	-0.5f,	-0.0f,	0.00f,	0.00f,	+0.0f,	+0.0f,	-1.0f,
+		-0.5f,	+0.5f,	-0.0f,	0.00f,	1.00f,	+0.0f,	+0.0f,	-1.0f,
+		+0.5f,	+0.5f,	-0.0f,	1.00f,	1.00f,	+0.0f,	+0.0f,	-1.0f,
+		+0.5f,	-0.5f,	-0.0f,	1.00f,	0.00f,	+0.0f,	+0.0f,	-1.0f,
 	};
 	static inline const v1f vtx_cube_3f[] = {
 		// lt
@@ -31,62 +31,62 @@ namespace NW
 		-1.0f,  1.0f, -1.0f,
 		-1.0f,  1.0f,  1.0f,
 		// rt
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		// bt
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
 		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+		// tp
+		-1.0f,  1.0f, -1.0f,
 		 1.0f,  1.0f, -1.0f,
-		 // bt
-		 -1.0f, -1.0f, -1.0f,
-		 -1.0f, -1.0f,  1.0f,
-		  1.0f, -1.0f, -1.0f,
-		 -1.0f, -1.0f,  1.0f,
-		 // tp
-		 -1.0f,  1.0f, -1.0f,
-		  1.0f,  1.0f, -1.0f,
-		  1.0f,  1.0f,  1.0f,
-		 -1.0f,  1.0f,  1.0f,
-		 // bk
-		 -1.0f,  1.0f, -1.0f,
-		 -1.0f, -1.0f, -1.0f,
-		  1.0f, -1.0f, -1.0f,
-		  1.0f,  1.0f, -1.0f,
-		  // ft
-		  -1.0f, -1.0f,  1.0f,
-		  -1.0f,  1.0f,  1.0f,
-		   1.0f,  1.0f,  1.0f,
-		   1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		// bk
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		// ft
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
 	};
 	static inline const v1f vtx_cube_3f2f3f[] = {
 		// lt
-		-0.5f,	-0.5f,	-0.5f,		0.00f,	0.00f,		-1.0f,	+0.0f,	+0.0f,
-		-0.5f,	-0.5f,	+0.5f,		0.00f,	1.00f,		-1.0f,	+0.0f,	+0.0f,
-		-0.5f,	+0.5f,	+0.5f,		1.00f,	1.00f,		-1.0f,	+0.0f,	+0.0f,
-		-0.5f,	+0.5f,	-0.5f,		1.00f,	0.00f,		-1.0f,	+0.0f,	+0.0f,
+		-0.5f,	-0.5f,	-0.5f,	0.00f,	0.00f,	-1.0f,	+0.0f,	+0.0f,
+		-0.5f,	-0.5f,	+0.5f,	0.00f,	1.00f,	-1.0f,	+0.0f,	+0.0f,
+		-0.5f,	+0.5f,	+0.5f,	1.00f,	1.00f,	-1.0f,	+0.0f,	+0.0f,
+		-0.5f,	+0.5f,	-0.5f,	1.00f,	0.00f,	-1.0f,	+0.0f,	+0.0f,
 		// rt
-		+0.5f,	-0.5f,	-0.5f,		0.00f,	0.00f,		+1.0f,	+0.0f,	+0.0f,
-		+0.5f,	-0.5f,	+0.5f,		0.00f,	1.00f,		+1.0f,	+0.0f,	+0.0f,
-		+0.5f,	+0.5f,	+0.5f,		1.00f,	1.00f,		+1.0f,	+0.0f,	+0.0f,
-		+0.5f,	+0.5f,	-0.5f,		1.00f,	0.00f,		+1.0f,	+0.0f,	+0.0f,
+		+0.5f,	-0.5f,	-0.5f,	0.00f,	0.00f,	+1.0f,	+0.0f,	+0.0f,
+		+0.5f,	-0.5f,	+0.5f,	0.00f,	1.00f,	+1.0f,	+0.0f,	+0.0f,
+		+0.5f,	+0.5f,	+0.5f,	1.00f,	1.00f,	+1.0f,	+0.0f,	+0.0f,
+		+0.5f,	+0.5f,	-0.5f,	1.00f,	0.00f,	+1.0f,	+0.0f,	+0.0f,
 		// bt
-		-0.5f,	-0.5f,	-0.5f,		0.00f,	0.00f,		+0.0f,	-1.0f,	+0.0f,
-		-0.5f,	-0.5f,	+0.5f,		0.00f,	1.00f,		+0.0f,	-1.0f,	+0.0f,
-		+0.5f,	-0.5f,	+0.5f,		1.00f,	1.00f,		+0.0f,	-1.0f,	+0.0f,
-		+0.5f,	-0.5f,	-0.5f,		1.00f,	0.00f,		+0.0f,	-1.0f,	+0.0f,
+		-0.5f,	-0.5f,	-0.5f,	0.00f,	0.00f,	+0.0f,	-1.0f,	+0.0f,
+		-0.5f,	-0.5f,	+0.5f,	0.00f,	1.00f,	+0.0f,	-1.0f,	+0.0f,
+		+0.5f,	-0.5f,	+0.5f,	1.00f,	1.00f,	+0.0f,	-1.0f,	+0.0f,
+		+0.5f,	-0.5f,	-0.5f,	1.00f,	0.00f,	+0.0f,	-1.0f,	+0.0f,
 		// tp
-		-0.5f,	+0.5f,	-0.5f,		0.00f,	0.00f,		+0.0f,	+1.0f,	+0.0f,
-		-0.5f,	+0.5f,	+0.5f,		0.00f,	1.00f,		+0.0f,	+1.0f,	+0.0f,
-		+0.5f,	+0.5f,	+0.5f,		1.00f,	1.00f,		+0.0f,	+1.0f,	+0.0f,
-		+0.5f,	+0.5f,	-0.5f,		1.00f,	0.00f,		+0.0f,	+1.0f,	+0.0f,
+		-0.5f,	+0.5f,	-0.5f,	0.00f,	0.00f,	+0.0f,	+1.0f,	+0.0f,
+		-0.5f,	+0.5f,	+0.5f,	0.00f,	1.00f,	+0.0f,	+1.0f,	+0.0f,
+		+0.5f,	+0.5f,	+0.5f,	1.00f,	1.00f,	+0.0f,	+1.0f,	+0.0f,
+		+0.5f,	+0.5f,	-0.5f,	1.00f,	0.00f,	+0.0f,	+1.0f,	+0.0f,
 		// bk
-		-0.5f,	-0.5f,	-0.5f,		0.00f,	0.00f,		+0.0f,	+0.0f,	-1.0f,
-		-0.5f,	+0.5f,	-0.5f,		0.00f,	1.00f,		+0.0f,	+0.0f,	-1.0f,
-		+0.5f,	+0.5f,	-0.5f,		1.00f,	1.00f,		+0.0f,	+0.0f,	-1.0f,
-		+0.5f,	-0.5f,	-0.5f,		1.00f,	0.00f,		+0.0f,	+0.0f,	-1.0f,
+		-0.5f,	-0.5f,	-0.5f,	0.00f,	0.00f,	+0.0f,	+0.0f,	-1.0f,
+		-0.5f,	+0.5f,	-0.5f,	0.00f,	1.00f,	+0.0f,	+0.0f,	-1.0f,
+		+0.5f,	+0.5f,	-0.5f,	1.00f,	1.00f,	+0.0f,	+0.0f,	-1.0f,
+		+0.5f,	-0.5f,	-0.5f,	1.00f,	0.00f,	+0.0f,	+0.0f,	-1.0f,
 		// ft
-		-0.5f,	-0.5f,	+0.5f,		0.00f,	0.00f,		+0.0f,	+0.0f,	+1.0f,
-		-0.5f,	+0.5f,	+0.5f,		0.00f,	1.00f,		+0.0f,	+0.0f,	+1.0f,
-		+0.5f,	+0.5f,	+0.5f,		1.00f,	1.00f,		+0.0f,	+0.0f,	+1.0f,
-		+0.5f,	-0.5f,	+0.5f,		1.00f,	0.00f,		+0.0f,	+0.0f,	+1.0f,
+		-0.5f,	-0.5f,	+0.5f,	0.00f,	0.00f,	+0.0f,	+0.0f,	+1.0f,
+		-0.5f,	+0.5f,	+0.5f,	0.00f,	1.00f,	+0.0f,	+0.0f,	+1.0f,
+		+0.5f,	+0.5f,	+0.5f,	1.00f,	1.00f,	+0.0f,	+0.0f,	+1.0f,
+		+0.5f,	-0.5f,	+0.5f,	1.00f,	0.00f,	+0.0f,	+0.0f,	+1.0f,
 	};
 }
 // index
@@ -121,7 +121,7 @@ namespace NW
 }
 namespace NW
 {
-	static inline const ubyte_t txr_pixels[] = {
+	static inline const v1u08 txr_pixels[] = {
 		0u,		128u,	0u,		255u,
 		0u,		0u,		128u,	255u,
 		0u,		0u,		128u,	255u,
@@ -132,38 +132,7 @@ namespace NW
 namespace NW
 {
 #if (NW_GAPI & NW_GAPI_OGL)
-	static inline cstr_t shd_src_screen_vtx = R"(
-#version 460 core
-
-layout(location = 0)in vec2 vsi_vtx_crd;
-
-out VS_INFO{vec4 vtx_crd;vec2 txr_crd;}vso;
-
-void main()
-{
-	gl_Position = vec4(vsi_vtx_crd.xy, 0.0f, 1.0f);
-
-	vso.vtx_crd = gl_Position;
-	vso.txr_crd = vec2((vso.vtx_crd.x / 2.0f) + 0.5f, (vso.vtx_crd.y / 2.0f) + 0.5f);
-}
-)";
-	static inline cstr_t shd_src_screen_pxl = R"(
-#version 460 core
-
-in VS_INFO{vec4 vtx_crd;vec2 txr_crd;}psi;
-
-layout(location=0)out vec4 pso_pxl_clr_0;
-
-layout(location=0)uniform sampler2D cst_txr_idx;
-
-void main()
-{
-	vec4 pxl_screen = texture(cst_txr_idx, psi.txr_crd).rgba;
-
-	pso_pxl_clr_0 = pxl_screen;
-}
-)";
-	static inline cstr_t shd_src_3d_vtx = R"(
+	static inline const cstr_t shd_src_3d_vtx = R"(
 #version 460 core
 
 layout(location = 0)in vec3 vsi_vtx_crd;
@@ -189,7 +158,7 @@ void main()
 	vso.nrm_crd.z = clamp(vsi_nrm_crd.z, 0.3f, 0.5f);
 }
 )";
-	static inline cstr_t shd_src_3d_pxl = R"(
+	static inline const cstr_t shd_src_3d_pxl = R"(
 #version 460 core
 
 in VS_INFO{vec4 vtx_crd;vec2 txr_crd;vec3 nrm_crd;}psi;
@@ -198,18 +167,46 @@ layout(location=0)out vec4 pso_pxl_clr_0;
 
 layout(location=0)uniform sampler2D cst_txr_idx;
 
-vec2 voronoi_points[10];
-
 void main()
 {
 	vec4 txr_clr;
-
+	
 	txr_clr = texture(cst_txr_idx, psi.txr_crd).rgba;
 
 	//if (txr_clr.r == 0.0f || txr_clr.g == 0.0f || txr_clr.b == 0.0f) { discard; }
 	//txr_clr = vec4(normalize(psi.nrm_crd), 1.0f);
-	//txr_clr = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	txr_clr = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+	pso_pxl_clr_0 = txr_clr;
+}
+)";
+	static inline const cstr_t shd_src_screen_vtx = R"(
+#version 460 core
+
+layout(location = 0)in vec3 vsi_vtx_crd;
+
+out VS_INFO{vec4 vtx_crd;}vso;
+
+void main()
+{
+	gl_Position = vec4(vsi_vtx_crd.xyz, 1.0f);
+
+	vso.vtx_crd = gl_Position;
+	
+}
+)";
+	static inline const cstr_t shd_src_screen_pxl = R"(
+#version 460 core
+
+in VS_INFO{vec4 vtx_crd;}psi;
+
+layout(location=0)out vec4 pso_pxl_clr_0;
+
+void main()
+{
+	vec4 txr_clr;
+	
+	txr_clr = texture(cst_txr_idx, psi.vtx_crd.xy).rgba;
 
 	pso_pxl_clr_0 = txr_clr;
 }
@@ -261,5 +258,6 @@ float4 main(float4 vtx_crd : sv_position, float2 txr_crd : vso_txr_crd, float3 n
 )";
 #endif
 }
+
 #endif	// NW_GFX_GAPI
 #endif	// NW_GFX_DATA_H
