@@ -8,17 +8,17 @@ layout(std140)uniform obj_tform{mat4 obj_modl;};
 // oput;
 out VS_INFO{vec4 vtx_crd;vec2 txr_crd;vec3 nrm_crd;}vso;
 // functions;
+// // helpers;
+// // core;
 void main()
 {
 	gl_Position =
 		cam_proj *
 		cam_view *
-		obj_modl *
+		//obj_modl *
 		vec4(vsi_vtx_crd.xyz, 1.0f);
 
 	vso.vtx_crd = gl_Position;
 	vso.txr_crd = vsi_txr_crd;
-	vso.nrm_crd.x = clamp(vsi_nrm_crd.x, 0.1f, 0.5f);
-	vso.nrm_crd.y = clamp(vsi_nrm_crd.y, 0.2f, 0.5f);
-	vso.nrm_crd.z = clamp(vsi_nrm_crd.z, 0.3f, 0.5f);
+	vso.nrm_crd = vsi_nrm_crd;
 }

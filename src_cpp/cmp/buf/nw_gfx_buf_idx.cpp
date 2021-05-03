@@ -4,20 +4,28 @@
 #	include "../../core/nw_gfx_engine.h"
 #	include "../../lib/nw_gfx_lib_buf.h"
 #	include "../../lib/nw_gfx_lib_info.h"
-#if (NW_GAPI & NW_GAPI_OGL)
+#	if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
 	gfx_buf_idx::gfx_buf_idx() : gfx_buf() { }
-	gfx_buf_idx::gfx_buf_idx(layt_tc& layout, cv1u count, ptr_tc data) : gfx_buf(layout, count, data) { }
+	gfx_buf_idx::gfx_buf_idx(layt_tc& layout, size_t count) : gfx_buf_idx() { NW_CHECK(remake(layout, count), "remake error!", return); }
+	gfx_buf_idx::gfx_buf_idx(layt_tc& layout, size_t count, ptr_tc data) : gfx_buf_idx() { NW_CHECK(remake(layout, count, data), "remake error!", return); }
+	gfx_buf_idx::gfx_buf_idx(gibuf_tc& copy) : gfx_buf_idx() { operator=(copy); }
+	gfx_buf_idx::gfx_buf_idx(gibuf_t&& copy) : gfx_buf_idx() { operator=(copy); }
 	gfx_buf_idx::~gfx_buf_idx() { }
 	// --setters
-	gfx_buf_idx::buf_t& gfx_buf_idx::set_data(cv1u key, ptr_tc data, cv1u count) {
+	gfx_buf_idx::buf_t& gfx_buf_idx::set_data(size_t key, ptr_tc data, size_t count) {
 		gfx_buf::set_data(key, data, count);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_handle());
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, get_stride() * key, get_stride() * count, get_data(get_stride() * key));
 		return *this;
 	}
+	// --operators
+	op_stream_t& gfx_buf_idx::operator<<(op_stream_t& stm) const { gfx_buf::operator<<(stm); return stm; }
+	ip_stream_t& gfx_buf_idx::operator>>(ip_stream_t& stm) { gfx_buf::operator>>(stm); return stm; }
 	// --==<core_methods>==--
-	v1bit gfx_buf_idx::remake() {
+	v1bit gfx_buf_idx::remake()
+	{
 		NW_CHECK(gfx_buf::remake(), "remake error!", return NW_FALSE);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_handle());
@@ -28,12 +36,13 @@ namespace NW
 	}
 	v1nil gfx_buf_idx::on_draw()
 	{
+		gfx_buf::on_draw();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_handle());
 	}
 	// --==</core_methods>==--
 }
-#endif
-#if (NW_GAPI & NW_GAPI_D3D)
+#	endif	// GAPI_OGL
+#	if (NW_GAPI & NW_GAPI_D3D)
 namespace NW
 {
 	gfx_buf_idx::gfx_buf_idx(gfx_engine& graphics) :
@@ -93,5 +102,5 @@ namespace NW
 	}
 	// --==</core_methods>==--
 }
-#endif
+#	endif	// GAPI_D3D
 #endif	// NW_GAPI

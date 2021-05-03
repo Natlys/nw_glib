@@ -49,23 +49,6 @@ namespace NW
 		if constexpr (NW_TRUE) {
 			// buffers
 			if constexpr (NW_TRUE) {
-				// shader buffers
-				if constexpr (NW_TRUE) {
-					// cam_tform
-					if constexpr (NW_TRUE) {
-						auto& sbuf = cmp_sys::get().new_ref<gfx_buf_shd>().get_val<mem_buf>();
-						mem_layt layt;
-						layt.add_node<m4f>("cam_modl").add_node<m4f>("cam_view").add_node<m4f>("cam_proj");
-						NW_CHECK(sbuf.remake(layt, 1u), "failed remake", return NW_FALSE);
-					}
-					// obj_tform
-					if constexpr (NW_TRUE) {
-						auto& sbuf = cmp_sys::get().new_ref<gfx_buf_shd>().get_val<mem_buf>();
-						mem_layt layt;
-						layt.add_node<m4f>("obj_modl");
-						NW_CHECK(sbuf.remake(layt, 1u), "failed remake", return NW_FALSE);
-					}
-				}
 				// vertex layouts
 				if constexpr (NW_TRUE) {
 					// rectangle
@@ -95,15 +78,15 @@ namespace NW
 			}
 			// samplers
 			if constexpr (NW_TRUE) {
-				auto& smp_nearest = cmp_sys::get().new_ref<gfx_smp>(NW_GFX_FILTER_NEAREST, NW_GFX_WRAP_BORDER, get_rand<v1f, 4u>(0.0f, 1.0f));
+				auto& smp_nearest = cmp_sys::get().new_ref<gfx_smp>(NW_GFX_FILTER_NEAREST, NW_GFX_WRAP_BORDER, v4f::make_rand(0.0f, 1.0f));
 			}
 			// textures
 			if constexpr (NW_TRUE) {
 				auto& txr_noise = cmp_sys::get().new_ref<gfx_txr, gfx_txr_2d>();
 				txr_noise->set_layt(t_mem_layt<v4u08>("pixel"));
-				txr_noise->set_size_xyz(v3u{ 16u, 16u, 1u });
+				txr_noise->set_size(v3u{ 16u, 16u, 1u });
 				NW_CHECK(txr_noise->remake(), "remake error!", return NW_FALSE);
-				for (v1u itr = 0u; itr < txr_noise->get_size(); itr++) { (*txr_noise)[itr] = get_rand<v1u08, 4u>(0u, 255u); }
+				for (v1u itr = 0u; itr < txr_noise->get_size(); itr++) { (*txr_noise)[itr] = v4u08::make_rand(0u, 255u); }
 				NW_CHECK(txr_noise->remake(), "remake error!", return NW_FALSE);
 			}
 			// materials

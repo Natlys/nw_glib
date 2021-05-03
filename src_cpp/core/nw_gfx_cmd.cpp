@@ -10,6 +10,7 @@ namespace NW
 {
 	gfx_cmd::gfx_cmd() : a_mem_user(), m_type(NW_NULL), m_prim(NW_NULL), m_cmps(NW_NULL) { }
 	gfx_cmd::gfx_cmd(type_tc type, prim_tc prim) : gfx_cmd() { NW_CHECK(remake(type, prim), "remake error!", return); }
+	gfx_cmd::gfx_cmd(type_tc type, prim_tc prim, cmps_tc& cmps) : gfx_cmd() { NW_CHECK(remake(type, prim, cmps), "remake error!", return); }
 	gfx_cmd::gfx_cmd(type_tc type, prim_tc prim, cmp_list_tc& cmps) : gfx_cmd() { NW_CHECK(remake(type, prim, cmps), "remake error!", return); }
 	gfx_cmd::gfx_cmd(cmd_tc& copy) : gfx_cmd() { operator=(copy); }
 	gfx_cmd::gfx_cmd(cmd_t&& copy) : gfx_cmd() { operator=(copy); }
@@ -18,12 +19,13 @@ namespace NW
 	gfx_cmd::cmd_t& gfx_cmd::set_type(type_tc type) { m_type = type; return *this; }
 	gfx_cmd::cmd_t& gfx_cmd::set_prim(prim_tc prim) { m_prim = prim; return *this; }
 	gfx_cmd::cmd_t& gfx_cmd::set_cmps() { while (m_cmps != NW_NULL) { rmv_cmp(NW_NULL); } return *this; }
+	gfx_cmd::cmd_t& gfx_cmd::set_cmps(cmps_tc& cmps) { set_cmps(); cmps_t temp = cmps; while (temp) { add_cmp(temp->m_data); temp = temp->m_link; } return *this; }
 	gfx_cmd::cmd_t& gfx_cmd::set_cmps(cmp_list_tc& cmps) { set_cmps(); for (auto& icmp : cmps) { add_cmp(icmp); } return *this; }
 	gfx_cmd::cmd_t& gfx_cmd::add_cmp(cmp_tc* cmp) {
-		cmps_t next_head = new t_mem_link<cmp_t>();
-		next_head->m_link = m_cmps;
-		next_head->m_data = const_cast<cmp_t*>(cmp);
-		m_cmps = next_head;
+		cmps_t next = new t_mem_link<cmp_t>();
+		next->m_link = m_cmps;
+		next->m_data = const_cast<cmp_t*>(cmp);
+		m_cmps = next;
 		return *this;
 	}
 	gfx_cmd::cmd_t& gfx_cmd::rmv_cmp(size_tc key) {
@@ -34,26 +36,6 @@ namespace NW
 		return *this;
 	}
 	// --operators
-	gfx_cmd::cmd_t& gfx_cmd::operator=(cmd_tc& copy) {
-		set_cmps();
-		cmps_t temp = copy.get_cmps();
-		while (temp != NW_NULL) {
-			add_cmp(temp->m_data);
-			temp = temp->m_link;
-		}
-		NW_CHECK(remake(copy.get_type(), copy.get_prim()), "remake error!", return *this);
-		return *this;
-	}
-	gfx_cmd::cmd_t& gfx_cmd::operator=(cmd_t&& copy) {
-		set_cmps();
-		cmps_t temp = copy.get_cmps();
-		while (temp != NW_NULL) {
-			add_cmp(temp->m_data);
-			temp = temp->m_link;
-		}
-		NW_CHECK(remake(copy.get_type(), copy.get_prim()), "remake error!", return *this);
-		return *this;
-	}
 	// --==<core_methods>==--
 	v1bit gfx_cmd::remake()
 	{

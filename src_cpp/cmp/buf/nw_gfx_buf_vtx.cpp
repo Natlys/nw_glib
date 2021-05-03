@@ -7,14 +7,21 @@
 namespace NW
 {
 	gfx_buf_vtx::gfx_buf_vtx() : gfx_buf() { }
-	gfx_buf_vtx::gfx_buf_vtx(layt_tc& layout, cv1u count, ptr_tc data) : gfx_buf(layout, count, data) {}
+	gfx_buf_vtx::gfx_buf_vtx(layt_tc& layout, size_t count) : gfx_buf_vtx() { NW_CHECK(remake(layout, count), "remake error!", return); }
+	gfx_buf_vtx::gfx_buf_vtx(layt_tc& layout, size_t count, ptr_tc data) : gfx_buf_vtx() { NW_CHECK(remake(layout, count, data), "remake error!", return); }
+	gfx_buf_vtx::gfx_buf_vtx(gvbuf_tc& copy) : gfx_buf_vtx() { operator=(copy); }
+	gfx_buf_vtx::gfx_buf_vtx(gvbuf_t&& copy) : gfx_buf_vtx() { operator=(copy); }
 	gfx_buf_vtx::~gfx_buf_vtx() { }
 	// --setters
-	gfx_buf_vtx::buf_t& gfx_buf_vtx::set_data(cv1u key, ptr_tc data, cv1u count) {
+	gfx_buf_vtx::buf_t& gfx_buf_vtx::set_data(size_t key, ptr_tc data, size_t count) {
 		gfx_buf::set_data(key, data, count);
+		glBindBuffer(GL_ARRAY_BUFFER, get_handle());
 		glBufferSubData(GL_ARRAY_BUFFER, get_stride() * key, get_stride() * count, get_data(get_stride() * key));
 		return *this;
 	}
+	// --operators
+	op_stream_t& gfx_buf_vtx::operator<<(op_stream_t& stm) const { gfx_buf::operator<<(stm); return stm; }
+	ip_stream_t& gfx_buf_vtx::operator>>(ip_stream_t& stm) { gfx_buf::operator>>(stm); return stm; }
 	// --==<core_methods>==--
 	v1bit gfx_buf_vtx::remake()
 	{
@@ -28,6 +35,7 @@ namespace NW
 	}
 	v1nil gfx_buf_vtx::on_draw()
 	{
+		gfx_buf::on_draw();
 		glBindBuffer(GL_ARRAY_BUFFER, get_handle());
 	}
 	// --==</core_methods>==--

@@ -4,47 +4,17 @@
 #	include "nw_gfx_img_info.h"
 namespace NW
 {
-	gfx_img::gfx_img() : mem_buf(), m_size(NW_NULL) { }
-	gfx_img::gfx_img(img_tc& copy) : mem_buf(copy), m_size(copy.m_size) { }
-	gfx_img::gfx_img(img_t&& copy) : mem_buf(copy), m_size(copy.m_size) { }
+	gfx_img::gfx_img() : mem_buf(), m_size(1) { }
+	gfx_img::gfx_img(img_tc& copy) : gfx_img() { operator=(copy); }
+	gfx_img::gfx_img(img_t&& copy) : gfx_img() { operator=(copy); }
 	gfx_img::~gfx_img() {}
 	// --setters
-	v1nil gfx_img::set_size_x(cv1u size_x) {
-		m_size[0] = size_x;
-		mem_buf::set_count(get_size());
-	}
-	v1nil gfx_img::set_size_y(cv1u size_y) {
-		m_size[1] = size_y;
-		mem_buf::set_count(get_size());
-	}
-	v1nil gfx_img::set_size_xy(cv1u size_x, cv1u size_y) {
-		m_size[0] = size_x;
-		m_size[1] = size_y;
-		mem_buf::set_count(get_size());
-	}
-	v1nil gfx_img::set_size_xy(cv2u size_xy) {
-		m_size[0] = size_xy[0];
-		m_size[1] = size_xy[1];
-		mem_buf::set_count(get_size());
-	}
-	v1nil gfx_img::set_size_xyz(cv1u size_x, cv1u size_y, cv1u size_z) {
-		m_size[0] = size_x;
-		m_size[1] = size_y;
-		m_size[2] = size_z;
-		mem_buf::set_count(get_size());
-	}
-	v1nil gfx_img::set_size_xyz(cv3u size_xyz) {
-		m_size[0] = size_xyz[0];
-		m_size[1] = size_xyz[1];
-		m_size[2] = size_xyz[2];
-		mem_buf::set_count(get_size());
-	}
-	gfx_img::buf_t& gfx_img::set_data(cv1u key, ptr_tc data, cv1u count) {
-		mem_buf::set_data(key, data, count);
-		NW_CHECK(has_size(), "no size!", return *this);
-		remake();
-		return *this;
-	}
+	gfx_img::img_t& gfx_img::set_size(cv1u size) { m_size[0] = size; mem_buf::set_count(get_size()); return *this; }
+	gfx_img::img_t& gfx_img::set_size(cv1u size_x, cv1u size_y) { m_size[0] = size_x; m_size[1] = size_y; mem_buf::set_count(get_size()); return *this; }
+	gfx_img::img_t& gfx_img::set_size(cv2u size_xy) { m_size[0] = size_xy[0]; m_size[1] = size_xy[1]; mem_buf::set_count(get_size()); return *this; }
+	gfx_img::img_t& gfx_img::set_size(cv1u size_x, cv1u size_y, cv1u size_z) { m_size[0] = size_x; m_size[1] = size_y; m_size[2] = size_z; mem_buf::set_count(get_size()); return *this; }
+	gfx_img::img_t& gfx_img::set_size(cv3u size) { m_size[0] = size[0]; m_size[1] = size[1]; m_size[2] = size[2]; mem_buf::set_count(get_size()); return *this; }
+	gfx_img::buf_t& gfx_img::set_data(size_t key, ptr_tc data, size_t count) { mem_buf::set_data(key, data, count); NW_CHECK(has_size(), "no size!", return *this); remake(); return *this; }
 	// --operators
 	op_stream_t& gfx_img::operator<<(op_stream_t& stm) const {
 		// mem_buf::operator<<(stm);
@@ -80,7 +50,7 @@ namespace NW
 			img_bmp_info bmp;
 			stm >> bmp;
 			NW_CHECK(bmp.data_info.nof_pixel_bits >= 8u && bmp.data_info.nof_pixel_bits <= 32u, "format error!", return stm);
-			set_size_xy(NW_MATH_ABS(bmp.data_info.width), NW_MATH_ABS(bmp.data_info.height));
+			set_size(NW_NUM_ABS(bmp.data_info.width), NW_NUM_ABS(bmp.data_info.height));
 			v1s nof_channels = bmp.data_info.nof_pixel_bits;
 			m_layt = mem_layt("pixel", type_info::get_type<v4u08>());
 			NW_CHECK(mem_buf::remake(bmp.data_info.image_size / nof_channels, NW_NULL), "remake error!", return stm);
@@ -117,7 +87,6 @@ namespace NW
 	v1bit gfx_img::remake()
 	{
 		NW_CHECK(mem_buf::remake(), "remake error!", return NW_FALSE);
-		if (get_size() == NW_NULL) { set_size_xyz(get_count(), 1u, 1u); }
 		NW_CHECK(has_size(), "no size!", return NW_FALSE);
 		
 		return NW_TRUE;

@@ -7,18 +7,22 @@
 namespace NW
 {
 	gfx_buf_shd::gfx_buf_shd() : gfx_buf(), m_slot(NW_NULL) { }
-	gfx_buf_shd::gfx_buf_shd(layt_tc& layout, cv1u count, ptr_tc data) : gfx_buf(layout, count, data) { }
+	gfx_buf_shd::gfx_buf_shd(layt_tc& layout, size_t count) : gfx_buf_shd() { NW_CHECK(remake(layout, count), "remake error!", return); }
+	gfx_buf_shd::gfx_buf_shd(layt_tc& layout, size_t count, ptr_tc data) : gfx_buf_shd() { NW_CHECK(remake(layout, count, data), "remake error!", return); }
+	gfx_buf_shd::gfx_buf_shd(gsbuf_tc& copy) : gfx_buf_shd() { operator=(copy); }
+	gfx_buf_shd::gfx_buf_shd(gsbuf_t&& copy) : gfx_buf_shd() { operator=(copy); }
 	gfx_buf_shd::~gfx_buf_shd() { }
 	// --setters
-	gfx_buf_shd::gsbuf_t& gfx_buf_shd::set_slot(cv1u slot) {
-		m_slot = slot;
-		return *this;
-	}
-	gfx_buf_shd::buf_t& gfx_buf_shd::set_data(cv1u key, ptr_tc data, cv1u count) {
+	gfx_buf_shd::gsbuf_t& gfx_buf_shd::set_slot(cv1u slot) { m_slot = slot; return *this; }
+	gfx_buf_shd::buf_t& gfx_buf_shd::set_data(size_t key, ptr_tc data, size_t count) {
 		gfx_buf::set_data(key, data, count);
+		glBindBuffer(GL_UNIFORM_BUFFER, get_handle());
 		glBufferSubData(GL_UNIFORM_BUFFER, get_stride() * key, get_stride() * count, get_data(get_stride() * key));
 		return *this;
 	}
+	// --operators
+	op_stream_t& gfx_buf_shd::operator<<(op_stream_t& stm) const { gfx_buf::operator<<(stm); return stm; }
+	ip_stream_t& gfx_buf_shd::operator>>(ip_stream_t& stm) { gfx_buf::operator>>(stm); return stm; }
 	// --==<core_methods>==--
 	v1bit gfx_buf_shd::remake()
 	{
@@ -32,6 +36,7 @@ namespace NW
 	}
 	v1nil gfx_buf_shd::on_draw()
 	{
+		gfx_buf::on_draw();
 		glBindBuffer(GL_UNIFORM_BUFFER, get_handle());
 		glBindBufferBase(GL_UNIFORM_BUFFER, get_slot(), get_handle());
 	}

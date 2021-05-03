@@ -33,6 +33,7 @@ namespace NW
 	public:
 		gfx_cmd();
 		gfx_cmd(type_tc type, prim_tc prim);
+		gfx_cmd(type_tc type, prim_tc prim, cmps_tc& cmps);
 		gfx_cmd(type_tc type, prim_tc prim, cmp_list_tc& cmps);
 		gfx_cmd(cmd_tc& copy);
 		gfx_cmd(cmd_t&& copy);
@@ -42,15 +43,12 @@ namespace NW
 		inline prim_tc get_prim() const { return m_prim; }
 		inline cmps_t get_cmps()        { return m_cmps; }
 		inline cmps_tc get_cmps() const { return m_cmps; }
-		inline size_tc get_cmp_count() const {
-			size_t count(0u); cmps_t link(m_cmps);
-			while (link) { count++; link = link->m_link; }
-			return count;
-		}
+		inline size_tc get_cmp_count() const { size_t count(0u); cmps_t link(m_cmps); while (link) { count++; link = link->m_link; } return count; }
 		// --setters
 		cmd_t& set_type(type_tc type);
 		cmd_t& set_prim(prim_tc prim);
 		cmd_t& set_cmps();
+		cmd_t& set_cmps(cmps_tc& cmps);
 		cmd_t& set_cmps(cmp_list_tc& cmps);
 		cmd_t& add_cmp(cmp_tc* cmp);
 		cmd_t& rmv_cmp(size_tc key = 0u);
@@ -62,11 +60,12 @@ namespace NW
 		inline v1bit has_cmps() const           { return m_cmps != NW_NULL; }
 		inline v1bit has_cmp(size_tc key) const { return get_cmp_count() > key; }
 		// --operators
-		cmd_t& operator=(cmd_tc& copy);
-		cmd_t& operator=(cmd_t&& copy);
+		inline cmd_t& operator=(cmd_tc& copy) { NW_CHECK(remake(copy.get_type(), copy.get_prim(), copy.get_cmps()), "remake error!", return *this); return *this; }
+		inline cmd_t& operator=(cmd_t&& copy) { NW_CHECK(remake(copy.get_type(), copy.get_prim(), copy.get_cmps()), "remake error!", return *this); return *this; }
 		// --core_methods
 		v1bit remake();
 		inline v1bit remake(type_tc type, prim_tc prim) { set_type(type).set_prim(prim); return remake(); }
+		inline v1bit remake(type_tc type, prim_tc prim, cmps_tc& cmps) { set_type(type).set_prim(prim).set_cmps(cmps); return remake(); }
 		inline v1bit remake(type_tc type, prim_tc prim, cmp_list_tc& cmps) { set_type(type).set_prim(prim).set_cmps(cmps); return remake(); }
 		v1nil on_draw();
 	private:

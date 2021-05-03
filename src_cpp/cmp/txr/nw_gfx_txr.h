@@ -42,7 +42,6 @@ namespace NW
 		// --setters
 		txr_t& set_slot(cv1u slot);
 		// --predicates
-		inline v1bit has_slot(cv1u slot = NW_NULL) const { return m_slot == slot; }
 		// --operators
 		inline txr_t& operator=(txr_tc& copy) { gfx_img::operator=(copy); return *this; }
 		inline txr_t& operator=(txr_t&& copy) { gfx_img::operator=(copy); return *this; }

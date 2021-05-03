@@ -6,23 +6,17 @@
 #	if (NW_GAPI & NW_GAPI_OGL)
 namespace NW
 {
-	gfx_buf::gfx_buf() :
-		t_cmp(), a_gfx_cmp(),
-		m_handle(NW_NULL)
-	{
-	}
-	gfx_buf::gfx_buf(layt_tc& layout, cv1u count, ptr_tc data) :
-		gfx_buf()
-	{
-		NW_CHECK(mem_buf::remake(layout, count, data), "remake error!", return);
-	}
+	gfx_buf::gfx_buf() : t_cmp(), a_gfx_cmp(), m_handle(NW_NULL) { }
+	gfx_buf::gfx_buf(layt_tc& layout, size_t count) : gfx_buf() { NW_CHECK(mem_buf::remake(layout, count), "remake error!", return); }
+	gfx_buf::gfx_buf(layt_tc& layout, size_t count, ptr_tc data) : gfx_buf() { NW_CHECK(mem_buf::remake(layout, count, data), "remake error!", return); }
+	gfx_buf::gfx_buf(gbuf_tc& copy) : gfx_buf() { operator=(copy); }
+	gfx_buf::gfx_buf(gbuf_t&& copy) : gfx_buf() { operator=(copy); }
 	gfx_buf::~gfx_buf() { if (m_handle != NW_NULL) { glDeleteBuffers(1u, &m_handle); m_handle = NW_NULL; } }
 	// --setters
-	gfx_buf::buf_t& gfx_buf::set_data(cv1u count, ptr_tc data, cv1u offset) {
-		mem_buf::set_data(count, data, offset);
-		return *this;
-	}
+	gfx_buf::buf_t& gfx_buf::set_data(size_t key, ptr_tc data, size_t count) { mem_buf::set_data(key, data, count); return *this; }
 	// --operators
+	op_stream_t& gfx_buf::operator<<(op_stream_t& stm) const { mem_buf::operator<<(stm); return stm; }
+	ip_stream_t& gfx_buf::operator>>(ip_stream_t& stm) { mem_buf::operator>>(stm); return stm; }
 	// --==<core_methods>==--
 	v1bit gfx_buf::remake()
 	{
@@ -32,6 +26,7 @@ namespace NW
 
 		return NW_TRUE;
 	}
+	v1nil gfx_buf::on_draw() { }
 	// --==</core_methods>==--
 }
 #	endif	// GAPI_OGL

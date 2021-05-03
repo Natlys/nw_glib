@@ -40,15 +40,18 @@ namespace NW
 		for (v1u itr(0u); itr < ref.get_buf_count(); itr++) {
 			auto& ibuf = ref.get_buf(itr);
 			glUniformBlockBinding(m_handle, ibuf->get_handle(), ibuf->get_slot());
+			ibuf->set_slot(itr);
 			ibuf->on_draw();
 		}
 		for (v1u itr(0u); itr < ref.get_txr_count(); itr++) {
 			auto& itxr = ref.get_txr(itr);
 			glUniform1i(itr, itxr->get_slot());
+			itxr->set_slot(itr);
 			itxr->on_draw();
 		}
 		for (v1u itr(0u); itr < ref.get_smp_count(); itr++) {
 			auto& ismp = ref.get_smp(itr);
+			ismp->set_slot(itr);
 			ismp->on_draw();
 		}
 	}

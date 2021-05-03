@@ -16,14 +16,29 @@ namespace NW
 		using gsbuf_tc = const gsbuf_t;
 	public:
 		gfx_buf_shd();
-		gfx_buf_shd(layt_tc& layout, cv1u count, ptr_tc data = NW_NULL);
+		gfx_buf_shd(gsbuf_tc& copy);
+		gfx_buf_shd(gsbuf_t&& copy);
+		gfx_buf_shd(layt_tc& layout, size_t count);
+		gfx_buf_shd(layt_tc& layout, size_t count, ptr_tc data);
 		virtual ~gfx_buf_shd();
 		// --getters
 		inline cv1u get_slot() const { return m_slot; }
 		// --setters
 		gsbuf_t& set_slot(cv1u slot);
-		virtual buf_t& set_data(cv1u key, ptr_tc data, cv1u count) override;
+		inline gsbuf_t& set_data() { mem_buf::set_data(); return *this; }
+		inline gsbuf_t& set_data(ptr_tc data) { mem_buf::set_data(data); return *this; }
+		inline gsbuf_t& set_data(size_t key, ptr_tc data) { mem_buf::set_data(key, data); return *this; }
+		inline gsbuf_t& set_data(ptr_tc data, size_t count) { mem_buf::set_data(data, count); return *this; }
+		virtual buf_t& set_data(size_t key, ptr_tc data, size_t count) override;
+		// --predicates
+		// --operators
+		inline gsbuf_t& operator=(gsbuf_tc& copy) { NW_CHECK(remake(copy.get_layt(), copy.get_count(), copy.get_data()), "remake error!", return *this); return set_slot(copy.get_slot()); }
+		inline gsbuf_t& operator=(gsbuf_t&& copy) { NW_CHECK(remake(copy.get_layt(), copy.get_count(), copy.get_data()), "remake error!", return *this); return set_slot(copy.get_slot()); }
+		virtual op_stream_t& operator<<(op_stream_t& stm) const override;
+		virtual ip_stream_t& operator>>(ip_stream_t& stm) override;
 		// --core_methods
+		inline v1bit remake(layt_tc& layout, size_t count) { return gfx_buf::remake(layout, count); }
+		inline v1bit remake(layt_tc& layout, size_t count, ptr_tc data) { return gfx_buf::remake(layout, count, data); }
 		virtual v1bit remake() override;
 		virtual v1nil on_draw() override;
 	private:

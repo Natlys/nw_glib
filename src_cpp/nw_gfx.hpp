@@ -10,7 +10,9 @@
 
 #include "cmp/nw_gfx_cmp.h"
 
-#include "cmp/cam/nw_gfx_cam.h"
+#include "cmp/tform/nw_gfx_tform.h"
+#include "cmp/tform/nw_gfx_tform_obj.h"
+#include "cmp/tform/nw_gfx_tform_cam.h"
 
 #include "cmp/img/nw_gfx_img.h"
 

@@ -49,8 +49,9 @@ namespace NW
 	class NW_API stt_scis;
 	class NW_API stt_viewp;
 
-	class NW_API gfx_cam;
-	class NW_API gfx_cam_lad;
+	class NW_API gfx_tform;
+	class NW_API gfx_tform_obj;
+	class NW_API gfx_tform_cam;
 }
 // --==<configuration>==--
 // --==</configuration>==--
