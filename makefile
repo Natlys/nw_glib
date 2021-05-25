@@ -11,21 +11,30 @@ endif
 .PHONY: clean prebuild prelink
 
 ifeq ($(config),work_win64)
-  RESCOMP = windres
+  ifeq ($(origin CC), default)
+    CC = F:\dev\gcc\bin\gcc.exe
+  endif
+  ifeq ($(origin CXX), default)
+    CXX = F:\dev\gcc\bin\g++.exe
+  endif
+  ifeq ($(origin AR), default)
+    AR = ar
+  endif
+  RESCOMP = default
   TARGETDIR = bin_cxx
-  TARGET = $(TARGETDIR)/nc_gfx.lib
+  TARGET = $(TARGETDIR)/nc_gfx
   OBJDIR = bin_cxx/win64/work
-  DEFINES += -DDEBUG -DNC_DEBUG
-  INCLUDES += -I%(prj.name)/src_cxx
+  DEFINES +=
+  INCLUDES += -Isrc_cxx
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -ffloat-store -g -std=c99
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffloat-store -g
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -ffloat-store -g -w -std=c99 -fpermissive
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffloat-store -g -w -fpermissive
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../nc_lib/bin_cxx/nc_lib.lib
-  LDDEPS += ../nc_lib/bin_cxx/nc_lib.lib
-  ALL_LDFLAGS += $(LDFLAGS) -L../nc_lib -L../nc_cfg -L/usr/lib64 -m64
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+  LIBS += ../nc_cfg/bin_cxx/nc_cfg.lib ../nc_lib/bin_cxx/nc_lib.lib
+  LDDEPS += ../nc_cfg/bin_cxx/nc_cfg.lib ../nc_lib/bin_cxx/nc_lib.lib
+  ALL_LDFLAGS += $(LDFLAGS) -L../nc_cfg -L../nc_lib -L../nc_mem -L../nc_iop -L/usr/lib64 -m64
+  LINKCMD = $(CC) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -37,49 +46,31 @@ all: prebuild prelink $(TARGET)
 
 endif
 
-ifeq ($(config),test_win64)
-  RESCOMP = windres
+ifeq ($(config),game_win64)
+  ifeq ($(origin CC), default)
+    CC = F:\dev\gcc\bin\gcc.exe
+  endif
+  ifeq ($(origin CXX), default)
+    CXX = F:\dev\gcc\bin\g++.exe
+  endif
+  ifeq ($(origin AR), default)
+    AR = ar
+  endif
+  RESCOMP = default
   TARGETDIR = bin_cxx
-  TARGET = $(TARGETDIR)/nc_gfx.lib
-  OBJDIR = bin_cxx/win64/test
-  DEFINES += -DNDEBUG -DNC_NDEBUG
-  INCLUDES += -I%(prj.name)/src_cxx
+  TARGET = $(TARGETDIR)/nc_gfx
+  OBJDIR = bin_cxx/win64/game
+  DEFINES +=
+  INCLUDES += -Isrc_cxx
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -ffast-math -O2 -std=c99
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffast-math -O2
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -w -std=c99 -fpermissive
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -w -fpermissive
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../nc_lib/bin_cxx/nc_lib.lib
-  LDDEPS += ../nc_lib/bin_cxx/nc_lib.lib
-  ALL_LDFLAGS += $(LDFLAGS) -L../nc_lib -L../nc_cfg -L/usr/lib64 -m64 -s
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-ifeq ($(config),play_win64)
-  RESCOMP = windres
-  TARGETDIR = bin_cxx
-  TARGET = $(TARGETDIR)/nc_gfx.lib
-  OBJDIR = bin_cxx/win64/play
-  DEFINES += -DNDEBUG -DNC_NDEBUG
-  INCLUDES += -I%(prj.name)/src_cxx
-  FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -ffast-math -O3 -std=c99
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -ffast-math -O3
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../nc_lib/bin_cxx/nc_lib.lib
-  LDDEPS += ../nc_lib/bin_cxx/nc_lib.lib
-  ALL_LDFLAGS += $(LDFLAGS) -L../nc_lib -L../nc_cfg -L/usr/lib64 -m64 -s
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+  LIBS += ../nc_cfg/bin_cxx/nc_cfg.lib ../nc_lib/bin_cxx/nc_lib.lib
+  LDDEPS += ../nc_cfg/bin_cxx/nc_cfg.lib ../nc_lib/bin_cxx/nc_lib.lib
+  ALL_LDFLAGS += $(LDFLAGS) -L../nc_cfg -L../nc_lib -L../nc_mem -L../nc_iop -L/usr/lib64 -m64 -s
+  LINKCMD = $(CC) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -92,6 +83,8 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/nc_gfx_entry.o \
+	$(OBJDIR)/nc_gfx_pch.o \
 
 RESOURCES := \
 
@@ -150,6 +143,22 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
+$(OBJDIR)/nc_gfx_entry.o: src_cxx/nc_gfx_entry.cxx
+	@echo $(notdir $<)
+ifeq ($(config),work_win64)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+endif
+ifeq ($(config),game_win64)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+endif
+$(OBJDIR)/nc_gfx_pch.o: src_cxx/nc_gfx_pch.cxx
+	@echo $(notdir $<)
+ifeq ($(config),work_win64)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+endif
+ifeq ($(config),game_win64)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+endif
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))

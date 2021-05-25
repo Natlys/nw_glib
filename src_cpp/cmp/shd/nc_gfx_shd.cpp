@@ -1,8 +1,8 @@
 #include "nc_gfx_pch.hpp"
-#include "nc_gfx_shd.h"
+#include "nc_gfx_shd.hxx"
 #if (defined NC_GAPI)
-#	include "../../core/nc_nc_gfx_eng.h"
-#	include "../bind/nc_gfx_bind.h"
+#	include "../../core/nc_nc_gfx_eng.hxx"
+#	include "../bind/nc_gfx_bind.hxx"
 #	if (NC_GAPI & NC_GAPI_OGL)
 namespace NC
 {
@@ -11,16 +11,16 @@ namespace NC
 	gfx_shd_t::gfx_shd_t(shd_t&& copy) : gfx_shd_t() { operator=(copy); }
 	gfx_shd_t::gfx_shd_t(source_tc& source) : gfx_shd_t() { NC_CHECK(remake(source), "remake error!", return); }
 	gfx_shd_t::~gfx_shd_t() { if (m_handle != NC_NULL) { get_context()->shd_del(m_handle); m_handle = NC_NULL; } }
-	// setters //
+	/* setters */
 	gfx_shd_t::shd_t& gfx_shd_t::set_source(source_tc& source) { m_source = source; return *this; }
 	// operators //
-	op_stream_t& gfx_shd_t::operator<<(op_stream_t& stm) const {
+	nc_ostream_t& gfx_shd_t::operator<<(nc_ostream_t& stm) const {
 		return stm;
 	}
-	ip_stream_t& gfx_shd_t::operator>>(ip_stream_t& stm) {
+	nc_istream_t& gfx_shd_t::operator>>(nc_istream_t& stm) {
 		return stm;
 	}
-	// commands //
+	/* commands */
 	v1bit_t gfx_shd_t::remake()
 	{
 		if (m_handle != NC_NULL) { get_context()->shd_del(m_handle); m_handle = NC_NULL; }
@@ -66,7 +66,7 @@ namespace NC
 	{
 	}
 	gfx_shd_t::~gfx_shd_t() { if (m_handle != NC_NULL) { m_handle->Release(); m_handle = NC_NULL; } }
-	// setters //
+	/* setters */
 	v1nil_t gfx_shd_t::set_buf(buf& ref, v1u_t idx) {
 		if (idx >= NC_MAX_SLOTS_BUF) { throw run_error(__FILE__, __LINE__); }
 		if (m_bufs.size() <= idx + 1) { m_bufs.resize(idx + 1); }
@@ -77,7 +77,7 @@ namespace NC
 		if (m_txrs.size() <= idx + 1) { m_txrs.resize(idx + 1); }
 		m_txrs[idx] = ref;
 	}
-	// commands //
+	/* commands */
 	v1bit_t gfx_shd_t::remake(cstr source_code)
 	{
 		if (m_handle != NC_NULL) { m_handle->Release(); m_handle = NC_NULL; }

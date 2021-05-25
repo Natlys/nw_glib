@@ -1,18 +1,18 @@
 #include "nc_gfx_pch.hpp"
-#include "nc_gfx_txr_3d.h"
+#include "nc_gfx_txr_3d.hxx"
 #if (defined NC_GAPI)
-#	include "../../core/nc_nc_gfx_eng.h"
-#	include "../../lib/nc_gfx_lib_info.h"
+#	include "../../core/nc_nc_gfx_eng.hxx"
+#	include "../../lib/nc_gfx_lib_info.hxx"
 #	if (NC_GAPI & NC_GAPI_OGL)
 namespace NC
 {
 	gfx_txr3d_cube_t::gfx_txr3d_cube_t() : gfx_txr_t() { }
 	gfx_txr3d_cube_t::~gfx_txr3d_cube_t() { }
-	// setters //
+	/* setters */
 	// operators //
-	op_stream_t& gfx_txr3d_cube_t::operator<<(op_stream_t& stm) const { return stm; }
-	ip_stream_t& gfx_txr3d_cube_t::operator>>(ip_stream_t& stm) { return stm; }
-	// commands //
+	nc_ostream_t& gfx_txr3d_cube_t::operator<<(nc_ostream_t& stm) const { return stm; }
+	nc_istream_t& gfx_txr3d_cube_t::operator>>(nc_istream_t& stm) { return stm; }
+	/* commands */
 	v1bit_t gfx_txr3d_cube_t::remake()
 	{
 		NC_CHECK(gfx_txr_t::remake(), "remake error!", return NC_FALSE);
@@ -61,7 +61,7 @@ namespace NC
 	{
 	}
 	gfx_txr3d_cube_t::~gfx_txr3d_cube_t() { if (m_native != NC_NULL) { m_native->Release(); m_native = NC_NULL; } }
-	// setters //
+	/* setters */
 	// operators //
 	stm_out& gfx_txr3d_cube_t::operator<<(stm_out& stm) const {
 		return stm;
@@ -69,7 +69,7 @@ namespace NC
 	stm_in& gfx_txr3d_cube_t::operator>>(stm_in& stm) {
 		return stm;
 	}
-	// commands //
+	/* commands */
 	v1bit_t gfx_txr3d_cube_t::remake(const gfx_img_t& img)
 	{
 		if (m_native != NC_NULL) { m_native->Release(); m_native = NC_NULL; }
